@@ -1,0 +1,49 @@
+﻿@model UCG.Models.TbMiembroJuntaDirectiva
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TbMiembroJuntaDirectiva</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdMiembrosJuntaDirectiva" />
+            <div class="form-group">
+                <label asp-for="IdJuntaDirectiva" class="control-label"></label>
+                <select asp-for="IdJuntaDirectiva" class="form-control" asp-items="ViewBag.IdJuntaDirectiva"></select>
+                <span asp-validation-for="IdJuntaDirectiva" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdAsociado" class="control-label"></label>
+                <select asp-for="IdAsociado" class="form-control" asp-items="ViewBag.IdAsociado"></select>
+                <span asp-validation-for="IdAsociado" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdPuesto" class="control-label"></label>
+                <select asp-for="IdPuesto" class="form-control" asp-items="ViewBag.IdPuesto"></select>
+                <span asp-validation-for="IdPuesto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Estado" class="control-label"></label>
+                <input asp-for="Estado" class="form-control" />
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

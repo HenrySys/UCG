@@ -1,0 +1,59 @@
+﻿@model IEnumerable<UCG.Models.TbAcuerdo>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NumeroAcuerdo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MontoAcuerdo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdActaNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumeroAcuerdo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MontoAcuerdo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdAcuerdo">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdAcuerdo">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdAcuerdo">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
