@@ -15,12 +15,12 @@ namespace UCG.Controllers
 {
     public class AccesoController : Controller
     {
-        private readonly UcgdbContext _appDBcontext;
+        private readonly UcgdbContext _context;
         private static Dictionary<string, int> _intentosPorUsuario = new Dictionary<string, int>();
         private readonly HashingService _hashingService;
         public AccesoController(UcgdbContext context, HashingService hashingService)
         {
-            _appDBcontext = context;
+            _context = context;
             _hashingService = hashingService;
 
         }
@@ -34,55 +34,43 @@ namespace UCG.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registrarse(UsuarioVM modelo)
+        public async Task<IActionResult> Registrarse(usuarioViewModel modelo)
         {
             if (modelo.Contraseña != modelo.ConfirmarContraseña)
             {
-                ViewData["Mensaje"] = "Las contraseñas no coinciden";
-                return View();
+                ModelState.AddModelError("Contraseña", "Las contraseñas no coinciden");
+                return View(modelo);
             }
 
-            TbUsuario usuario = new TbUsuario
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            var usuario = new TbUsuario
             {
                 NombreUsuario = modelo.NombreUsuario,
-                Contraseña = _hashingService.GenerateHash(modelo.Contraseña),
-                Rol= RolUsuario.Admin, //el rol 3 pertenece a usuario
+                Contraseña = _hashingService.GenerateHash(modelo.Contraseña), // Hashear la contraseña
+                Rol = RolUsuario.Admin, // Asigna el rol correcto
                 Correo = modelo.Correo,
                 Estado = EstadoUsuario.Activo
             };
 
-            if (ModelState.IsValid)
+            try
             {
-                var nombreUsuario = usuario.NombreUsuario;
-                var contraseña = usuario.Contraseña;
-                var idRol = usuario.Rol;
-                var correo = usuario.Correo;
-                var estado = usuario.Estado;
-
-                // Llamar al procedimiento almacenado usando MySqlConnector
-                var result = await _appDBcontext.Database.ExecuteSqlRawAsync(
-                    "CALL sp_insertar_usuario(@p_nombre_usuario, @p_contraseña, @p_rol, @p_correo, @p_estado)",
-                    new MySqlConnector.MySqlParameter("@p_nombre_usuario", nombreUsuario),
-                    new MySqlConnector.MySqlParameter("@p_contraseña", contraseña),
-                    new MySqlConnector.MySqlParameter("@p_rol", idRol),
-                    new MySqlConnector.MySqlParameter("@p_correo", correo),
-                    new MySqlConnector.MySqlParameter("@p_estado", estado)
-                );
-
-                // Verifica si la inserción fue exitosa (dependiendo del retorno de tu procedimiento)
-                if (result > 0) // Cambia esto según cómo tu procedimiento maneje la inserción
-                {
-                    return RedirectToAction("Login", "Acceso");
-                }
-                else
-                {
-                    ViewData["Mensaje"] = "Error al registrar al usuario.";
-                    return View();
-                }
+                _context.Add(usuario);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Login", "Acceso"); // Redirigir al login tras el registro exitoso
             }
-
-            return View();
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocurrió un error al registrar el usuario.");
+                // Loggear el error si es necesario
+                Console.WriteLine($"Error al registrar usuario: {ex.Message}");
+                return View(modelo);
+            }
         }
+
 
         [HttpGet]
         public IActionResult Login()
@@ -98,13 +86,13 @@ namespace UCG.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LogInVM modelo)
+        public async Task<IActionResult> Login(LoginViewModel modelo)
         {
             // Verifica si el modelo es válido
             if (ModelState.IsValid)
             {
                 // Busca al usuario por correo
-                TbUsuario? usuario_encontrado = await _appDBcontext.TbUsuarios
+                TbUsuario? usuario_encontrado = await _context.TbUsuarios
                     .FirstOrDefaultAsync(u => u.Correo == modelo.Correo);
 
                 // Verifica si se encontró el usuario
@@ -164,16 +152,6 @@ namespace UCG.Controllers
 
             return View(modelo);
         }
-
-
-
-
-
-
-
-
-
-
 
     }
 }
