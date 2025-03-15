@@ -1,0 +1,89 @@
+﻿
+.content {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0 8%;
+    margin-bottom: 5rem;
+    margin-top: 5rem;
+    border-radius: 6rem;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, 0.27);
+    padding-bottom: 4rem;
+}
+
+.content h2{
+    text-align: center;
+     padding-top:10%;
+     margin-bottom:60px;
+     font-weight:600;
+     position:relative;
+    
+
+}
+
+.rowA {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+    grid-gap:30px;
+    margin-bottom:4rem;
+
+}
+
+.function {
+    text-align: center;
+    padding: 25px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+    .function i {
+        font-size: 40px;
+        margin-bottom: 10px;
+        color: #f78f1e;
+    }
+
+.function h4{
+    font-weight: 600;
+    margin-bottom:8px;
+
+}
+
+    .function a i.fa-solid.fa-arrow-right {
+        font-size: 19px;
+        color:#000;
+    }
+
+        .function a i.fa-solid.fa-arrow-right:hover {
+            font-size: 19px;
+            color: #fff;
+        }
+
+.actionA {
+    background-color: #fff;
+    padding: 0.5rem 1rem 0.2rem 1rem;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+    .actionA:hover {
+        color: #fff;
+        background-color: #000;
+    }
+
+
+.function:hover {
+    background: #f78f1e;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+        .function:hover i {
+            color: #fff;
+        }

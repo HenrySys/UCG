@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using UCG.Models;
 using UCG.Services;
+using Rotativa.AspNetCore; // Importar Rotativa
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<UcgdbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ucgdbConnection")) // Detecta la versión automáticamente
     );
 });
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -45,12 +48,21 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.UseAuthentication();
 
+RotativaConfiguration.Setup("C:\\Users\\Israel\\OneDrive\\Documentos\\GitHub\\UCG\\UCG\\wwwroot\\");
 
 app.MapControllerRoute(
     name: "default",

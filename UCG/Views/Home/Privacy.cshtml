@@ -1,6 +1,40 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<head>
+    <link href="~/css/Admin.css" rel="stylesheet" asp-append-version="true" />
+</head>
 
-<p>Use this page to detail your site's privacy policy.</p>
+
+
+
+<div class="content">
+
+    <h2 class="title">Funciones de Administrador</h2>
+
+    <div class="rowA">
+
+
+        <div class="function">
+
+            <i class="fa-solid fa-circle-user"></i>
+            <h4>Usuarios</h4>
+            <p>Control de Usuarios</p>
+
+            <a class="actionA" asp-area="" asp-controller="TbUsuarios" asp-action="Index"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+
+        <div class="function">
+
+            <i class="fa-solid fa-newspaper"></i>
+            <h4>Asociaciones</h4>
+            <p>Control de Asociaciones</p>
+
+            <a class="actionA" asp-area="" asp-controller="TbAsociacions" asp-action="Index"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+
+    </div>
+
+</div>

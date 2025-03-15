@@ -24,4 +24,6 @@ public partial class TbProyecto
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
+
+    public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();
 }

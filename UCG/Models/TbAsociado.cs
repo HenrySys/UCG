@@ -23,9 +23,9 @@ public partial class TbAsociado
 
     public DateOnly FechaNacimiento { get; set; }
 
-    public string Sexo { get; set; } = null!;
+    public string? Sexo { get; set; }
 
-    public string EstadoCivil { get; set; } = null!;
+    public string? EstadoCivil { get; set; }
 
     public string Telefono { get; set; } = null!;
 
@@ -46,6 +46,8 @@ public partial class TbAsociado
     public virtual ICollection<TbCategoriaMovimiento> TbCategoriaMovimientos { get; } = new List<TbCategoriaMovimiento>();
 
     public virtual ICollection<TbMiembroJuntaDirectiva> TbMiembroJuntaDirectivas { get; } = new List<TbMiembroJuntaDirectiva>();
+
+    public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();
 
     public virtual ICollection<TbProyecto> TbProyectos { get; } = new List<TbProyecto>();
 }

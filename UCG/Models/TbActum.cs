@@ -9,8 +9,6 @@ public partial class TbActum
 
     public int? IdAsociacion { get; set; }
 
-    public int? IdAsociado { get; set; }
-
     public DateOnly FechaSesion { get; set; }
 
     public string? NumeroActa { get; set; }
@@ -20,6 +18,8 @@ public partial class TbActum
     public string? Estado { get; set; }
 
     public decimal? MontoTotalAcordado { get; set; }
+
+    public int? IdAsociado { get; set; }
 
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 

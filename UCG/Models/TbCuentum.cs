@@ -19,6 +19,10 @@ public partial class TbCuentum
 
     public string Estado { get; set; } = null!;
 
+    public int? IdAsociado { get; set; }
+
+    public string? Banco { get; set; }
+
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
     public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();

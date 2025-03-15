@@ -39,15 +39,23 @@ public partial class TbMovimiento
 
     public string Estado { get; set; } = null!;
 
+    public int? IdConcepto { get; set; }
+
     public virtual TbActum? IdActaNavigation { get; set; }
 
     public virtual TbAsociacion IdAsociacionNavigation { get; set; } = null!;
 
+    public virtual TbAsociado? IdAsociadoNavigation { get; set; }
+
     public virtual TbCategoriaMovimiento? IdCategoriaMovimientoNavigation { get; set; }
+
+    public virtual TbConceptoMovimiento? IdConceptoNavigation { get; set; }
 
     public virtual TbCuentum? IdCuentaNavigation { get; set; }
 
     public virtual TbProveedor? IdProveedorNavigation { get; set; }
+
+    public virtual TbProyecto? IdProyectoNavigation { get; set; }
 
     public virtual ICollection<TbDetalleMovimiento> TbDetalleMovimientos { get; } = new List<TbDetalleMovimiento>();
 }

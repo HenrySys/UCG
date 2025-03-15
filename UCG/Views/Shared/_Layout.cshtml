@@ -29,8 +29,52 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbClientes" asp-action="Index">Clientes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbUsuarios" asp-action="Create">Usuarios</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbUsuarios" asp-action="Index">Usuarios</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">Categoria Movimiento</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoMovimientoes" asp-action="Index">Concepto Movimiento</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbProveedors" asp-action="Index">Proveedor</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociadoes" asp-action="Index">Asociado</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociacions" asp-action="Index">Asociacion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbCuentums" asp-action="Index">Cuenta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbProyectoes" asp-action="Index">Proyecto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbDetalleMovimientoes" asp-action="Index">Detalle Movimiento</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbActums" asp-action="Index">Acta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbActaAsistenciums" asp-action="Index">Acta Asistencia</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAcuerdoes" asp-action="Index">Acuerdo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="TbMovimientoes" asp-action="Index">Movimientos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="AsociacionPdf" asp-action="Index">PDF Asociaciones
+
+                            </a>
+                        </li>
+
+
+
                     </ul>
 
                     @if (!(User.Identity?.IsAuthenticated ?? false))

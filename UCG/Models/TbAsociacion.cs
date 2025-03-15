@@ -43,6 +43,8 @@ public partial class TbAsociacion
 
     public virtual ICollection<TbCliente> TbClientes { get; } = new List<TbCliente>();
 
+    public virtual ICollection<TbConceptoMovimiento> TbConceptoMovimientos { get; } = new List<TbConceptoMovimiento>();
+
     public virtual ICollection<TbCuentum> TbCuenta { get; } = new List<TbCuentum>();
 
     public virtual TbJuntaDirectiva? TbJuntaDirectiva { get; set; }

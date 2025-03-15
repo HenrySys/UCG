@@ -29,6 +29,8 @@ public partial class UcgdbContext : DbContext
 
     public virtual DbSet<TbCliente> TbClientes { get; set; }
 
+    public virtual DbSet<TbConceptoMovimiento> TbConceptoMovimientos { get; set; }
+
     public virtual DbSet<TbCuentum> TbCuenta { get; set; }
 
     public virtual DbSet<TbDetalleMovimiento> TbDetalleMovimientos { get; set; }
@@ -47,7 +49,9 @@ public partial class UcgdbContext : DbContext
 
     public virtual DbSet<TbUsuario> TbUsuarios { get; set; }
 
-    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=localhost;database=ucgdb;uid=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.3.0-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,7 +84,7 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdAsociacion, "fk_tb_acta_tb_asociacion");
 
-            entity.HasIndex(e => e.IdAsociado, "fk_tb_acta_tb_asociado");
+            entity.HasIndex(e => e.IdAsociado, "fk_tb_cuenta_tb_miembro_junta_directiva_asociado");
 
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.Descripcion)
@@ -107,7 +111,7 @@ public partial class UcgdbContext : DbContext
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActa)
                 .HasForeignKey(d => d.IdAsociado)
                 .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("fk_tb_acta_tb_asociado");
+                .HasConstraintName("fk_tb_acta_tb_miembro_junta_directiva_asociado");
         });
 
         modelBuilder.Entity<TbAcuerdo>(entity =>
@@ -224,7 +228,7 @@ public partial class UcgdbContext : DbContext
                 .HasColumnType("enum('Activo','Inactivo')")
                 .HasColumnName("estado");
             entity.Property(e => e.EstadoCivil)
-                .HasMaxLength(30)
+                .HasColumnType("enum('Soltero(a)','Casado(a)','Divorciado(A)','Viudo(A)','Union libre')")
                 .HasColumnName("estado_civil");
             entity.Property(e => e.FechaNacimiento).HasColumnName("fecha_nacimiento");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
@@ -236,7 +240,7 @@ public partial class UcgdbContext : DbContext
                 .HasMaxLength(30)
                 .HasColumnName("nombre");
             entity.Property(e => e.Sexo)
-                .HasMaxLength(15)
+                .HasColumnType("enum('Masculino','Femenino','Otro')")
                 .HasColumnName("sexo");
             entity.Property(e => e.Telefono)
                 .HasMaxLength(25)
@@ -263,18 +267,18 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdAsociado, "fk_tb_categoria_movimiento_tb_asociado");
 
+            entity.HasIndex(e => e.IdConcepto, "fk_tb_categoria_movimiento_tb_concepto_movimiento");
+
             entity.Property(e => e.IdCategoriaMovimiento).HasColumnName("id_categoria_movimiento");
             entity.Property(e => e.DescripcionCategoria)
                 .HasMaxLength(100)
                 .HasColumnName("descripcion_categoria");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
+            entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
             entity.Property(e => e.NombreCategoria)
                 .HasMaxLength(100)
                 .HasColumnName("nombre_categoria");
-            entity.Property(e => e.TipoMovimiento)
-                .HasColumnType("enum('Ingreso','Egreso')")
-                .HasColumnName("tipoMovimiento");
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbCategoriaMovimientos)
                 .HasForeignKey(d => d.IdAsociacion)
@@ -285,6 +289,11 @@ public partial class UcgdbContext : DbContext
                 .HasForeignKey(d => d.IdAsociado)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tb_categoria_movimiento_tb_asociado");
+
+            entity.HasOne(d => d.IdConceptoNavigation).WithMany(p => p.TbCategoriaMovimientos)
+                .HasForeignKey(d => d.IdConcepto)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_tb_categoria_movimiento_tb_concepto_movimiento");
         });
 
         modelBuilder.Entity<TbCliente>(entity =>
@@ -329,6 +338,29 @@ public partial class UcgdbContext : DbContext
                 .HasConstraintName("fk_tb_cliente_tb_asociacion");
         });
 
+        modelBuilder.Entity<TbConceptoMovimiento>(entity =>
+        {
+            entity.HasKey(e => e.IdConceptoMovimiento).HasName("PRIMARY");
+
+            entity.ToTable("tb_concepto_movimiento");
+
+            entity.HasIndex(e => e.IdAsociacion, "fk_tb_concepto_movimiento_tb_asociacion");
+
+            entity.Property(e => e.IdConceptoMovimiento).HasColumnName("id_concepto_movimiento");
+            entity.Property(e => e.Concepto)
+                .HasMaxLength(100)
+                .HasColumnName("concepto");
+            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
+            entity.Property(e => e.TipoMovimiento)
+                .HasColumnType("enum('Ingreso','Egreso')")
+                .HasColumnName("tipoMovimiento");
+
+            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbConceptoMovimientos)
+                .HasForeignKey(d => d.IdAsociacion)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_concepto_movimiento_tb_asociacion");
+        });
+
         modelBuilder.Entity<TbCuentum>(entity =>
         {
             entity.HasKey(e => e.IdCuenta).HasName("PRIMARY");
@@ -340,11 +372,13 @@ public partial class UcgdbContext : DbContext
             entity.HasIndex(e => e.NumeroCuenta, "numero_cuenta").IsUnique();
 
             entity.Property(e => e.IdCuenta).HasColumnName("id_cuenta");
+            entity.Property(e => e.Banco).HasColumnType("enum('BN','BP','BCR','BAC')");
             entity.Property(e => e.Estado)
                 .HasDefaultValueSql("'Activo'")
                 .HasColumnType("enum('Activo','Inactivo')")
                 .HasColumnName("estado");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
+            entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
             entity.Property(e => e.NumeroCuenta).HasColumnName("numero_cuenta");
             entity.Property(e => e.Telefono)
                 .HasMaxLength(50)
@@ -477,11 +511,17 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdAsociacion, "fk_tb_movimiento_tb_asociacion");
 
+            entity.HasIndex(e => e.IdAsociado, "fk_tb_movimiento_tb_asociado");
+
             entity.HasIndex(e => e.IdCategoriaMovimiento, "fk_tb_movimiento_tb_categoria_movimiento");
+
+            entity.HasIndex(e => e.IdConcepto, "fk_tb_movimiento_tb_concepto_movimiento");
 
             entity.HasIndex(e => e.IdCuenta, "fk_tb_movimiento_tb_cuenta");
 
             entity.HasIndex(e => e.IdProveedor, "fk_tb_movimiento_tb_proveedor");
+
+            entity.HasIndex(e => e.IdProyecto, "fk_tb_movimiento_tb_proyecto");
 
             entity.Property(e => e.IdMovimiento).HasColumnName("id_movimiento");
             entity.Property(e => e.Descripcion)
@@ -493,13 +533,14 @@ public partial class UcgdbContext : DbContext
                 .HasColumnName("estado");
             entity.Property(e => e.FechaMovimiento).HasColumnName("fecha_movimiento");
             entity.Property(e => e.FuenteFondo)
-                .HasColumnType("enum('Fondos Propios','Aporte Dinadeco','Donacion','Compra','Pago Servicios','Alquiler','Fondos Recaudados')")
+                .HasColumnType("enum('Fondos Propios','Aporte 2% Dinadeco')")
                 .HasColumnName("fuente_fondo");
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
             entity.Property(e => e.IdCategoriaMovimiento).HasColumnName("id_categoria_movimiento");
             entity.Property(e => e.IdCliente).HasColumnName("id_cliente");
+            entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
             entity.Property(e => e.IdCuenta).HasColumnName("id_cuenta");
             entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor");
             entity.Property(e => e.IdProyecto).HasColumnName("id_proyecto");
@@ -525,10 +566,20 @@ public partial class UcgdbContext : DbContext
                 .HasForeignKey(d => d.IdAsociacion)
                 .HasConstraintName("fk_tb_movimiento_tb_asociacion");
 
+            entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbMovimientos)
+                .HasForeignKey(d => d.IdAsociado)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_movimiento_tb_asociado");
+
             entity.HasOne(d => d.IdCategoriaMovimientoNavigation).WithMany(p => p.TbMovimientos)
                 .HasForeignKey(d => d.IdCategoriaMovimiento)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tb_movimiento_tb_categoria_movimiento");
+
+            entity.HasOne(d => d.IdConceptoNavigation).WithMany(p => p.TbMovimientos)
+                .HasForeignKey(d => d.IdConcepto)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_tb_movimiento_tb_concepto_movimiento");
 
             entity.HasOne(d => d.IdCuentaNavigation).WithMany(p => p.TbMovimientos)
                 .HasForeignKey(d => d.IdCuenta)
@@ -539,6 +590,11 @@ public partial class UcgdbContext : DbContext
                 .HasForeignKey(d => d.IdProveedor)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tb_movimiento_tb_proveedor");
+
+            entity.HasOne(d => d.IdProyectoNavigation).WithMany(p => p.TbMovimientos)
+                .HasForeignKey(d => d.IdProyecto)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_tb_movimiento_tb_proyecto");
         });
 
         modelBuilder.Entity<TbProveedor>(entity =>

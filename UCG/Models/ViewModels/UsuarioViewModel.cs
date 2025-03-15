@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static UCG.Models.TbUsuario;
 
 namespace UCG.Models.ViewModels
 {
