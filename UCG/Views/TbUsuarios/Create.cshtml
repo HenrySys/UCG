@@ -1,6 +1,6 @@
 ﻿@using UCG.Models.ViewModels
 @using static UCG.Models.TbUsuario;
-@model usuarioViewModel
+@model UsuarioViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -33,8 +33,7 @@
             <div class="form-group">
                 <label asp-for="Rol" class="control-label"></label>
                 <select asp-for="Rol" asp-items="Html.GetEnumSelectList<RolUsuario>()" class="form-control"></select>
-                <span asp-validation-for="Rol" class="text-danger"></span>
-            </div>
+             </div>
             <div class="form-group">
                 <label asp-for="Estado" class="control-label"></label>
                 <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoUsuario>()" class="form-control"></select>

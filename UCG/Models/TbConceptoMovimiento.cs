@@ -3,13 +3,19 @@ using System.Collections.Generic;
 
 namespace UCG.Models;
 
+public enum TiposDeConceptoMovimientos
+{
+    Ingreso,
+    Egreso
+}
+
 public partial class TbConceptoMovimiento
 {
     public int IdConceptoMovimiento { get; set; }
 
     public int? IdAsociacion { get; set; }
 
-    public string? TipoMovimiento { get; set; }
+    public TiposDeConceptoMovimientos TipoMovimiento { get; set; }
 
     public string? Concepto { get; set; }
 

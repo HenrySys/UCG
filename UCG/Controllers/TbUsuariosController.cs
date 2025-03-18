@@ -56,7 +56,7 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( usuarioViewModel model)
+        public async Task<IActionResult> Create( UsuarioViewModel model)
         {
             if (ModelState.IsValid)
             {

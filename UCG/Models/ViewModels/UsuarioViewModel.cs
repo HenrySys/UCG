@@ -3,7 +3,7 @@ using static UCG.Models.TbUsuario;
 
 namespace UCG.Models.ViewModels
 {
-    public class usuarioViewModel
+    public class UsuarioViewModel
     {
         public int IdUsuario { get; set; }
 
@@ -19,6 +19,7 @@ namespace UCG.Models.ViewModels
         [DataType(DataType.Password)]
         [Required]
         public string? ConfirmarContraseña { get; set; }
+
         [Display(Name = "Rol de usuario")]
         [Required]
         public RolUsuario Rol { get; set; }

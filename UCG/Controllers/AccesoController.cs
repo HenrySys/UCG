@@ -34,7 +34,7 @@ namespace UCG.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registrarse(usuarioViewModel modelo)
+        public async Task<IActionResult> Registrarse(UsuarioViewModel modelo)
         {
             if (modelo.Contraseña != modelo.ConfirmarContraseña)
             {

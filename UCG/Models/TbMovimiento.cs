@@ -1,25 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
 
 public partial class TbMovimiento
 {
+    public enum TiposDeMovimientos
+    {
+        Ingreso,
+        Egreso
+    }
+    public enum FuentesDeFondo
+    {
+        FondosPropios,
+        Aporte2Dinadeco
+    }
+    public enum MetodosDePago
+    {
+        Transferencia,
+        SinpeMovil,
+        Efectivo,
+        Cheque
+    }
+    public enum EstadoDeMovimiento
+    {
+        Inactivo,
+        Procesado,
+        EnProceso
+    }
     public int IdMovimiento { get; set; }
 
-    public int IdAsociacion { get; set; }
+    public int IdAsociacion { get; set; } 
 
     public int? IdAsociado { get; set; }
 
-    public string TipoMovimiento { get; set; } = null!;
+    public TiposDeMovimientos? TipoMovimiento { get; set; }
 
     public int? IdCategoriaMovimiento { get; set; }
 
-    public string FuenteFondo { get; set; } = null!;
+    public FuentesDeFondo? FuenteFondo { get; set; } 
 
     public int? IdProyecto { get; set; }
 
-    public int? IdCuenta { get; set; }
+    public int IdCuenta { get; set; }
 
     public int? IdActa { get; set; }
 
@@ -29,17 +53,17 @@ public partial class TbMovimiento
 
     public string Descripcion { get; set; } = null!;
 
-    public string MetdodoPago { get; set; } = null!;
+    public MetodosDePago MetdodoPago { get; set; } 
 
     public DateOnly FechaMovimiento { get; set; }
 
-    public decimal? SubtotalMovido { get; set; }
+    public decimal SubtotalMovido { get; set; }
 
-    public decimal? MontoTotalMovido { get; set; }
+    public decimal MontoTotalMovido { get; set; }
 
-    public string Estado { get; set; } = null!;
+    public EstadoDeMovimiento Estado { get; set; }
 
-    public int? IdConcepto { get; set; }
+    public int IdConcepto { get; set; }
 
     public virtual TbActum? IdActaNavigation { get; set; }
 

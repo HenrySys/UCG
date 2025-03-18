@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.DotNet.Scaffolding.Shared.Project;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using UCG.Models;
+using UCG.Models.ViewModels;
+using static UCG.Models.TbMovimiento;
 
 namespace UCG.Controllers
 {
@@ -51,33 +57,143 @@ namespace UCG.Controllers
         // GET: TbMovimientoes/Create
         public IActionResult Create()
         {
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
+            ViewData["IdAsociacion"] = new SelectList(
+           _context.TbAsociacions
+               .Select(a => new
+               {
+                   IdAsociacion = a.IdAsociacion,
+                   cod = a.CodigoRegistro + " " + a.CedulaJuridica
+               }),
+           "IdAsociacion", "cod");
+
+            ViewData["IdAsociado"] = new SelectList(
+            _context.TbAsociados
+                .Select(a => new
+                {
+                    IdAsociado = a.IdAsociado,
+                    NombreCompleto = a.Nombre + " " + a.Apellido1 
+                }),
+            "IdAsociado", "NombreCompleto");
+
+            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "NumeroActa");
             ViewData["IdCategoriaMovimiento"] = new SelectList(_context.TbCategoriaMovimientos, "IdCategoriaMovimiento", "IdCategoriaMovimiento");
-            ViewData["IdCuenta"] = new SelectList(_context.TbCuenta, "IdCuenta", "IdCuenta");
+            ViewData["IdConcepto"] = new SelectList(_context.TbConceptoMovimientos, "IdConceptoMovimiento", "Concepto");
+            ViewData["IdCuenta"] = new SelectList(_context.TbCuenta, "IdCuenta", "NumeroCuenta");
             ViewData["IdProveedor"] = new SelectList(_context.TbProveedors, "IdProveedor", "IdProveedor");
+            ViewData["IdProyecto"] = new SelectList(_context.TbProyectos, "IdProyecto", "IdProyecto");
             return View();
         }
 
-        // POST: TbMovimientoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdMovimiento,IdAsociacion,IdAsociado,TipoMovimiento,IdCategoriaMovimiento,FuenteFondo,IdProyecto,IdCuenta,IdActa,IdProveedor,IdCliente,Descripcion,MetdodoPago,FechaMovimiento,SubtotalMovido,MontoTotalMovido,Estado")] TbMovimiento tbMovimiento)
+        public async Task<IActionResult> Create(MovimientoViewModel model)
         {
+
+
             if (ModelState.IsValid)
             {
-                _context.Add(tbMovimiento);
+                var movimiento = new TbMovimiento()
+                {
+                    FechaMovimiento = model.FechaMovimiento,
+                    IdAsociacion = model.IdAsociacion,
+                    IdAsociado = model.IdAsociado,
+                    TipoMovimiento = model.TipoMovimiento,
+                    IdConcepto = model.IdConceptoMovimiento,
+                    IdCategoriaMovimiento = model.IdCategoriaMovimiento,
+                    Estado = model.Estado,
+                    FuenteFondo = model.FuenteFondo,
+                    IdCuenta = model.IdCuenta,
+                    MetdodoPago = model.MetodoPago,
+                    SubtotalMovido = model.SubtotalMovido,
+                    MontoTotalMovido = model.MontoTotalMovido,
+                    
+
+                    IdActa = model?.IdActa,
+                    IdProyecto = model?.IdProyecto,
+                    IdCliente = model?.IdCliente
+
+                };
+
+                _context.Add(movimiento);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbMovimiento.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbMovimiento.IdAsociacion);
-            ViewData["IdCategoriaMovimiento"] = new SelectList(_context.TbCategoriaMovimientos, "IdCategoriaMovimiento", "IdCategoriaMovimiento", tbMovimiento.IdCategoriaMovimiento);
-            ViewData["IdCuenta"] = new SelectList(_context.TbCuenta, "IdCuenta", "IdCuenta", tbMovimiento.IdCuenta);
-            ViewData["IdProveedor"] = new SelectList(_context.TbProveedors, "IdProveedor", "IdProveedor", tbMovimiento.IdProveedor);
-            return View(tbMovimiento);
+            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", model.IdActa);
+            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", model.IdAsociacion);
+            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", model.IdAsociado);
+            ViewData["IdCategoriaMovimiento"] = new SelectList(_context.TbCategoriaMovimientos, "IdCategoriaMovimiento", "IdCategoriaMovimiento", model.IdCategoriaMovimiento);
+            ViewData["IdConcepto"] = new SelectList(_context.TbConceptoMovimientos, "IdConceptoMovimiento", "IdConceptoMovimiento", model.IdConceptoMovimiento);
+            ViewData["IdCuenta"] = new SelectList(_context.TbCuenta, "IdCuenta", "IdCuenta", model.IdCuenta);
+            ViewData["IdProveedor"] = new SelectList(_context.TbProveedors, "IdProveedor", "IdProveedor", model.IdProveedor);
+            ViewData["IdProyecto"] = new SelectList(_context.TbProyectos, "IdProyecto", "IdProyecto", model.IdProyecto);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var asociados = _context.TbAsociados
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!asociados.Any())
+                {
+                    return Json(new { success = false, message = "No hay asociados disponibles." });
+                }
+
+                return Json(new { success = true, data = asociados });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerConceptosPorTipo(int tipoMovimiento, int idAsociacion)
+        {
+            try
+            {
+                var tipoMovimientoEnum = (TiposDeConceptoMovimientos)tipoMovimiento;
+                var conceptos = _context.TbConceptoMovimientos
+                    .Where(c => c.TipoMovimiento == tipoMovimientoEnum && c.IdAsociacion == idAsociacion)
+                    .ToList();
+                if (!conceptos.Any())
+                {
+                    return Json(new { success = false, message = "No hay conceptos disponibles." });
+                }
+                return Json(new { success = true, data = conceptos });
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false, message = "No hay conceptos para el tipo de movimiento disponibles.", ex.Message });
+            }
+        }
+
+        // Acción para obtener categorías por IdConcepto
+        [HttpGet]
+        public JsonResult ObtenerCategoriaPorTipoConcepto(int idConcepto)
+        {
+            try
+            {
+                var categorias = _context.TbCategoriaMovimientos
+                    .Where(c => c.IdConcepto == idConcepto)
+                    .ToList();
+                if (!categorias.Any())
+                {
+                    return Json(new { success = false, message = "No hay categorias disponibles." });
+                }
+                return Json(new { success = true, data = categorias });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "No hay categorias para el concepto de movimientos disponibles.", ex.Message });
+            }
         }
 
         // GET: TbMovimientoes/Edit/5
@@ -101,9 +217,7 @@ namespace UCG.Controllers
             return View(tbMovimiento);
         }
 
-        // POST: TbMovimientoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdMovimiento,IdAsociacion,IdAsociado,TipoMovimiento,IdCategoriaMovimiento,FuenteFondo,IdProyecto,IdCuenta,IdActa,IdProveedor,IdCliente,Descripcion,MetdodoPago,FechaMovimiento,SubtotalMovido,MontoTotalMovido,Estado")] TbMovimiento tbMovimiento)

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ViewModels;
+
 
 namespace UCG.Controllers
 {
@@ -56,16 +58,24 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdConceptoMovimiento,IdAsociacion,TipoMovimiento,Concepto")] TbConceptoMovimiento tbConceptoMovimiento)
+        public async Task<IActionResult> Create([Bind("IdConceptoMovimiento,IdAsociacion,TipoMovimiento,Concepto")] ConceptoMovimientoViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tbConceptoMovimiento);
+                var concepto = new TbConceptoMovimiento()
+                {
+                    IdAsociacion = model.IdAsociacion,
+                    TipoMovimiento = model.TipoMovimiento,
+                    Concepto = model.Concepto
+         
+                };
+
+                _context.Add(concepto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbConceptoMovimiento.IdAsociacion);
-            return View(tbConceptoMovimiento);
+            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", model.IdAsociacion);
+            return View(model);
         }
 
         // GET: TbConceptoMovimientoes/Edit/5
