@@ -163,5 +163,10 @@ namespace UCG.Controllers
         {
           return (_context.TbCuenta?.Any(e => e.IdCuenta == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

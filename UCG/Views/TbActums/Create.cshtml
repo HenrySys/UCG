@@ -1,4 +1,7 @@
-﻿@model UCG.Models.TbActum
+﻿@using UCG.Models.ViewModels;
+@using static UCG.Models.TbActum;
+@model ActaViewModel;
+
 
 @{
     ViewData["Title"] = "Create";
@@ -14,11 +17,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class ="form-control" asp-items="ViewBag.IdAsociacion"></select>
+                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
+                    <option disabled="" selected="">Seleccione una asociacion</option>
+                </select>
+                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class ="form-control" asp-items="ViewBag.IdAsociado"></select>
+                <select asp-for="IdAsociado" class ="form-select" id="IdAsociado">
+                    <option disabled="" selected="" >Seleccione un asociado</option>
+                </select>
+                <span asp-validation-for="IdAsociado" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="FechaSesion" class="control-label"></label>
@@ -37,7 +46,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
+                <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeActa>()">
+                    <option disabled="" selected="">Seleccione un Estado</option>
+                </select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -57,5 +68,20 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+        <script>
+            const rutasMovimiento = {
+                obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActums")',              
+            };
+        </script>
+
+        <!-- Tu script separado -->
+        <script src="~/js/ActaScripts/ActaCreate.js"></script>
+     }
 }

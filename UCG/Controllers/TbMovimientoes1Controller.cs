@@ -205,5 +205,10 @@ namespace UCG.Controllers
         {
           return (_context.TbMovimientos?.Any(e => e.IdMovimiento == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

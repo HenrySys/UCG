@@ -163,5 +163,10 @@ namespace UCG.Controllers
         {
           return (_context.TbActaAsistencia?.Any(e => e.IdActaAsistencia == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

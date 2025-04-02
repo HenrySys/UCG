@@ -24,14 +24,14 @@ namespace UCG.Models.ViewModels
 
        [Display(Name = "Rol de usuario")]
        [Required]
-       public RolUsuario Rol { get; set; }
+       public RolUsuario? Rol { get; set; }
 
        [DataType(DataType.EmailAddress)]
        [Required]
        public string? Correo { get; set; }
 
        [Required]
-       public EstadoUsuario Estado { get; set; } 
+       public EstadoUsuario? Estado { get; set; } 
 
    }
 }

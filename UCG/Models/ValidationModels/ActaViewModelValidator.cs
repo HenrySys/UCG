@@ -26,7 +26,16 @@ namespace UCG.Models.ValidationModels
             .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
              .MustAsync(async (id, cancellation) =>
              {
-                 return await _context.TbAsociados.AnyAsync(a => a.IdAsociado == id);
+                 return await _context.TbActa.AnyAsync(a => a.IdAsociado == id);
+             })
+             .WithMessage("El asociado seleccionada no existe.");
+
+             RuleFor(x => x.IdAsociacion)
+            .NotNull().WithMessage("Debe seleccionar una Acta.")
+            .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
+             .MustAsync(async (id, cancellation) =>
+             {
+                 return await _context.TbActa.AnyAsync(a => a.IdAsociacion == id);
              })
              .WithMessage("El asociado seleccionada no existe.");
 

@@ -83,6 +83,8 @@ public partial class TbAsociado
 
     public virtual ICollection<TbActaAsistencium> TbActaAsistencia { get; } = new List<TbActaAsistencium>();
 
+    public virtual ICollection<TbActum> TbActas { get; } = new List<TbActum>();
+
     public virtual ICollection<TbCategoriaMovimiento> TbCategoriaMovimientos { get; } = new List<TbCategoriaMovimiento>();
 
     public virtual ICollection<TbMiembroJuntaDirectiva> TbMiembroJuntaDirectivas { get; } = new List<TbMiembroJuntaDirectiva>();

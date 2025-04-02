@@ -163,5 +163,10 @@ namespace UCG.Controllers
         {
           return (_context.TbProveedors?.Any(e => e.IdProveedor == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

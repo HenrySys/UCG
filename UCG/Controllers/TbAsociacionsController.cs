@@ -159,5 +159,10 @@ namespace UCG.Controllers
         {
           return (_context.TbAsociacions?.Any(e => e.IdAsociacion == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

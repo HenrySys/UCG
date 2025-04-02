@@ -21,9 +21,14 @@ namespace UCG.Controllers
         // GET: TbPuestoes
         public async Task<IActionResult> Index()
         {
+            try{
               return _context.TbPuestos != null ? 
                           View(await _context.TbPuestos.ToListAsync()) :
                           Problem("Entity set 'UcgdbContext.TbPuestos'  is null.");
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al mostrar Puestos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         // GET: TbPuestoes/Details/5
@@ -34,6 +39,7 @@ namespace UCG.Controllers
                 return NotFound();
             }
 
+            try{
             var tbPuesto = await _context.TbPuestos
                 .FirstOrDefaultAsync(m => m.IdPuesto == id);
             if (tbPuesto == null)
@@ -42,6 +48,10 @@ namespace UCG.Controllers
             }
 
             return View(tbPuesto);
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al mostrar Puestos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         // GET: TbPuestoes/Create
@@ -57,13 +67,20 @@ namespace UCG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPuesto,Nombre,Decripcion")] TbPuesto tbPuesto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                return View(tbPuesto);
+            }
+            
+
+            try{
                 _context.Add(tbPuesto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al Crear Puestos. Error="+ex;
+                return RedirectToAction("Error");
             }
-            return View(tbPuesto);
         }
 
         // GET: TbPuestoes/Edit/5
@@ -74,12 +91,17 @@ namespace UCG.Controllers
                 return NotFound();
             }
 
+            try{
             var tbPuesto = await _context.TbPuestos.FindAsync(id);
             if (tbPuesto == null)
             {
                 return NotFound();
             }
             return View(tbPuesto);
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al editar Puestos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         // POST: TbPuestoes/Edit/5
@@ -94,12 +116,16 @@ namespace UCG.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
+                return View(tbPuesto);
+            }
+            
+            try
                 {
                     _context.Update(tbPuesto);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,10 +137,11 @@ namespace UCG.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al editar Puestos. Error="+ex;
+                return RedirectToAction("Error");
             }
-            return View(tbPuesto);
+                
         }
 
         // GET: TbPuestoes/Delete/5
@@ -124,7 +151,7 @@ namespace UCG.Controllers
             {
                 return NotFound();
             }
-
+            try{
             var tbPuesto = await _context.TbPuestos
                 .FirstOrDefaultAsync(m => m.IdPuesto == id);
             if (tbPuesto == null)
@@ -133,6 +160,10 @@ namespace UCG.Controllers
             }
 
             return View(tbPuesto);
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al Eliminar Puestos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         // POST: TbPuestoes/Delete/5
@@ -144,6 +175,8 @@ namespace UCG.Controllers
             {
                 return Problem("Entity set 'UcgdbContext.TbPuestos'  is null.");
             }
+
+            try{
             var tbPuesto = await _context.TbPuestos.FindAsync(id);
             if (tbPuesto != null)
             {
@@ -152,11 +185,20 @@ namespace UCG.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al editar Puestos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         private bool TbPuestoExists(int id)
         {
           return (_context.TbPuestos?.Any(e => e.IdPuesto == id)).GetValueOrDefault();
+        }
+
+        public IActionResult Error()
+        {
+            return View("Error");
         }
     }
 }

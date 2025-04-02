@@ -163,5 +163,10 @@ namespace UCG.Controllers
         {
           return (_context.TbAcuerdos?.Any(e => e.IdAcuerdo == id)).GetValueOrDefault();
         }
+        
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

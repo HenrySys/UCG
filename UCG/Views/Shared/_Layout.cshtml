@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="~/UCG.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+
+
 </head>
 <body>
     <header>
@@ -27,12 +29,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                       @*  @if (User.IsInRole("Admin") || User.IsInRole("root"))
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbClientes" asp-action="Index">Clientes</a>
                         </li>
+                        }
+                        @if (User.IsInRole("root")){
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbUsuarios" asp-action="Index">Usuarios</a>
                         </li>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("root")){
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">Categoria Movimiento</a>
                         </li>
@@ -45,9 +53,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociadoes" asp-action="Index">Asociado</a>
                         </li>
+                        }
+                        @if (User.IsInRole("root")){
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociacions" asp-action="Index">Asociacion</a>
                         </li>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("root"))
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbCuentums" asp-action="Index">Cuenta</a>
                         </li>
@@ -69,17 +82,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbMovimientoes" asp-action="Index">Movimientos</a>
                         </li>
+                        }
+                        @if (User.IsInRole("root")){
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="AsociacionPdf" asp-action="Index">PDF Asociaciones
 
                             </a>
                         </li>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("root"))
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoAsociacions" asp-action="Index">
                                 Conceptos de movimientos de Asociacion
 
                             </a>
                         </li>
+                        } *@
 
 
 

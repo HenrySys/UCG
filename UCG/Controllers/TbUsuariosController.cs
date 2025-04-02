@@ -7,24 +7,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
+using UCG.Services;
 
 namespace UCG.Controllers
 {
    public class TbUsuariosController : Controller
    {
        private readonly UcgdbContext _context;
+       private readonly HashingService _hashingService;
 
-       public TbUsuariosController(UcgdbContext context)
+       public TbUsuariosController(UcgdbContext context, HashingService hashingService )
        {
            _context = context;
+           _hashingService = hashingService;
        }
 
        // GET: TbUsuarios
        public async Task<IActionResult> Index()
        {
+        try{
              return _context.TbUsuarios != null ? 
-                         View(await _context.TbUsuarios.ToListAsync()) :
-                         Problem("Entity set 'UcgdbContext.TbUsuarios'  is null.");
+                        View(await _context.TbUsuarios.ToListAsync()) :
+                        Problem("Entity set 'UcgdbContext.TbUsuarios'  is null.");
+        }catch(Exception ex){
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar los usuarios. Error:" + ex;
+            return RedirectToAction("Error");  
+        }
        }
 
        // GET: TbUsuarios/Details/5
@@ -35,6 +43,8 @@ namespace UCG.Controllers
                return NotFound();
            }
 
+           try{
+
            var tbUsuario = await _context.TbUsuarios
                .FirstOrDefaultAsync(m => m.IdUsuario == id);
            if (tbUsuario == null)
@@ -43,6 +53,10 @@ namespace UCG.Controllers
            }
 
            return View(tbUsuario);
+           }catch(Exception ex){
+            TempData["ErrorMessage"] = "Ocurrió un error al obtener los detalles del usuario. Error=" + ex;
+            return RedirectToAction("Error");
+           }
        }
 
        // GET: TbUsuarios/Create
@@ -58,22 +72,39 @@ namespace UCG.Controllers
        [ValidateAntiForgeryToken]
        public async Task<IActionResult> Create( UsuarioViewModel model)
        {
-           if (ModelState.IsValid)
+
+            if (model.Contraseña != model.ConfirmarContraseña)
            {
-               var usuario = new TbUsuario()
+               ModelState.AddModelError("Contraseña", "Las contraseñas no coinciden");
+               return View(model);
+           }
+           
+            if (!ModelState.IsValid)
+           {
+            return View(model);
+           }
+
+            
+                var usuario = new TbUsuario
                {
                    NombreUsuario = model.NombreUsuario,
-                   Contraseña = model.Contraseña,
+                   Contraseña = _hashingService.GenerateHash(model.Contraseña),
                    Rol = model.Rol,
-                   Estado = model.Estado,
-                   Correo = model.Correo
+                   Correo = model.Correo,
+                   Estado = model.Estado
+                   
 
                };
-               _context.Add(usuario);
+            try
+            {
+                _context.Add(usuario);
                await _context.SaveChangesAsync();
                return RedirectToAction(nameof(Index));
-           }
-           return View(model );
+            }catch(Exception ex){
+                ModelState.AddModelError("", "Ocurrió un error al registrar el usuario.");
+                Console.WriteLine($"Error al registrar usuario: {ex.Message}");
+                return View(model);
+            }
        }
 
        // GET: TbUsuarios/Edit/5
@@ -84,12 +115,18 @@ namespace UCG.Controllers
                return NotFound();
            }
 
+           try{
+
            var tbUsuario = await _context.TbUsuarios.FindAsync(id);
            if (tbUsuario == null)
            {
                return NotFound();
            }
            return View(tbUsuario);
+           }catch(Exception ex){
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar la edición del usuario. Error="+ ex;
+            return RedirectToAction("Error");
+           }
        }
 
        // POST: TbUsuarios/Edit/5
@@ -104,12 +141,15 @@ namespace UCG.Controllers
                return NotFound();
            }
 
-           if (ModelState.IsValid)
-           {
+           if (!ModelState.IsValid){
+            return View(tbUsuario);
+           }
+           
                try
                {
                    _context.Update(tbUsuario);
                    await _context.SaveChangesAsync();
+                   return RedirectToAction(nameof(Index));
                }
                catch (DbUpdateConcurrencyException)
                {
@@ -122,9 +162,13 @@ namespace UCG.Controllers
                        throw;
                    }
                }
-               return RedirectToAction(nameof(Index));
-           }
-           return View(tbUsuario);
+               catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el usuario. Error="+ex;
+                return RedirectToAction("Error");
+               }
+               
+           
+           
        }
 
        // GET: TbUsuarios/Delete/5
@@ -135,6 +179,8 @@ namespace UCG.Controllers
                return NotFound();
            }
 
+           try{
+
            var tbUsuario = await _context.TbUsuarios
                .FirstOrDefaultAsync(m => m.IdUsuario == id);
            if (tbUsuario == null)
@@ -143,6 +189,10 @@ namespace UCG.Controllers
            }
 
            return View(tbUsuario);
+           }catch(Exception ex){
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar la eliminación del usuario. Error="+ex;
+                return RedirectToAction("Error");
+           }
        }
 
        // POST: TbUsuarios/Delete/5
@@ -154,6 +204,9 @@ namespace UCG.Controllers
            {
                return Problem("Entity set 'UcgdbContext.TbUsuarios'  is null.");
            }
+
+           try {
+
            var tbUsuario = await _context.TbUsuarios.FindAsync(id);
            if (tbUsuario != null)
            {
@@ -162,11 +215,20 @@ namespace UCG.Controllers
             
            await _context.SaveChangesAsync();
            return RedirectToAction(nameof(Index));
+           }catch(Exception ex){
+            TempData["ErrorMessage"] = "Ocurrió un error al eliminar el usuario. Error="+ex;
+                return RedirectToAction("Error");
+           }
        }
 
        private bool TbUsuarioExists(int id)
        {
          return (_context.TbUsuarios?.Any(e => e.IdUsuario == id)).GetValueOrDefault();
        }
+
+       public IActionResult Error()
+        {
+            return View("Error");
+        }
    }
 }

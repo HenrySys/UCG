@@ -175,5 +175,10 @@ namespace UCG.Controllers
         {
           return (_context.TbMiembroJuntaDirectivas?.Any(e => e.IdMiembrosJuntaDirectiva == id)).GetValueOrDefault();
         }
+
+        public IActionResult Error()
+        {
+            return View("Error");
+        }
     }
 }

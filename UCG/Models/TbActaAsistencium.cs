@@ -13,7 +13,7 @@ public partial class TbActaAsistencium
 
     public DateOnly Fecha { get; set; }
 
-    public virtual TbAsociacion? IdActaNavigation { get; set; }
+    public virtual TbActum? IdActaNavigation { get; set; }
 
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
 }

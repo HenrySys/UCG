@@ -7,6 +7,8 @@ namespace UCG.Models.ViewModels
     {
         public int IdActa { get; set; }
 
+        [Display(Name = "Asociacion")]
+        public int? IdAsociacion { get; set; }
         [Display(Name = "Fecha de Acta")]
         [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly FechaSesion { get; set; }

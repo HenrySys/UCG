@@ -48,8 +48,6 @@ public partial class TbAsociacion
 
     public virtual ICollection<TbActum> TbActa { get; } = new List<TbActum>();
 
-    public virtual ICollection<TbActaAsistencium> TbActaAsistencia { get; } = new List<TbActaAsistencium>();
-
     public virtual ICollection<TbAsociado> TbAsociados { get; } = new List<TbAsociado>();
 
     public virtual ICollection<TbCliente> TbClientes { get; } = new List<TbCliente>();

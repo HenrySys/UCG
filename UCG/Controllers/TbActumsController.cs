@@ -49,7 +49,6 @@ namespace UCG.Controllers
         public IActionResult Create()
         {
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
             return View();
         }
 
@@ -69,6 +68,28 @@ namespace UCG.Controllers
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActum.IdAsociacion);
             ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActum.IdAsociado);
             return View(tbActum);
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var asociados = _context.TbAsociados
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!asociados.Any())
+                {
+                    return Json(new { success = false, message = "No hay asociados disponibles." });
+                }
+
+                return Json(new { success = true, data = asociados });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
+            }
         }
 
         // GET: TbActums/Edit/5
@@ -168,6 +189,11 @@ namespace UCG.Controllers
         private bool TbActumExists(int id)
         {
           return (_context.TbActa?.Any(e => e.IdActa == id)).GetValueOrDefault();
+        }
+
+        public IActionResult Error()
+        {
+            return View("Error");
         }
     }
 }

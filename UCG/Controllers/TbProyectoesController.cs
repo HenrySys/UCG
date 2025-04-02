@@ -21,8 +21,13 @@ namespace UCG.Controllers
         // GET: TbProyectoes
         public async Task<IActionResult> Index()
         {
+            try{
             var ucgdbContext = _context.TbProyectos.Include(t => t.IdActaNavigation).Include(t => t.IdAsociacionNavigation).Include(t => t.IdAsociadoNavigation);
             return View(await ucgdbContext.ToListAsync());
+            }catch(Exception ex){
+                TempData["ErrorMessage"] = "Ocurrió un error al mostrar Proyectos. Error="+ex;
+                return RedirectToAction("Error");
+            }
         }
 
         // GET: TbProyectoes/Details/5
@@ -174,6 +179,11 @@ namespace UCG.Controllers
         private bool TbProyectoExists(int id)
         {
           return (_context.TbProyectos?.Any(e => e.IdProyecto == id)).GetValueOrDefault();
+        }
+
+        public IActionResult Error()
+        {
+            return View("Error");
         }
     }
 }

@@ -35,6 +35,7 @@ public partial class TbActum
     public int? IdAsociado { get; set; }
 
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
+
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
 
     public virtual ICollection<TbAcuerdo> TbAcuerdos { get; } = new List<TbAcuerdo>();
@@ -44,4 +45,8 @@ public partial class TbActum
     public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();
 
     public virtual ICollection<TbProyecto> TbProyectos { get; } = new List<TbProyecto>();
+
+    public virtual ICollection<TbActaAsistencium> TbActaAsistencias { get; } = new List<TbActaAsistencium>();
+
+
 }

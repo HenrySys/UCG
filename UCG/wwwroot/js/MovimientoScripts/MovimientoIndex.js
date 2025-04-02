@@ -8,9 +8,5 @@
         }
     });
 
-    new DataTable('#movimientosTable', {
-        search: {
-            return: true
-        }
-    });
+   
 });

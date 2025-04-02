@@ -70,10 +70,10 @@ public partial class UcgdbContext : DbContext
 
             entity.Property(e => e.IdActaAsistencia).HasColumnName("id_acta_asistencia");
             entity.Property(e => e.Fecha).HasColumnName("fecha");
-            entity.Property(e => e.IdActa).HasColumnName("id_acta ");
+            entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
 
-            entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencia)
+            entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencias)
                 .HasForeignKey(d => d.IdActa)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
@@ -92,7 +92,7 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdAsociacion, "fk_tb_acta_tb_asociacion");
 
-            entity.HasIndex(e => e.IdAsociado, "fk_tb_cuenta_tb_miembro_junta_directiva_asociado");
+            entity.HasIndex(e => e.IdAsociado, "fk_tb_acta_tb_asociado");
 
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.Descripcion)
@@ -115,6 +115,11 @@ public partial class UcgdbContext : DbContext
                 .HasForeignKey(d => d.IdAsociacion)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_acta_tb_asociacion");
+
+            entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActas)
+                .HasForeignKey(d =>d.IdAsociado)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_acta_tb_asociado");
         });
 
         modelBuilder.Entity<TbAcuerdo>(entity =>
