@@ -7,7 +7,6 @@ public partial class TbCategoriaMovimiento
 {
     public int IdCategoriaMovimiento { get; set; }
 
-    public int? IdAsociacion { get; set; }
 
     public int? IdAsociado { get; set; }
 
