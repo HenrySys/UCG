@@ -15,7 +15,7 @@ namespace UCG.Models.ViewModels
         public int? IdUsuario { get; set; }
 
         [Display(Name = "Nacionalidad")]
-        public string? Nacionalidad { get; set; }
+        public NacionalidadDeAsociado? Nacionalidad { get; set; }
 
         [Display(Name = "Cedula")]
         public string? Cedula { get; set; }
@@ -34,10 +34,10 @@ namespace UCG.Models.ViewModels
         public DateOnly FechaNacimiento { get; set; }
 
         [Display(Name = "Sexo")]
-        public string? Sexo { get; set; }
+        public SexoDeAsociado? Sexo { get; set; }
 
         [Display(Name = "EstadoCivil")]
-        public string? EstadoCivil { get; set; }
+        public EstadoCivilDeAsociado? EstadoCivil { get; set; }
 
         [Display(Name = "Telefono")]
         public string? Telefono { get; set; }

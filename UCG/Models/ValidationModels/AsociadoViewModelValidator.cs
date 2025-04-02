@@ -39,9 +39,8 @@ namespace UCG.Models.ValidationModels
                .WithMessage("El Usuario seleccionado no existe.");
 
             RuleFor(x => x.Nacionalidad)
-                .NotNull().WithMessage("Debe ingresar una Nacionalidad.")
-                .NotEmpty().WithMessage("Debe ingresar una Nacionalidad.")
-                .MaximumLength(100).WithMessage("La Nacionalidad no puede superar los 100 caracteres.");
+                .IsInEnum().WithMessage("Debe seleccionar una Nacionalidad valido.")
+                .NotEmpty().WithMessage("Debe ingresar una Nacionalidad.");
 
             RuleFor(x => x.Cedula)
                 .NotNull().WithMessage("Debe ingresar una Cedula.")
@@ -73,14 +72,13 @@ namespace UCG.Models.ValidationModels
                 .NotEmpty().WithMessage("Debe ingresar una fecha válida.");
 
             RuleFor(x => x.Sexo)
-                .NotNull().WithMessage("Debe ingresar una Sexo valido.")
-                .NotEmpty().WithMessage("Debe ingresar una Sexo valido.")
-                .MaximumLength(100).WithMessage("El Sexo no puede superar los 100 caracteres.");
+                .IsInEnum().WithMessage("Debe ingresar una Sexo valido.")
+                .NotEmpty().WithMessage("Debe ingresar una Sexo valido.");
+             
 
             RuleFor(x => x.EstadoCivil)
-                .NotNull().WithMessage("Debe ingresar un Estado Civil.")
-                .NotEmpty().WithMessage("Debe ingresar un Estado Civil.")
-                .MaximumLength(100).WithMessage("El Estado Civil no puede superar los 100 caracteres.");
+                .IsInEnum().WithMessage("Debe seleccionar una estado civil valido.")
+                .NotEmpty().WithMessage("Debe ingresar un estado civil.");
 
             RuleFor(x => x.Telefono)
                 .NotNull().WithMessage("Debe ingresar un Telefono.")

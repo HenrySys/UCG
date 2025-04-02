@@ -44,7 +44,7 @@ public partial class TbCliente
 
     public EstadoDeCliente? Estado { get; set; } = null!;
 
-    public string? TipoCliente { get; set; }
+    public TipoDeCliente? TipoCliente { get; set; }
 
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 }

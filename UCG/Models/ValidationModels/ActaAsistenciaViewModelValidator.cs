@@ -31,6 +31,13 @@ namespace UCG.Models.ValidationModels
                })
                .WithMessage("El Asociado seleccionada no existe.");
 
+            RuleFor(x => new { x.IdActa, x.IdAsociado })
+               .MustAsync(async (ids, cancellation) =>
+               {
+                   return !await _context.TbActaAsistencia
+                       .AnyAsync(a => a.IdActa == ids.IdActa && a.IdAsociado == ids.IdAsociado);
+               })
+               .WithMessage("Ya existe una participacion de ese asociado en esta misma acta.");
         }
     }
 }

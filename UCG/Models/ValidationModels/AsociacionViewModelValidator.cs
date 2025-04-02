@@ -87,8 +87,7 @@ namespace UCG.Models.ValidationModels
 
             RuleFor(x => x.Estado)
                .IsInEnum().WithMessage("Debe seleccionar una estado valido.")
-               .NotEmpty().WithMessage("Debe ingresar un estado.")
-               ;
+               .NotEmpty().WithMessage("Debe ingresar un estado.");
         }
     }
 }

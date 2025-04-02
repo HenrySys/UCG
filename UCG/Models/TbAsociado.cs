@@ -53,7 +53,7 @@ public partial class TbAsociado
 
     public int? IdUsuario { get; set; }
 
-    public string? Nacionalidad { get; set; }
+    public NacionalidadDeAsociado? Nacionalidad { get; set; }
 
     public string Cedula { get; set; } = null!;
 
@@ -65,9 +65,9 @@ public partial class TbAsociado
 
     public DateOnly FechaNacimiento { get; set; }
 
-    public string? Sexo { get; set; }
+    public SexoDeAsociado? Sexo { get; set; }
 
-    public string? EstadoCivil { get; set; }
+    public EstadoCivilDeAsociado? EstadoCivil { get; set; }
 
     public string Telefono { get; set; } = null!;
 

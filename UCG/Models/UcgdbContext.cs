@@ -64,19 +64,19 @@ public partial class UcgdbContext : DbContext
 
             entity.ToTable("tb_acta_asistencia");
 
-            entity.HasIndex(e => e.IdAsociacion, "fk_tb_acta_asistencia_tb_asociacion");
+            entity.HasIndex(e => e.IdActa, "fk_tb_acta_asistencia_tb_acta");
 
             entity.HasIndex(e => e.IdAsociado, "fk_tb_acta_asistencia_tb_asociado");
 
             entity.Property(e => e.IdActaAsistencia).HasColumnName("id_acta_asistencia");
             entity.Property(e => e.Fecha).HasColumnName("fecha");
-            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
+            entity.Property(e => e.IdActa).HasColumnName("id_acta ");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
 
-            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbActaAsistencia)
-                .HasForeignKey(d => d.IdAsociacion)
+            entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencia)
+                .HasForeignKey(d => d.IdActa)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_tb_acta_asistencia_tb_asociacion");
+                .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
 
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActaAsistencia)
                 .HasForeignKey(d => d.IdAsociado)

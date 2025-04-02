@@ -30,9 +30,9 @@ namespace UCG.Models.ValidationModels
                .WithMessage("La Asociación seleccionada no existe.");
 
             RuleFor(x => x.TipoProveedor)
-                .NotNull().WithMessage("Debe ingresar un Tipo Proveedor.")
                 .NotEmpty().WithMessage("Debe ingresar un Tipo Proveedor.")
-                .MaximumLength(100).WithMessage("El Tipo Proveedor no puede superar los 100 caracteres.");
+                .IsInEnum().WithMessage("Debe seleccionar un Tipo Proveedor valido.")
+              ;
 
             RuleFor(x => x.NombreEmpresa)
                 .NotNull().WithMessage("Debe ingresar un Nombre de Empresa.")

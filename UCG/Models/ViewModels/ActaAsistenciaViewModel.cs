@@ -10,13 +10,12 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Asociado")]
         public int? IdAsociado { get; set; }
 
-        [Display(Name = "Asociacion")]
-        public int? IdAsociacion { get; set; }
+        [Display(Name = "Acta")]
+        public int? IdActa { get; set; }
 
         [Display(Name = "Fecha de Asistencia")]
         [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly Fecha { get; set; }
-
 
     }
 }
