@@ -1,15 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
 
 public partial class TbProveedor
 {
+     public enum EstadoDeProveedor
+    {
+        [Display(Name = "Activo")]
+        Activo = 1,
+
+        [Display(Name = "Inactivo")]
+        Inactivo = 2,
+        
+    }
+
+    public enum TipoDeProveedor
+    {
+        [Display(Name = "Fisico")]
+        Fisico = 1,
+
+        [Display(Name = "Juridico")]
+        Juridico = 2,
+
+    }
     public int IdProveedor { get; set; }
 
     public int? IdAsociacion { get; set; }
 
-    public string TipoProveedor { get; set; } = null!;
+    public TipoDeProveedor TipoProveedor { get; set; }
 
     public string NombreEmpresa { get; set; } = null!;
 
@@ -27,7 +47,7 @@ public partial class TbProveedor
 
     public string? Fax { get; set; }
 
-    public string Estado { get; set; } = null!;
+    public EstadoDeProveedor? Estado { get; set; } = null!;
 
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 

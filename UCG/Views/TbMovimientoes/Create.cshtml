@@ -17,66 +17,63 @@
                 <label asp-for="FechaMovimiento"></label>
                 <input asp-for="FechaMovimiento" class="form-control" type="date" id="FechaMovimiento" />
                 <span asp-validation-for="FechaMovimiento" class="text-danger"></span>
-
             </div>
+
             <div class="form-group">
                 <label asp-for="IdAsociacion"></label>
                 <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
-                    <option value="">Seleccione una asociacion</option>
+                    <option disabled="" selected="">Seleccione una asociacion</option>
                 </select>
                 <span asp-validation-for="IdAsociacion" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="IdAsociado"></label>
-                <select asp-for="IdAsociado" class="form-select" aria-label="Default select example" id="IdAsociado">
-                    <option value="">Seleccione un asociado</option>
+                <select asp-for="IdAsociado" class="form-select" id="IdAsociado">
+                    <option disabled="" selected="" >Seleccione un asociado</option>
                 </select>
                 <span asp-validation-for="IdAsociado" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="TipoMovimiento"></label>
-                <select asp-for="TipoMovimiento" class="form-select" aria-label="Default select example" asp-items="Html.GetEnumSelectList<TiposDeMovimientos>()" id="TipoMovimiento">
-                    <option value="">Seleccione un tipo moviento</option>
+                <select asp-for="TipoMovimiento" class="form-select" asp-items="Html.GetEnumSelectList<TipoDeMovimiento>()" id="TipoMovimiento">
+                    <option disabled="" selected="" >Seleccione un tipo movimiento</option>
                 </select>
                 <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
-
             </div>
 
             <div class="form-group">
                 <label asp-for="IdConceptoMovimiento"></label>
-                <select asp-for="IdConceptoMovimiento" aria-label="Default select example" class="form-select"  id="IdConceptoMovimiento">
+                <select asp-for="IdConceptoMovimiento" class="form-select" id="IdConceptoMovimiento">
                     <option value="">Seleccione un concepto</option>
                 </select>
                 <span asp-validation-for="IdConceptoMovimiento" class="text-danger"></span>
-
             </div>
 
             <div class="form-group">
                 <label asp-for="IdCategoriaMovimiento"></label>
-                <select asp-for="IdCategoriaMovimiento" aria-label="Default select example" class="form-select" asp-items="ViewBag.IdCategoria" id="IdCategoria">
-                    <option value="">Seleccione una categoria de movimiento</option>
+                <select asp-for="IdCategoriaMovimiento" class="form-select" id="IdCategoria">
+                    <option disabled="" selected="">Seleccione una categoria de movimiento</option>
                 </select>
                 <span asp-validation-for="IdCategoriaMovimiento" class="text-danger"></span>
-
             </div>
+
             <div class="form-group">
                 <label asp-for="IdCuenta"></label>
-                <select asp-for="IdCuenta" class="form-select" aria-label="Default select example" asp-items="ViewBag.IdCuenta" id="IdCuenta">
-                    <option value="">Seleccione una cuenta</option>
-
+                <select asp-for="IdCuenta" class="form-select" id="IdCuenta">
+                    <option disabled="" selected="">Seleccione una cuenta</option>
                 </select>
                 <span asp-validation-for="IdCuenta" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="FuenteFondo"></label>
-                <select asp-for="FuenteFondo" class="form-select" aria-label="Default select example" asp-items="Html.GetEnumSelectList<FuentesDeFondo>()" id="FuenteFondo">
-                    <option value="">Seleccione una fuente de los fondos</option>
+                <select asp-for="FuenteFondo" class="form-select" asp-items="Html.GetEnumSelectList<FuentesDeFondo>()" id="FuenteFondo">
+                    <option disabled="" selected="">Seleccione una fuente de los fondos</option>
                 </select>
                 <span asp-validation-for="FuenteFondo" class="text-danger"></span>
-
             </div>
-
 
             <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
@@ -88,96 +85,23 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+        <script>
+            const rutasMovimiento = {
+                obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbMovimientoes")',
+                obtenerCuentas: '@Url.Action("ObtenerCuentasPorAsociacion", "TbMovimientoes")',
+                obtenerConceptos: '@Url.Action("ObtenerConceptosPorTipo", "TbMovimientoes")',
+                obtenerCategoria: '@Url.Action("ObtenerCategoriaPorTipoConcepto", "TbMovimientoes")'
+            };
+        </script>
+
+        <!-- Tu script separado -->
+        <script src="~/js/MovimientoScripts/MovimientoCreate.js"></script>
+    }
+ 
 }
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        $('#IdAsociacion').change(function () {
-            var idAsociacion = $(this).val();
-            console.log("ID Asociación:", idAsociacion);
-
-            if (idAsociacion) {
-                $.ajax({
-                    url: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbMovimientoes")',
-                    data: { idAsociacion: idAsociacion },
-                    success: function (response) {
-                        var asociadosDropdown = $('#IdAsociado');
-                        asociadosDropdown.empty();
-                        asociadosDropdown.append('<option value="">Seleccione un asociado</option>');
-
-                        console.log("Respuesta del servidor:", response);
-
-                        if (response.success) {
-                            $.each(response.data, function (index, item) {
-                                var nombreCompleto = item.nombre + ' ' + item.apellido1;
-                                asociadosDropdown.append('<option value="' + item.idAsociado + '">' + nombreCompleto + '</option>');
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Atención',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Error al cargar los asociados: ' + error
-                        });
-                    }
-                });
-            } else {
-                $('#IdAsociado').empty().append('<option value="">Seleccione un asociado</option>');
-            }
-        });
-        $('#TipoMovimiento').change(function () {
-            var tipoMovimiento = $(this).val();
-            var idAsociacion = $('#IdAsociacion').val(); 
-
-            console.log("Tipo de movimiento:", tipoMovimiento);
-            console.log("ID Asociación para conceptos:", idAsociacion);
-
-            if (tipoMovimiento) {
-                $.ajax({
-                    url: '@Url.Action("ObtenerConceptosPorTipo", "TbMovimientoes")',
-                    data: { tipoMovimiento: tipoMovimiento, idAsociacion: idAsociacion },
-                    success: function (response) {
-                        var conceptosDropdown = $('#IdConceptoMovimiento');
-                        conceptosDropdown.empty();
-                        conceptosDropdown.append('<option value="">Seleccione un concepto</option>');
-
-                        console.log("Respuesta del servidor:", response);
-
-                        if (response.success) {
-                            $.each(response.data, function (index, item) {
-                                conceptosDropdown.append('<option value="' + item.idConcepto + '">' + item.concepto + '</option>');
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Atención',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Error al cargar los conceptos: ' + error
-                        });
-                    }
-                });
-            } else {
-                $('#IdConceptoMovimiento').empty().append('<option value="">Seleccione un concepto</option>');
-            }
-        });
-
-    });
-</script>
-

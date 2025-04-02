@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
 
-public enum TiposDeConceptoMovimientos
-{
-    Ingreso,
-    Egreso
-}
-
 public partial class TbConceptoMovimiento
 {
+    public enum TiposDeConceptoMovimientos
+    {
+        [Display(Name = "Ingreso")]
+        Ingreso = 1,
+
+        [Display(Name = "Egreso")]
+        Egreso = 2
+    }
+
     public int IdConceptoMovimiento { get; set; }
 
-    public int? IdAsociacion { get; set; }
-
-    public TiposDeConceptoMovimientos TipoMovimiento { get; set; }
+    public TiposDeConceptoMovimientos? TipoMovimiento { get; set; }
 
     public string? Concepto { get; set; }
 
-    public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
-
-    public virtual ICollection<TbCategoriaMovimiento> TbCategoriaMovimientos { get; } = new List<TbCategoriaMovimiento>();
+    public virtual ICollection<TbConceptoAsociacion> TbConceptoAsociacions { get; } = new List<TbConceptoAsociacion>();
 
     public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();
 }

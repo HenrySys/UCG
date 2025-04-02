@@ -23,8 +23,6 @@ public partial class TbActum
 
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
-    public virtual TbAsociado? IdAsociadoNavigation { get; set; }
-
     public virtual ICollection<TbAcuerdo> TbAcuerdos { get; } = new List<TbAcuerdo>();
 
     public virtual ICollection<TbJuntaDirectiva> TbJuntaDirectivas { get; } = new List<TbJuntaDirectiva>();

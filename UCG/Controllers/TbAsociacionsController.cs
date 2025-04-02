@@ -47,6 +47,7 @@ namespace UCG.Controllers
         // GET: TbAsociacions/Create
         public IActionResult Create()
         {
+           
             return View();
         }
 

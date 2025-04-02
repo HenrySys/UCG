@@ -1,4 +1,7 @@
-﻿@model UCG.Models.TbCuentum
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbCuentum;
+
+@model CuentumViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -14,11 +17,16 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class ="form-control" asp-items="ViewBag.IdAsociacion"></select>
+                <select asp-for="IdAsociacion" class ="form-select" asp-items="ViewBag.IdAsociacion">
+                    <option disabled="" selected="">Seleccione una asociacion</option>
+                </select>
+                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="TipoCuenta" class="control-label"></label>
-                <input asp-for="TipoCuenta" class="form-control" />
+                <select asp-for="TipoCuenta" class="form-control" asp-items="Html.GetEnumSelectList<TipoDeCuenta>()">
+                    <option disable="" selected="">Seleccione un tipo de cuenta</option>
+                </select>
                 <span asp-validation-for="TipoCuenta" class="text-danger"></span>
             </div>
             <div class="form-group">

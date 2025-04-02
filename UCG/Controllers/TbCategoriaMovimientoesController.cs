@@ -21,7 +21,7 @@ namespace UCG.Controllers
         // GET: TbCategoriaMovimientoes
         public async Task<IActionResult> Index()
         {
-            var ucgdbContext = _context.TbCategoriaMovimientos.Include(t => t.IdAsociacionNavigation).Include(t => t.IdAsociadoNavigation);
+            var ucgdbContext = _context.TbCategoriaMovimientos.Include(t => t.IdAsociadoNavigation);
             return View(await ucgdbContext.ToListAsync());
         }
 
@@ -34,7 +34,6 @@ namespace UCG.Controllers
             }
 
             var tbCategoriaMovimiento = await _context.TbCategoriaMovimientos
-                .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdAsociadoNavigation)
                 .FirstOrDefaultAsync(m => m.IdCategoriaMovimiento == id);
             if (tbCategoriaMovimiento == null)
@@ -48,7 +47,6 @@ namespace UCG.Controllers
         // GET: TbCategoriaMovimientoes/Create
         public IActionResult Create()
         {
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
             ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
             return View();
         }
@@ -58,7 +56,7 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdCategoriaMovimiento,IdAsociacion,IdAsociado,TipoMovimiento,NombreCategoria,DescripcionCategoria")] TbCategoriaMovimiento tbCategoriaMovimiento)
+        public async Task<IActionResult> Create([Bind("IdCategoriaMovimiento,IdAsociado,TipoMovimiento,NombreCategoria,DescripcionCategoria,IdConceptoAsociacion")] TbCategoriaMovimiento tbCategoriaMovimiento)
         {
             if (ModelState.IsValid)
             {
@@ -66,8 +64,9 @@ namespace UCG.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCategoriaMovimiento.IdAsociacion);
             ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbCategoriaMovimiento.IdAsociado);
+            ViewData["IdConceptoAsociacion"] = new SelectList(_context.TbConceptoAsociacions, "IdConceptoAsociacion", "IdConceptoAsociacion", tbCategoriaMovimiento.IdConceptoAsociacion);
+
             return View(tbCategoriaMovimiento);
         }
 
@@ -84,8 +83,9 @@ namespace UCG.Controllers
             {
                 return NotFound();
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCategoriaMovimiento.IdAsociacion);
             ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbCategoriaMovimiento.IdAsociado);
+            ViewData["IdConceptoAsociacion"] = new SelectList(_context.TbConceptoAsociacions, "IdConceptoAsociacion", "IdConceptoAsociacion", tbCategoriaMovimiento.IdConceptoAsociacion);
+
             return View(tbCategoriaMovimiento);
         }
 
@@ -94,7 +94,7 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdCategoriaMovimiento,IdAsociacion,IdAsociado,TipoMovimiento,NombreCategoria,DescripcionCategoria")] TbCategoriaMovimiento tbCategoriaMovimiento)
+        public async Task<IActionResult> Edit(int id, [Bind("IdCategoriaMovimiento,IdAsociado,TipoMovimiento,NombreCategoria,DescripcionCategoria,IdConceptoAsociacion")] TbCategoriaMovimiento tbCategoriaMovimiento)
         {
             if (id != tbCategoriaMovimiento.IdCategoriaMovimiento)
             {
@@ -121,8 +121,9 @@ namespace UCG.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCategoriaMovimiento.IdAsociacion);
             ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbCategoriaMovimiento.IdAsociado);
+            ViewData["IdConceptoAsociacion"] = new SelectList(_context.TbConceptoAsociacions, "IdConceptoAsociacion", "IdConceptoAsociacion", tbCategoriaMovimiento.IdConceptoAsociacion);
+
             return View(tbCategoriaMovimiento);
         }
 
@@ -135,7 +136,6 @@ namespace UCG.Controllers
             }
 
             var tbCategoriaMovimiento = await _context.TbCategoriaMovimientos
-                .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdAsociadoNavigation)
                 .FirstOrDefaultAsync(m => m.IdCategoriaMovimiento == id);
             if (tbCategoriaMovimiento == null)

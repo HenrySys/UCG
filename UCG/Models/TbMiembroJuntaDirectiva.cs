@@ -1,10 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
 
 public partial class TbMiembroJuntaDirectiva
 {
+    public enum EstadoDeMiembroJD
+    {
+        [Display(Name = "Activo")]
+        Activo = 1,
+
+        [Display(Name = "Inactivo")]
+        Inactivo = 2
+    }
     public int IdMiembrosJuntaDirectiva { get; set; }
 
     public int? IdJuntaDirectiva { get; set; }
@@ -13,7 +22,7 @@ public partial class TbMiembroJuntaDirectiva
 
     public int? IdPuesto { get; set; }
 
-    public string Estado { get; set; } = null!;
+    public EstadoDeMiembroJD? Estado { get; set; }
 
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
 

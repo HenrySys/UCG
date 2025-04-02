@@ -29,6 +29,8 @@ public partial class UcgdbContext : DbContext
 
     public virtual DbSet<TbCliente> TbClientes { get; set; }
 
+    public virtual DbSet<TbConceptoAsociacion> TbConceptoAsociacions { get; set; }
+
     public virtual DbSet<TbConceptoMovimiento> TbConceptoMovimientos { get; set; }
 
     public virtual DbSet<TbCuentum> TbCuenta { get; set; }
@@ -48,12 +50,8 @@ public partial class UcgdbContext : DbContext
     public virtual DbSet<TbPuesto> TbPuestos { get; set; }
 
     public virtual DbSet<TbUsuario> TbUsuarios { get; set; }
-    public IEnumerable<object> TbConceptos { get; internal set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;database=ucgdb;uid=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.3.0-mysql"));
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -66,10 +64,19 @@ public partial class UcgdbContext : DbContext
 
             entity.ToTable("tb_acta_asistencia");
 
+            entity.HasIndex(e => e.IdAsociacion, "fk_tb_acta_asistencia_tb_asociacion");
+
             entity.HasIndex(e => e.IdAsociado, "fk_tb_acta_asistencia_tb_asociado");
 
             entity.Property(e => e.IdActaAsistencia).HasColumnName("id_acta_asistencia");
+            entity.Property(e => e.Fecha).HasColumnName("fecha");
+            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
+
+            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbActaAsistencia)
+                .HasForeignKey(d => d.IdAsociacion)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_acta_asistencia_tb_asociacion");
 
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActaAsistencia)
                 .HasForeignKey(d => d.IdAsociado)
@@ -106,13 +113,8 @@ public partial class UcgdbContext : DbContext
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbActa)
                 .HasForeignKey(d => d.IdAsociacion)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_acta_tb_asociacion");
-
-            entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActa)
-                .HasForeignKey(d => d.IdAsociado)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("fk_tb_acta_tb_miembro_junta_directiva_asociado");
         });
 
         modelBuilder.Entity<TbAcuerdo>(entity =>
@@ -229,19 +231,19 @@ public partial class UcgdbContext : DbContext
                 .HasColumnType("enum('Activo','Inactivo')")
                 .HasColumnName("estado");
             entity.Property(e => e.EstadoCivil)
-                .HasColumnType("enum('Soltero(a)','Casado(a)','Divorciado(A)','Viudo(A)','Union libre')")
+                .HasColumnType("enum('Soltero(a)','Casado(a)','Divorciado(a)','Viudo(a)','Union libre')")
                 .HasColumnName("estado_civil");
             entity.Property(e => e.FechaNacimiento).HasColumnName("fecha_nacimiento");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.Nacionalidad)
-                .HasMaxLength(60)
+                .HasColumnType("enum('Nacional','Residente','Extranjero')")
                 .HasColumnName("nacionalidad");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(30)
                 .HasColumnName("nombre");
             entity.Property(e => e.Sexo)
-                .HasColumnType("enum('Masculino','Femenino','Otro')")
+                .HasColumnType("enum('Femenino','Masculino','Otro')")
                 .HasColumnName("sexo");
             entity.Property(e => e.Telefono)
                 .HasMaxLength(25)
@@ -264,37 +266,29 @@ public partial class UcgdbContext : DbContext
 
             entity.ToTable("tb_categoria_movimiento");
 
-            entity.HasIndex(e => e.IdAsociacion, "fk_tb_categoria_movimiento_tb_asociacion");
-
             entity.HasIndex(e => e.IdAsociado, "fk_tb_categoria_movimiento_tb_asociado");
 
-            entity.HasIndex(e => e.IdConcepto, "fk_tb_categoria_movimiento_tb_concepto_movimiento");
+            entity.HasIndex(e => e.IdConceptoAsociacion, "fk_tb_categoria_movimiento_tb_concepto_asociacion");
 
             entity.Property(e => e.IdCategoriaMovimiento).HasColumnName("id_categoria_movimiento");
             entity.Property(e => e.DescripcionCategoria)
                 .HasMaxLength(100)
                 .HasColumnName("descripcion_categoria");
-            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
-            entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
+            entity.Property(e => e.IdConceptoAsociacion).HasColumnName("id_concepto_asociacion");
             entity.Property(e => e.NombreCategoria)
                 .HasMaxLength(100)
                 .HasColumnName("nombre_categoria");
-
-            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbCategoriaMovimientos)
-                .HasForeignKey(d => d.IdAsociacion)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_tb_categoria_movimiento_tb_asociacion");
 
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbCategoriaMovimientos)
                 .HasForeignKey(d => d.IdAsociado)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tb_categoria_movimiento_tb_asociado");
 
-            entity.HasOne(d => d.IdConceptoNavigation).WithMany(p => p.TbCategoriaMovimientos)
-                .HasForeignKey(d => d.IdConcepto)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("fk_tb_categoria_movimiento_tb_concepto_movimiento");
+            entity.HasOne(d => d.IdConceptoAsociacionNavigation).WithMany(p => p.TbCategoriaMovimientos)
+                .HasForeignKey(d => d.IdConceptoAsociacion)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_categoria_movimiento_tb_concepto_asociacion");
         });
 
         modelBuilder.Entity<TbCliente>(entity =>
@@ -332,11 +326,39 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Telefono)
                 .HasMaxLength(25)
                 .HasColumnName("telefono");
+            entity.Property(e => e.TipoCliente)
+                .HasColumnType("enum('Donante','Colaborador','Cliente')")
+                .HasColumnName("tipo_cliente");
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbClientes)
                 .HasForeignKey(d => d.IdAsociacion)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_cliente_tb_asociacion");
+        });
+
+        modelBuilder.Entity<TbConceptoAsociacion>(entity =>
+        {
+            entity.HasKey(e => e.IdConceptoAsociacion).HasName("PRIMARY");
+
+            entity.ToTable("tb_concepto_asociacion");
+
+            entity.HasIndex(e => e.IdAsociacion, "fk_tb_concepto_asociacion_tb_asociacion");
+
+            entity.HasIndex(e => e.IdConcepto, "fk_tb_concepto_asociacion_tb_concepto");
+
+            entity.Property(e => e.IdConceptoAsociacion).HasColumnName("id_concepto_asociacion");
+            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
+            entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
+
+            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbConceptoAsociacions)
+                .HasForeignKey(d => d.IdAsociacion)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_concepto_asociacion_tb_asociacion");
+
+            entity.HasOne(d => d.IdConceptoNavigation).WithMany(p => p.TbConceptoAsociacions)
+                .HasForeignKey(d => d.IdConcepto)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_concepto_asociacion_tb_concepto");
         });
 
         modelBuilder.Entity<TbConceptoMovimiento>(entity =>
@@ -345,21 +367,13 @@ public partial class UcgdbContext : DbContext
 
             entity.ToTable("tb_concepto_movimiento");
 
-            entity.HasIndex(e => e.IdAsociacion, "fk_tb_concepto_movimiento_tb_asociacion");
-
             entity.Property(e => e.IdConceptoMovimiento).HasColumnName("id_concepto_movimiento");
             entity.Property(e => e.Concepto)
                 .HasMaxLength(100)
                 .HasColumnName("concepto");
-            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.TipoMovimiento)
                 .HasColumnType("enum('Ingreso','Egreso')")
                 .HasColumnName("tipoMovimiento");
-
-            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbConceptoMovimientos)
-                .HasForeignKey(d => d.IdAsociacion)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_tb_concepto_movimiento_tb_asociacion");
         });
 
         modelBuilder.Entity<TbCuentum>(entity =>
@@ -529,12 +543,11 @@ public partial class UcgdbContext : DbContext
                 .HasMaxLength(300)
                 .HasColumnName("descripcion");
             entity.Property(e => e.Estado)
-                .HasDefaultValueSql("'Inactivo'")
-                .HasColumnType("enum('Procesado','Inactivo','En Proceso')")
+                .HasColumnType("enum('Procesado','Inactivo','EnProceso')")
                 .HasColumnName("estado");
             entity.Property(e => e.FechaMovimiento).HasColumnName("fecha_movimiento");
             entity.Property(e => e.FuenteFondo)
-                .HasColumnType("enum('Fondos Propios','Aporte 2% Dinadeco')")
+                .HasColumnType("enum('FondosPropios','Aporte2Dinadeco')")
                 .HasColumnName("fuente_fondo");
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");

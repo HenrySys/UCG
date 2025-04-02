@@ -14,7 +14,7 @@ namespace UCG.Models.ViewModels
                 .NotEmpty().WithMessage("Este campo no puede ser vacío")
                 .EmailAddress().WithMessage("Ingrese un correo electrónico válido");
 
-            
+
 
         }
     }

@@ -15,7 +15,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<UcgdbContext>(options =>
 {
-    options.UseMySql(
+     options.UseMySql(
         builder.Configuration.GetConnectionString("ucgdbConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ucgdbConnection")) // Detecta la versión automáticamente
     );

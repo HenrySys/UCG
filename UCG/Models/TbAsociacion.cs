@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
 
 public partial class TbAsociacion
 {
+    public enum EstadoDeAsociacion
+    {
+        [Display(Name = "Activo")]
+        Activo = 1,
+
+        [Display(Name = "Inactivo")]
+        Inactivo = 2,
+        
+    }
+
     public int IdAsociacion { get; set; }
 
     public string CedulaJuridica { get; set; } = null!;
@@ -33,17 +44,17 @@ public partial class TbAsociacion
 
     public string Descripcion { get; set; } = null!;
 
-    public string Estado { get; set; } = null!;
+    public EstadoDeAsociacion? Estado { get; set; }
 
     public virtual ICollection<TbActum> TbActa { get; } = new List<TbActum>();
 
-    public virtual ICollection<TbAsociado> TbAsociados { get; } = new List<TbAsociado>();
+    public virtual ICollection<TbActaAsistencium> TbActaAsistencia { get; } = new List<TbActaAsistencium>();
 
-    public virtual ICollection<TbCategoriaMovimiento> TbCategoriaMovimientos { get; } = new List<TbCategoriaMovimiento>();
+    public virtual ICollection<TbAsociado> TbAsociados { get; } = new List<TbAsociado>();
 
     public virtual ICollection<TbCliente> TbClientes { get; } = new List<TbCliente>();
 
-    public virtual ICollection<TbConceptoMovimiento> TbConceptoMovimientos { get; } = new List<TbConceptoMovimiento>();
+    public virtual ICollection<TbConceptoAsociacion> TbConceptoAsociacions { get; } = new List<TbConceptoAsociacion>();
 
     public virtual ICollection<TbCuentum> TbCuenta { get; } = new List<TbCuentum>();
 

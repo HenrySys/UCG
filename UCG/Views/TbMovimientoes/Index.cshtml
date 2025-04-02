@@ -9,7 +9,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="movimientosTable">
     <thead>
         <tr>
             <th>
@@ -65,7 +65,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+         <tr data-id="@item.IdMovimiento">
             <td>
                 @Html.DisplayFor(modelItem => item.IdAsociado)
             </td>
@@ -103,7 +103,7 @@
                 @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                @Html.DisplayFor(modelitem => item.IdAsociacionNavigation.IdAsociacion)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IdCategoriaMovimientoNavigation.IdCategoriaMovimiento)
@@ -123,3 +123,10 @@
 }
     </tbody>
 </table>
+
+@section Scripts {
+    @{
+    <!-- Tu script separado -->
+    <script src="~/js/MovimientoScripts/MovimientoIndex.js"></script>
+    }
+}
