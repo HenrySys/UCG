@@ -15,16 +15,13 @@
             }
         }
     });
-
-
     $('#miTabla tbody').on('click', 'tr', function () {
-        var idProyecto = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Proveedor:", idProyecto);
+        var idConceptoAsociacion = $(this).data("id"); // Obtener ID de la fila seleccionada
+        console.log("ID ConceptoAsociacion:", idConceptoAsociacion);
 
-        if (idProyecto) {
-            window.location.href = "/TbProyectoes/Details/" + idProyecto;
+        if (idConceptoAsociacion) {
+            window.location.href = "/TbConceptoAsociacions/Details/" + idConceptoAsociacion;
         }
     });
-
 
 });

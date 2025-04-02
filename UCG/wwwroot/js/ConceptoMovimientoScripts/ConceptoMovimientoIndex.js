@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#miTabla').DataTable({
+    var tabla = $('#miTabla').DataTable({
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -15,12 +15,13 @@
             }
         }
     });
-    $("#miTabla tbody tr").click(function () {
+    $('#miTabla tbody').on('click', 'tr', function () {
         var idConceptoMovimiento = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Concepto:", idConceptoMovimiento);
-        // Redirigir a la página de detalles
+        console.log("ID ConceptoMovimiento:", idConceptoMovimiento);
+
         if (idConceptoMovimiento) {
-            window.location.href = "/TbMovimientoes/Details/" + idConceptoMovimiento;
+            window.location.href = "/TbConceptoMovimientoes/Details/" + idConceptoMovimiento;
         }
     });
+   
 });

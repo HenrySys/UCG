@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#miTabla').DataTable({
+    var tabla = $('#miTabla').DataTable({
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -15,12 +15,14 @@
             }
         }
     });
-    $("#miTabla tbody tr").click(function () {
+
+    $('#miTabla tbody').on('click', 'tr', function () {
         var idProveedor = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Acta:", idProveedor);
-        // Redirigir a la página de detalles
+        console.log("ID Proveedor:", idProveedor);
+
         if (idProveedor) {
             window.location.href = "/TbProveedors/Details/" + idProveedor;
         }
     });
+    
 });

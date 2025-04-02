@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#miTabla').DataTable({
+    var tabla = $('#miTabla').DataTable({
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -15,10 +15,12 @@
             }
         }
     });
-    $("#miTabla tbody tr").click(function () {
+
+    // Asignar evento con delegación
+    $('#miTabla tbody').on('click', 'tr', function () {
         var idAsociacion = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Acta:", idAsociacion);
-        // Redirigir a la página de detalles
+        console.log("ID Asociación:", idAsociacion);
+
         if (idAsociacion) {
             window.location.href = "/TbAsociacions/Details/" + idAsociacion;
         }
