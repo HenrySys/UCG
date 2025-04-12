@@ -1,4 +1,6 @@
-﻿@model UCG.Models.TbAcuerdo
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbAcuerdo;
+@model AcuerdoViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -14,7 +16,9 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class ="form-control" asp-items="ViewBag.IdActa"></select>
+                <select asp-for="IdActa" class ="form-select" asp-items="ViewBag.IdActa">
+                      <option disabled="" selected="">Seleccione un acta</option>
+                </select>
             </div>
             <div class="form-group">
                 <label asp-for="NumeroAcuerdo" class="control-label"></label>

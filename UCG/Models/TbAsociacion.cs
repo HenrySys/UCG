@@ -13,22 +13,26 @@ public partial class TbAsociacion
 
         [Display(Name = "Inactivo")]
         Inactivo = 2,
-        
+
     }
 
     public int IdAsociacion { get; set; }
 
+    [Display(Name = "Cédula Jurídica")]
     public string CedulaJuridica { get; set; } = null!;
 
+    [Display(Name = "Codigo Registro")]
     public string CodigoRegistro { get; set; } = null!;
 
     public string Nombre { get; set; } = null!;
 
+    [Display(Name = "Fecha Constitucion")]
     public DateOnly FechaConstitucion { get; set; }
 
     public string Telefono { get; set; } = null!;
 
     public string? Fax { get; set; }
+
 
     public string Correo { get; set; } = null!;
 

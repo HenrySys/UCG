@@ -4,13 +4,13 @@ namespace UCG.Models.ViewModels
 {
     public class ConceptoAsociacionViewModel
     {
-        [Display(Name = "ID Concepto Asociacion")]
+        [Display(Name = "Concepto Asociacion")]
         public int IdConceptoAsociacion { get; set; }
 
-        [Display(Name = "ID Asociacion")]
+        [Display(Name = "Asociacion")]
         public int? IdAsociacion { get; set; }
 
-        [Display(Name = "ID Concepto")]
+        [Display(Name = "Concepto")]
         public int? IdConcepto { get; set; }
     }
 }

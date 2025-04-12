@@ -25,6 +25,7 @@ public partial class TbUsuario
     }
     public int IdUsuario { get; set; }
 
+    [Display(Name = "Nombre")]
     public string? NombreUsuario { get; set; }
 
     public string? Contraseña { get; set; }

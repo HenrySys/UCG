@@ -13,16 +13,15 @@
                 "next": "Siguiente",
                 "previous": "Anterior"
             }
-            
         }
     });
+    // Asignar evento con delegación
     $('#miTabla tbody').on('click', 'tr', function () {
-        var idAsociado = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Asociado:", idAsociado);
+        var idAcuerdo = $(this).data("id"); 
+        console.log("ID Acuerdo:", idAcuerdo);
 
-        if (idAsociado) {
-            window.location.href = "/TbAsociadoes/Details/" + idAsociado;
+        if (idAcuerdo) {
+            window.location.href = "/TbAcuerdoes/Details/" + idAcuerdo;
         }
     });
-
 });

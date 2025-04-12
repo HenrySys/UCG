@@ -9,51 +9,67 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroAcuerdo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MontoAcuerdo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdActaNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumeroAcuerdo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MontoAcuerdo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdAcuerdo">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdAcuerdo">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdAcuerdo">Delete</a>
-            </td>
-        </tr>
+<div  class="tabletable-responsive">
+    <table  id="miTabla" class="table table-striped table-hover display compact">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.NumeroAcuerdo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nombre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descripcion)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MontoAcuerdo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdActaNavigation)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumeroAcuerdo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nombre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descripcion)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MontoAcuerdo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdAcuerdo">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdAcuerdo">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdAcuerdo">Delete</a>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+</div>
+<!-- DataTables CSS con Bootstrap -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+@section Scripts {
+    @{
+        <!-- Tu script separado -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="~/js/AcuerdoScripts/AcuerdoIndex.js"></script>
+    }
 }
-    </tbody>
-</table>

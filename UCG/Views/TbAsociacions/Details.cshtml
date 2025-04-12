@@ -4,9 +4,7 @@
     ViewData["Title"] = "Detalle de asociacion";
 }
 
-
 <h1>Details</h1>
-
 
 <div>
     <h4>TbAsociacion</h4>
@@ -34,7 +32,7 @@
             @Html.DisplayNameFor(model => model.FechaConstitucion)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaConstitucion)
+            @Model.FechaConstitucion.ToString("dd/MM/yyyy")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Telefono)

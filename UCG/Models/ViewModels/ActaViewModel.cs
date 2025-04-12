@@ -12,7 +12,7 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Fecha de Acta")]
         [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly FechaSesion { get; set; }
-        [Display(Name = "NUmero de acta")]
+        [Display(Name = "Numero de acta")]
         public string? NumeroActa { get; set; }
         [Display(Name = "Descripcion")]
         public string? Descripcion { get; set; }
@@ -21,9 +21,11 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Monto total acordado")]
         public decimal? MontoTotalAcordado { get; set; }
         [Display(Name = "Asociado")]
-        public int? IdAsociado { get; set; }
+        public int IdAsociado { get; set; }
 
-        public List<ActaAsistenciaViewModel> ActaAsistencia { get; set; } = new List<ActaAsistenciaViewModel>();
+        public string ActaAsistenciaJason { get; set; } 
+
+        public List<ActaAsistenciaViewModel> ActaAsistencia { get; set; } = new ();
 
     }
 }

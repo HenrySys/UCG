@@ -17,6 +17,7 @@ public partial class TbConceptoMovimiento
 
     public int IdConceptoMovimiento { get; set; }
 
+    [Display(Name = "Tipo Movimiento")]
     public TiposDeConceptoMovimientos? TipoMovimiento { get; set; }
 
     public string? Concepto { get; set; }

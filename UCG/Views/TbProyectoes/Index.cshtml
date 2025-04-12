@@ -9,60 +9,63 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table id="miTabla" class="table table-striped table-hover display">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MontoTotalDestinado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdActaNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-            <tr data-id="@item.IdProyecto">
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MontoTotalDestinado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdProyecto">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdProyecto">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdProyecto">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="table-responsive">
+
+    <table id="miTabla" class="table table-striped table-hover display">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nombre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descripcion)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MontoTotalDestinado)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdActaNavigation)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+                <tr data-id="@item.IdProyecto">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nombre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descripcion)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MontoTotalDestinado)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdProyecto">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdProyecto">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdProyecto">Delete</a>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+</div>
 
 <!-- DataTables CSS con Bootstrap -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">

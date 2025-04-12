@@ -44,7 +44,9 @@
             @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
         </dt>
         <dd class = "col-sm-10">
+            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
             @Html.DisplayFor(model => model.IdAsociacionNavigation.IdAsociacion)
+               </a>
         </dd>
     </dl>
 </div>

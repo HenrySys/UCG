@@ -38,13 +38,17 @@
             @Html.DisplayNameFor(model => model.IdActaNavigation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdActaNavigation.IdActa)
+            <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation.IdActa">
+            @Html.DisplayFor(model => model.IdActaNavigation.NumeroActa)
+                </a>
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdAsociacionNavigation.IdAsociacion)
+            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+            @Html.DisplayFor(model => model.IdAsociacionNavigation.Nombre)
+                </a>    
         </dd>
     </dl>
 </div>

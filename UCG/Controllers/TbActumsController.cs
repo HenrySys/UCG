@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using UCG.Models;
+using UCG.Models.ValidationModels;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -46,10 +49,18 @@ namespace UCG.Controllers
         }
 
         // GET: TbActums/Create
+        [HttpGet]
         public IActionResult Create()
         {
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            return View();
+            var model = new ActaViewModel
+            {
+                FechaSesion = DateOnly.FromDateTime(DateTime.Today),
+                ActaAsistencia = new List<ActaAsistenciaViewModel>()
+            };
+
+            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+
+            return View(model);
         }
 
         // POST: TbActums/Create
@@ -57,18 +68,73 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdActa,IdAsociacion,IdAsociado,FechaSesion,NumeroActa,Descripcion,Estado,MontoTotalAcordado")] TbActum tbActum)
+        public async Task<IActionResult> Create(ActaViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(tbActum);
+                if (!string.IsNullOrWhiteSpace(model.ActaAsistenciaJason))
+                {
+                    model.ActaAsistencia = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.ActaAsistenciaJason);
+                }
+
+                model.ActaAsistencia ??= new List<ActaAsistenciaViewModel>();
+
+                var validator = new ActaViewModelValidator(_context);
+                var validationResult = await validator.ValidateAsync(model);
+
+                if (!validationResult.IsValid)
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
+                    return View(model);
+                }
+
+                var acta = new TbActum
+                {
+                    IdAsociacion = model.IdAsociacion,
+                    FechaSesion = model.FechaSesion,
+                    NumeroActa = model.NumeroActa,
+                    Descripcion = model.Descripcion,
+                    Estado = model.Estado,
+                    MontoTotalAcordado = model.MontoTotalAcordado,
+                };
+
+                _context.Add(acta);
                 await _context.SaveChangesAsync();
+
+                // 👇 Guardar asistencias si hay
+                foreach (var asistencia in model.ActaAsistencia)
+                {
+                    var nuevaAsistencia = new TbActaAsistencium
+                    {
+                        IdActa = acta.IdActa,
+                        IdAsociado = asistencia.IdAsociado,
+                        Fecha = asistencia.Fecha
+                    };
+
+                    _context.TbActaAsistencia.Add(nuevaAsistencia);
+                }
+
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActum.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActum.IdAsociado);
-            return View(tbActum);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Ocurrió un error al guardar el acta.");
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
+                return View(model);
+            }
         }
+
+
 
         [HttpGet]
         public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)

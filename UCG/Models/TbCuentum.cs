@@ -28,7 +28,6 @@ public partial class TbCuentum
         Debito = 3,
         
     }
-
     public enum BancoDeCuenta
     {
         [Display(Name = "Banco Nacional")]
@@ -41,17 +40,19 @@ public partial class TbCuentum
         BCR = 3,
         
         [Display(Name = "BAC")]
-        BAC = 4,
-        
+        BAC = 4,      
     }
     public int IdCuenta { get; set; }
 
     public int? IdAsociacion { get; set; }
 
+    [Display(Name = "Tipo Cuenta")]
     public TipoDeCuenta? TipoCuenta { get; set; }
 
+    [Display(Name = "Titulo Cuenta")]
     public string TituloCuenta { get; set; } = null!;
 
+    [Display(Name = "Numero Cuenta")]
     public int NumeroCuenta { get; set; }
 
     public string Telefono { get; set; } = null!;
@@ -62,6 +63,7 @@ public partial class TbCuentum
 
     public BancoDeCuenta? Banco { get; set; }
 
+    [Display(Name = "Cod Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
     public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();

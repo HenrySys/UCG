@@ -1,4 +1,6 @@
-﻿@model UCG.Models.TbPuesto
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbPuesto;
+@model PuestoViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -13,14 +15,14 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+                <label asp-for="NombrePuesto" class="control-label"></label>
+                <input asp-for="NombrePuesto" class="form-control" />
+                <span asp-validation-for="NombrePuesto" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Decripcion" class="control-label"></label>
-                <input asp-for="Decripcion" class="form-control" />
-                <span asp-validation-for="Decripcion" class="text-danger"></span>
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

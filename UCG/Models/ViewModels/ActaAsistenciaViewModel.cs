@@ -8,7 +8,7 @@ namespace UCG.Models.ViewModels
         public int IdActaAsistencia { get; set; }
         
         [Display(Name = "Asociado")]
-        public int? IdAsociado { get; set; }
+        public int IdAsociado { get; set; }
 
         [Display(Name = "Acta")]
         public int? IdActa { get; set; }

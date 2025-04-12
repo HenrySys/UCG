@@ -1,4 +1,5 @@
-﻿@model IEnumerable<UCG.Models.TbAsociacion>
+﻿
+@model IEnumerable<UCG.Models.TbAsociacion>
 
 @{
     ViewData["Title"] = "Index";
@@ -9,7 +10,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table id="miTabla" class="table table-striped table-hover display">
+<table id="miTabla" class="table table-striped table-hover display compact">
     <thead>
         <tr>
             <th>
@@ -45,9 +46,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Pueblo)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Direccion)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.Descripcion)
             </th>
@@ -70,7 +69,7 @@
                 @Html.DisplayFor(modelItem => item.Nombre)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaConstitucion)
+                @item.FechaConstitucion.ToString("yyyy-MM-dd")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Telefono)
@@ -96,9 +95,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Direccion)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Estado)
             </td>

@@ -29,14 +29,19 @@ public partial class TbProveedor
 
     public int? IdAsociacion { get; set; }
 
+    [Display(Name = "Tipo Proveedor")]
     public TipoDeProveedor TipoProveedor { get; set; }
 
+    [Display(Name = "Nombre Proveedor")]
     public string NombreEmpresa { get; set; } = null!;
 
+    [Display(Name = "Ced Proveedor")]
     public string CedulaJuridica { get; set; } = null!;
 
+    [Display(Name = "Nombre Contacto")]
     public string NombreContacto { get; set; } = null!;
 
+    [Display(Name = "Cedula Contacto")]
     public string CedulaContacto { get; set; } = null!;
 
     public string Direccion { get; set; } = null!;
@@ -49,6 +54,7 @@ public partial class TbProveedor
 
     public EstadoDeProveedor? Estado { get; set; } = null!;
 
+    [Display(Name = "Cod Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
     public virtual ICollection<TbMovimiento> TbMovimientos { get; } = new List<TbMovimiento>();

@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using UCG.Models;
 using UCG.Services;
 using Rotativa.AspNetCore; // Importar Rotativa
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 
@@ -44,6 +42,8 @@ builder.Services.AddControllersWithViews().AddFluentValidation(fv =>
 {
     fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 });
+
+
 
 var app = builder.Build();
 

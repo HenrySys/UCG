@@ -24,6 +24,4 @@
             window.location.href = "/TbMovimientoes/Details/" + idMovimiento;
         }
     });
-
-
 });

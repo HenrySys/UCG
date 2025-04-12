@@ -22,20 +22,25 @@ public partial class TbActum
 
     public int? IdAsociacion { get; set; }
 
+    [Display(Name = "Fecha de Sesion")]
     public DateOnly FechaSesion { get; set; }
 
+    [Display(Name = "Fecha de Acta")]
     public string? NumeroActa { get; set; }
 
     public string? Descripcion { get; set; }
 
     public EstadoDeActa? Estado { get; set; }
 
+    [Display(Name = "Monto Total Acordado")]
     public decimal? MontoTotalAcordado { get; set; }
 
     public int? IdAsociado { get; set; }
 
+    [Display(Name = "Cod Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 
+    [Display(Name = "Ced Asociado")]
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
 
     public virtual ICollection<TbAcuerdo> TbAcuerdos { get; } = new List<TbAcuerdo>();

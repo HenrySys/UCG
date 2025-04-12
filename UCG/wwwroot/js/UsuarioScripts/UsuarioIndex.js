@@ -23,6 +23,4 @@
             window.location.href = "/TbUsuarios/Details/" + idUsuario;
         }
     });
-
-    
 });

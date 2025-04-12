@@ -46,5 +46,6 @@ public partial class TbCliente
 
     public TipoDeCliente? TipoCliente { get; set; }
 
+    [Display(Name = "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 }
