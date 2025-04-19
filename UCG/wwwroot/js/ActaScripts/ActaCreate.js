@@ -91,7 +91,6 @@
             $(this).closest('tr').remove();
         });
 
-        // Convertir tabla a JSON antes de enviar
         $('form').on('submit', function (e) {
             limpiarErrores();
 
