@@ -109,7 +109,7 @@ namespace UCG.Controllers
                 _context.Add(acta);
                 await _context.SaveChangesAsync();
 
-                // 👇 Guardar asistencias si hay
+                //Guardar asistencias si hay
                 foreach (var asistencia in model.ActaAsistencia)
                 {
                     var nuevaAsistencia = new TbActaAsistencium

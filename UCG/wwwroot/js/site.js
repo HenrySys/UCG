@@ -3,5 +3,3 @@
 
 // Write your JavaScript code.
 
-<link href="_content/Blazorise/blazorise.css" rel="stylesheet" />
-<link href="_content/Blazorise.FluentUI/blazorise.fluentui.css" rel="stylesheet" />

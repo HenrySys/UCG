@@ -53,7 +53,6 @@
         // Limpiar al abrir el modal
         $('#detailModal').on('show.bs.modal', function () {
             limpiarErrores();
-            $('#modalIdAsociado').val('0');
         });
 
         // Agregar asistencia
@@ -108,12 +107,7 @@
                 });
             });
 
-            if (asistencias.length === 0) {
-                e.preventDefault(); // Evita el envío
-                alert('Debe agregar al menos una asistencia.');
-                return;
-            }
-
+          
             $('#ActaAsistenciaJason').val(JSON.stringify(asistencias));
         });
 

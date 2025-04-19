@@ -42,8 +42,7 @@ namespace UCG.Models.ValidationModels
             RuleFor(x => x.FechaSesion)
                 .NotNull().WithMessage("Debe ingresar una fecha de sesion.")
                 .NotEmpty().WithMessage("Debe ingresar una fecha de sesion.")
-                .Must(date => date != default(DateOnly)).WithMessage("La fecha de sesion no es valida.")
-                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today)).WithMessage("La fecha de sesion no puede ser mayor a la fecha actual.");
+                .Must(date => date != default(DateOnly)).WithMessage("La fecha de sesion no es valida.");
 
             RuleFor(x => x.NumeroActa)
                 .NotNull().WithMessage("Debe ingresar un numero de acta.")
@@ -68,12 +67,7 @@ namespace UCG.Models.ValidationModels
                 .GreaterThanOrEqualTo(0).WithMessage("El Monto Total Acordado debe ser un valor Mayor o Igual a ¢0.")
                 .LessThanOrEqualTo(9999999999).WithMessage("El Monto Total Acordado no puede ser mayor a ¢9.999.999.999.");
 
-            RuleFor(x => x.ActaAsistencia)
-                .NotNull().WithMessage("Debe ingresar al menos una asistencia.")
-                .Must(list => list.Count > 0).WithMessage("Debe ingresar al menos una asistencia.");
 
-            RuleForEach(x => x.ActaAsistencia)
-                .SetValidator(new ActaAsistenciaViewModelValidator(_context));
         }
     }
 }
