@@ -48,91 +48,45 @@ namespace UCG.Controllers
             return View(tbActum);
         }
 
-        // GET: TbActums/Create
         [HttpGet]
         public IActionResult Create()
         {
             var model = new ActaViewModel
             {
-                FechaSesion = DateOnly.FromDateTime(DateTime.Today),
-                //ActaAsistencia = new List<ActaAsistenciaViewModel>()
+                FechaSesion = DateOnly.FromDateTime(DateTime.Today)
             };
 
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
-
             return View(model);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ActaViewModel model)
+        {
+          
 
-        // POST: TbActums/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(ActaViewModel model)
-        //{
-        //    try
-        //    {
-        //        if (!string.IsNullOrWhiteSpace(model.ActaAsistenciaJason))
-        //        {
-        //            model.ActaAsistencia = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.ActaAsistenciaJason);
-        //        }
+            if (!ModelState.IsValid)
+            {
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
+                return View(model);
+            }
 
-        //        model.ActaAsistencia ??= new List<ActaAsistenciaViewModel>();
+            var acta = new TbActum
+            {
+                IdAsociacion = model.IdAsociacion,
+                FechaSesion = model.FechaSesion,
+                NumeroActa = model.NumeroActa,
+                Descripcion = model.Descripcion,
+                Estado = model.Estado,
+                MontoTotalAcordado = model.MontoTotalAcordado
+            };
 
-        //        var validator = new ActaViewModelValidator(_context);
-        //        var validationResult = await validator.ValidateAsync(model);
+            _context.TbActa.Add(acta);
+            await _context.SaveChangesAsync();
 
-        //        if (!validationResult.IsValid)
-        //        {
-        //            foreach (var error in validationResult.Errors)
-        //            {
-        //                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-        //            }
-        //        }
+            return RedirectToAction(nameof(Index));
+        }
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
-        //            return View(model);
-        //        }
-
-        //        var acta = new TbActum
-        //        {
-        //            IdAsociacion = model.IdAsociacion,
-        //            FechaSesion = model.FechaSesion,
-        //            NumeroActa = model.NumeroActa,
-        //            Descripcion = model.Descripcion,
-        //            Estado = model.Estado,
-        //            MontoTotalAcordado = model.MontoTotalAcordado,
-        //        };
-
-        //        _context.Add(acta);
-        //        await _context.SaveChangesAsync();
-
-        //        //Guardar asistencias si hay
-        //        foreach (var asistencia in model.ActaAsistencia)
-        //        {
-        //            var nuevaAsistencia = new TbActaAsistencium
-        //            {
-        //                IdActa = acta.IdActa,
-        //                IdAsociado = asistencia.IdAsociado,
-        //                Fecha = asistencia.Fecha
-        //            };
-
-        //            _context.TbActaAsistencia.Add(nuevaAsistencia);
-        //        }
-
-        //        await _context.SaveChangesAsync();
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Ocurrió un error al guardar el acta.");
-        //        ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
-        //        return View(model);
-        //    }
-        //}
 
 
 

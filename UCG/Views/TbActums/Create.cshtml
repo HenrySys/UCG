@@ -56,28 +56,7 @@
                 <input asp-for="MontoTotalAcordado" class="form-control" />
                 <span asp-validation-for="MontoTotalAcordado" class="text-danger"></span>
             </div>
-            <div class="mb-3">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal">
-                    Agregar Asistencias
-                </button>
-            </div>
 
-            <h4>Asistencias</h4>
-            <table class="table table-bordered" id="detailsTable">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Asociado</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-
-
-            <input type="hidden" id="ActaAsistenciaJason" name="ActaAsistencia" />
-
-
-            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -89,27 +68,7 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Agregar Detalle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label">Asociado</label>
-                <select id="modalIdAsociado" class="form-select">
-                    <option value="0" disabled selected>Seleccione un asociado</option>
-                </select>
-              
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="addDetailBtn" class="btn btn-success">Agregar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");

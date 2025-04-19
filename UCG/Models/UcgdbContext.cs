@@ -73,10 +73,10 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
 
-            entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencias)
-                .HasForeignKey(d => d.IdActa)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
+            //entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencias)
+            //    .HasForeignKey(d => d.IdActa)
+            //    .OnDelete(DeleteBehavior.Cascade)
+            //    .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
 
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActaAsistencia)
                 .HasForeignKey(d => d.IdAsociado)
@@ -236,7 +236,7 @@ public partial class UcgdbContext : DbContext
                 .HasColumnType("enum('Activo','Inactivo')")
                 .HasColumnName("estado");
             entity.Property(e => e.EstadoCivil)
-                .HasColumnType("enum('Soltero(a)','Casado(a)','Divorciado(a)','Viudo(a)','Union libre')")
+                .HasColumnType("enum('Soltero','Casado','Divorciado','Viudo','Union libre')")
                 .HasColumnName("estado_civil");
             entity.Property(e => e.FechaNacimiento).HasColumnName("fecha_nacimiento");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
