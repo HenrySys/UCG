@@ -51,7 +51,7 @@ public partial class TbActum
 
     public virtual ICollection<TbProyecto> TbProyectos { get; } = new List<TbProyecto>();
 
-    //public virtual ICollection<TbActaAsistencium> TbActaAsistencias { get; } = new List<TbActaAsistencium>();
+    public virtual ICollection<TbActaAsistencium> TbActaAsistencias { get; } = new List<TbActaAsistencium>();
 
 
 }

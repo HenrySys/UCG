@@ -50,7 +50,7 @@ body {
     padding: 2rem;
 }
 
-.form-control,
+.form-control,.form-select,
 .login-btn {
     border-radius: 10px;
     font-size: 1rem;
@@ -58,6 +58,12 @@ body {
 }
 
     .form-control:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: #ff7f50;
+    }
+
+    .form-select:focus {
         outline: none;
         box-shadow: none;
         border-color: #ff7f50;

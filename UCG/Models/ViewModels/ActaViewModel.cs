@@ -23,8 +23,16 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Asociado")]
         public int IdAsociado { get; set; }
 
+        public string ActaAsistenciaJason { get; set; } = null!;
 
+        public string ActaAcuerdoJason { get; set; } = null!;
 
+        public List<AcuerdoViewModel> ActaAcuerdo { get; set; } = new();
+
+        public List<ActaAsistenciaViewModel> ActaAsistencia { get; set; } = new ();
+
+    
+        
 
     }
 }

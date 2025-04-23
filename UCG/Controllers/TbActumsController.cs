@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -59,17 +60,54 @@ namespace UCG.Controllers
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ActaViewModel model)
         {
-          
+            if (!string.IsNullOrWhiteSpace(model.ActaAsistenciaJason))
+                model.ActaAsistencia = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.ActaAsistenciaJason);
+
+            if (!string.IsNullOrWhiteSpace(model.ActaAcuerdoJason))
+                model.ActaAcuerdo = JsonConvert.DeserializeObject<List<AcuerdoViewModel>>(model.ActaAcuerdoJason);
+
+            model.ActaAsistencia ??= new();
+            model.ActaAcuerdo ??= new();
+
+            var validator = new ActaViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            // Validar asistencias
+            var asistenciaValidator = new ActaAsistenciaViewModelValidator(_context);
+            foreach (var asistencia in model.ActaAsistencia)
+            {
+                var result = await asistenciaValidator.ValidateAsync(asistencia);
+                validationResult.Errors.AddRange(result.Errors);
+            }
+
+            // Validar acuerdos
+            var acuerdoValidator = new AcuerdoViewModelValidator(_context);
+            foreach (var acuerdo in model.ActaAcuerdo)
+            {
+                var result = await acuerdoValidator.ValidateAsync(acuerdo);
+                validationResult.Errors.AddRange(result.Errors);
+            }
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
             if (!ModelState.IsValid)
             {
+                model.ActaAsistenciaJason = JsonConvert.SerializeObject(model.ActaAsistencia ?? new());
+                model.ActaAcuerdoJason = JsonConvert.SerializeObject(model.ActaAcuerdo ?? new());
+
+
                 ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
+               
+
                 return View(model);
             }
+
 
             var acta = new TbActum
             {
@@ -78,14 +116,37 @@ namespace UCG.Controllers
                 NumeroActa = model.NumeroActa,
                 Descripcion = model.Descripcion,
                 Estado = model.Estado,
-                MontoTotalAcordado = model.MontoTotalAcordado
+                MontoTotalAcordado = model.MontoTotalAcordado,
             };
 
             _context.TbActa.Add(acta);
             await _context.SaveChangesAsync();
 
+            foreach (var asistencia in model.ActaAsistencia)
+            {
+                _context.TbActaAsistencia.Add(new TbActaAsistencium
+                {
+                    IdActa = acta.IdActa,
+                    IdAsociado = asistencia.IdAsociado,
+                    Fecha = asistencia.Fecha
+                });
+            }
+
+            foreach (var acuerdo in model.ActaAcuerdo)
+            {
+                _context.TbAcuerdos.Add(new TbAcuerdo
+                {
+                    IdActa = acta.IdActa,
+                    Nombre = acuerdo.Nombre,
+                    Descripcion = acuerdo.Descripcion,
+                    MontoAcuerdo = acuerdo.MontoAcuerdo
+                });
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
 
 

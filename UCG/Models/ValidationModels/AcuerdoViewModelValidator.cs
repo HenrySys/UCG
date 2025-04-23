@@ -11,24 +11,6 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdAcuerdo)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbAcuerdos.AnyAsync(a => a.IdAcuerdo == id);
-                })
-                .WithMessage("Ya existe un acuerdo con ese id.");
-
-            RuleFor(x => x.IdActa)
-              .NotNull().WithMessage("Debe seleccionar una Acta.")
-              .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
-               .MustAsync(async (id, cancellation) =>
-               {
-                   return await _context.TbAcuerdos.AnyAsync(a => a.IdActa == id);
-               })
-               .WithMessage("La Acta seleccionada no existe.");
-
             RuleFor(x => x.Nombre)
                 .NotNull().WithMessage("Debe ingresar un Nombre de Proyecto.")
                 .NotEmpty().WithMessage("Debe ingresar un Nombre de Proyecto.")

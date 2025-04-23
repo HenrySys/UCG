@@ -73,10 +73,10 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.IdActa).HasColumnName("id_acta");
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
 
-            //entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencias)
-            //    .HasForeignKey(d => d.IdActa)
-            //    .OnDelete(DeleteBehavior.Cascade)
-            //    .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
+            entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActaAsistencias)
+                .HasForeignKey(d => d.IdActa)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_tb_acta_asistencia_tb_acta");
 
             entity.HasOne(d => d.IdAsociadoNavigation).WithMany(p => p.TbActaAsistencia)
                 .HasForeignKey(d => d.IdAsociado)

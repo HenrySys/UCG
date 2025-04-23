@@ -12,21 +12,13 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdActa)
-                 .NotNull().WithMessage("Debe seleccionar una Acta.")
-                 .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
-                 .MustAsync(async (id, cancellation) =>
-                 {
-                     return !await _context.TbActa.AnyAsync(a => a.IdActa == id);
-                 })
-                 .WithMessage("Ya existe un Acta con ese id.");
 
             RuleFor(x => x.IdAsociado)
-                 .NotNull().WithMessage("Debe seleccionar una Acta.")
+                 .NotNull().WithMessage("Debe seleccionar una Asociado.")
                  .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
                  .MustAsync(async (id, cancellation) =>
                  {
-                     return await _context.TbActa.AnyAsync(a => a.IdAsociado == id);
+                     return await _context.TbAsociados.AnyAsync(a => a.IdAsociado == id);
                  })
                  .WithMessage("El asociado seleccionada no existe.");
 
@@ -35,9 +27,9 @@ namespace UCG.Models.ValidationModels
                  .GreaterThan(0).WithMessage("Debe seleccionar una Acta valida.")
                  .MustAsync(async (id, cancellation) =>
                  {
-                     return await _context.TbActa.AnyAsync(a => a.IdAsociacion == id);
+                     return await _context.TbAsociacions.AnyAsync(a => a.IdAsociacion == id);
                  })
-                 .WithMessage("El asociado seleccionada no existe.");
+                 .WithMessage("El asociacion seleccionada no existe.");
 
             RuleFor(x => x.FechaSesion)
                 .NotNull().WithMessage("Debe ingresar una fecha de sesion.")
@@ -66,7 +58,6 @@ namespace UCG.Models.ValidationModels
             RuleFor(x => x.MontoTotalAcordado)
                 .GreaterThanOrEqualTo(0).WithMessage("El Monto Total Acordado debe ser un valor Mayor o Igual a ¢0.")
                 .LessThanOrEqualTo(9999999999).WithMessage("El Monto Total Acordado no puede ser mayor a ¢9.999.999.999.");
-
 
         }
     }

@@ -13,7 +13,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="IdAsociacion" class="control-label"></label>
@@ -53,10 +53,43 @@
             </div>
             <div class="form-group">
                 <label asp-for="MontoTotalAcordado" class="control-label"></label>
-                <input asp-for="MontoTotalAcordado" class="form-control" />
+                <input  type="number" asp-for="MontoTotalAcordado" class="form-control" />
                 <span asp-validation-for="MontoTotalAcordado" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailModalAsistencia">
+                    Agregar Asistencias
+                </button>
+            </div>
 
+            <h4>Asistencias</h4>
+            <table class="table table-bordered" id="detailsTableAsistencia">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Asociado</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailModalAcuerdo">
+                    Agregar Acuerdos
+                </button>
+            </div>
+
+            <h4>Acuerdos</h4>
+            <table class="table table-bordered" id="detailsTableAcuerdo">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -68,31 +101,111 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<!-- Modal Asistencia -->
+<div class="modal fade" id="detailModalAsistencia" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Asistencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Asociado</label>
+                <select id="modalIdAsociado" class="form-select">
+                    <option value="0" disabled="" selected="">Seleccione un asociado</option>
+                </select>
+              
+            </div>
+            <input type="hidden" id="ActaAsistenciaJason" name="ActaAsistenciaJason" value="@Model.ActaAsistenciaJason" />
 
+            <div class="modal-footer">
+                <button type="button" id="addDetailAsistenciaBtn" class="btn btn-success">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Acuerdo -->
+<div class="modal fade" id="detailModalAcuerdo" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Acuerdo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Campo para el nombre del acuerdo -->
+                <div class="mb-3">
+                    <label for="nombreAcuerdo" class="form-label">Nombre del Acuerdo</label>
+                    <input type="text" class="form-control" id="nombreAcuerdo" placeholder="Ingrese el nombre del acuerdo" required>
+                </div>
+
+                <!-- Campo para la descripcion del acuerdo -->
+
+                <div class="mb-3 " id="descripcionAcuerdo">
+                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Descripcion</span>
+                        <textarea id="summernoteAcuerdo" class="form-control" rows="5" required></textarea>
+                    </div>
+                </div>
+
+                <!-- Campo para el monto del acuerdo -->
+
+                <div class="mb-3">
+                    <label for="montoAcuerdo" class="form-label">Monto del Acuerdo</label>
+                    <div class="input-group" id="montoe">
+                        <span class="input-group-text">₡</span>
+                        <input type="number"
+                               class="form-control"
+                               id="montoAcuerdo"
+                               placeholder="Ingrese el monto del acuerdo"
+                               required
+                               min="0"
+                               step="0.01"
+                               inputmode="decimal"
+                               oninput="this.value = this.value.replace(/[^0-9.]/g, '')" />
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="ActaAcuerdoJason" name="ActaAcuerdoJason" value="@Model.ActaAcuerdoJason" />
+
+            <div class="modal-footer">
+                <button type="button" id="addDetailAcuerdoBtn" class="btn btn-success">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
-        <!-- jQuery primero -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery primero (antes que Summernote) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        <!-- DataTables CSS -->
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <!-- Summernote CSS y JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 
-        <!-- DataTables JS -->
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
-        <script>
-            const rutasMovimiento = {
-                obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActums")',              
-            };
-        </script>
+    <script>
+        const rutasMovimiento = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActums")',
+        };
+      
+    </script>
 
-        <!-- Tu script separado -->
-        <script src="~/js/ActaScripts/ActaCreate.js"></script>
-     }
+    <!-- Tu script separado -->
+    <script src="~/js/ActaScripts/ActaCreate.js"></script>
 }
