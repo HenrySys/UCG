@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
@@ -38,9 +39,12 @@ namespace UCG.Controllers
             }
 
             var tbActum = await _context.TbActa
-                .Include(t => t.IdAsociacionNavigation)
-                .Include(t => t.IdAsociadoNavigation)
-                .FirstOrDefaultAsync(m => m.IdActa == id);
+             .Include(a => a.TbActaAsistencias)
+                 .ThenInclude(a => a.IdAsociadoNavigation)
+             .Include(a => a.TbAcuerdos)
+             .Include(a => a.IdAsociacionNavigation)
+             .Include(a => a.IdAsociadoNavigation)
+             .FirstOrDefaultAsync(a => a.IdActa == id);
             if (tbActum == null)
             {
                 return NotFound();
@@ -52,11 +56,7 @@ namespace UCG.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var model = new ActaViewModel
-            {
-                FechaSesion = DateOnly.FromDateTime(DateTime.Today)
-            };
-
+            var model = new ActaViewModel();
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
             return View(model);
         }
@@ -65,88 +65,196 @@ namespace UCG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ActaViewModel model)
         {
-            if (!string.IsNullOrWhiteSpace(model.ActaAsistenciaJason))
-                model.ActaAsistencia = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.ActaAsistenciaJason);
+            if (!await ParseFechaSesionAsync(model))
+            {
+                TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
+                TempData.Keep("ErrorMessage");
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
 
-            if (!string.IsNullOrWhiteSpace(model.ActaAcuerdoJason))
-                model.ActaAcuerdo = JsonConvert.DeserializeObject<List<AcuerdoViewModel>>(model.ActaAcuerdoJason);
-
-            model.ActaAsistencia ??= new();
-            model.ActaAcuerdo ??= new();
+            if (!await DeserializarJsonAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en los datos de asistencias o acuerdos.";
+                TempData.Keep("ErrorMessage");
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
 
             var validator = new ActaViewModelValidator(_context);
             var validationResult = await validator.ValidateAsync(model);
-
-            // Validar asistencias
-            var asistenciaValidator = new ActaAsistenciaViewModelValidator(_context);
-            foreach (var asistencia in model.ActaAsistencia)
-            {
-                var result = await asistenciaValidator.ValidateAsync(asistencia);
-                validationResult.Errors.AddRange(result.Errors);
-            }
-
-            // Validar acuerdos
-            var acuerdoValidator = new AcuerdoViewModelValidator(_context);
-            foreach (var acuerdo in model.ActaAcuerdo)
-            {
-                var result = await acuerdoValidator.ValidateAsync(acuerdo);
-                validationResult.Errors.AddRange(result.Errors);
-            }
 
             foreach (var error in validationResult.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
             if (!ModelState.IsValid)
             {
-                model.ActaAsistenciaJason = JsonConvert.SerializeObject(model.ActaAsistencia ?? new());
-                model.ActaAcuerdoJason = JsonConvert.SerializeObject(model.ActaAcuerdo ?? new());
-
-
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre", model.IdAsociacion);
-               
-
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                TempData.Keep("ErrorMessage");
+                await PrepararViewDataAsync(model);
                 return View(model);
             }
 
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var acta = MapearActa(model);
 
-            var acta = new TbActum
+                _context.TbActa.Add(acta);
+                await _context.SaveChangesAsync();
+
+                await GuardarAsistenciasAsync(model.ActaAsistencia, acta.IdActa);
+                await GuardarAcuerdosAsync(model.ActaAcuerdo, acta.IdActa);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El acta fue creada exitosamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar el acta: " + ex.Message;
+                TempData.Keep("ErrorMessage");
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+        }
+
+
+        private async Task<bool> ParseFechaSesionAsync(ActaViewModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.FechaSesionTexto))
+            {
+                if (DateOnly.TryParseExact(model.FechaSesionTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fecha))
+                {
+                    model.FechaSesion = fecha;
+                    return true;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
+                    TempData.Keep("ErrorMessage");
+
+                    return false;
+                }
+            }
+            TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
+            TempData.Keep("ErrorMessage");
+
+            return false;
+        }
+
+
+        private async Task<bool> DeserializarJsonAsync(ActaViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.ActaAsistenciaJason))
+                    model.ActaAsistencia = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.ActaAsistenciaJason);
+
+                if (!string.IsNullOrWhiteSpace(model.ActaAcuerdoJason))
+                    model.ActaAcuerdo = JsonConvert.DeserializeObject<List<AcuerdoViewModel>>(model.ActaAcuerdoJason);
+
+                model.ActaAsistencia ??= new();
+                model.ActaAcuerdo ??= new();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al deserializar los datos: " + ex.Message;
+                return false;
+            }
+        }
+
+
+        private async Task PrepararViewDataAsync(ActaViewModel model)
+        {
+            ViewData["IdAsociacion"] = new SelectList(
+                await _context.TbAsociacions.ToListAsync(),
+                "IdAsociacion",
+                "Nombre",
+                model.IdAsociacion);
+
+            ViewData["IdAsociado"] = new SelectList(
+                await _context.TbAsociados
+                    .Where(a => a.IdAsociacion == model.IdAsociacion)
+                    .Select(a => new { a.IdAsociado, NombreCompleto = a.Nombre + " " + a.Apellido1 })
+                    .ToListAsync(),
+                "IdAsociado",
+                "NombreCompleto",
+                model.IdAsociado);
+
+            model.ActaAsistenciaJason = JsonConvert.SerializeObject(model.ActaAsistencia ?? new());
+            model.ActaAcuerdoJason = JsonConvert.SerializeObject(model.ActaAcuerdo ?? new());
+        }
+
+        private TbActum MapearActa(ActaViewModel model)
+        {
+            return new TbActum
             {
                 IdAsociacion = model.IdAsociacion,
+                IdAsociado = model.IdAsociado,
                 FechaSesion = model.FechaSesion,
                 NumeroActa = model.NumeroActa,
                 Descripcion = model.Descripcion,
                 Estado = model.Estado,
                 MontoTotalAcordado = model.MontoTotalAcordado,
             };
+        }
 
-            _context.TbActa.Add(acta);
-            await _context.SaveChangesAsync();
-
-            foreach (var asistencia in model.ActaAsistencia)
+        private async Task GuardarAsistenciasAsync(List<ActaAsistenciaViewModel> asistencias, int idActa)
+        {
+            foreach (var asistencia in asistencias)
             {
                 _context.TbActaAsistencia.Add(new TbActaAsistencium
                 {
-                    IdActa = acta.IdActa,
+                    IdActa = idActa,
                     IdAsociado = asistencia.IdAsociado,
                     Fecha = asistencia.Fecha
                 });
             }
+        }
 
-            foreach (var acuerdo in model.ActaAcuerdo)
+        private async Task GuardarAcuerdosAsync(List<AcuerdoViewModel> acuerdos, int idActa)
+        {
+            foreach (var acuerdo in acuerdos)
             {
                 _context.TbAcuerdos.Add(new TbAcuerdo
                 {
-                    IdActa = acta.IdActa,
+                    IdActa = idActa,
                     Nombre = acuerdo.Nombre,
                     Descripcion = acuerdo.Descripcion,
                     MontoAcuerdo = acuerdo.MontoAcuerdo
                 });
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
+
+
+
+        //[HttpGet]
+        //public JsonResult ValidarAcuerdosPorAsociacion(string nombreAcuerdo, int idAsociacion)
+        //{
+        //    try
+        //    {
+        //        // Verifica si ya existe un acuerdo con ese nombre en alguna acta de esa asociación
+        //        bool existe = _context.TbAcuerdos
+        //            .Any(a => a.Nombre == nombreAcuerdo && a.IdActaNavigation.IdAsociacion == idAsociacion);
+
+        //        if (existe)
+        //        {
+        //            return Json(new { success = false, message = "Ya existe un acuerdo con ese nombre en esta asociación." });
+        //        }
+
+        //        return Json(new { success = true, message = "Nombre de acuerdo disponible." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = "Error al validar acuerdo: " + ex.Message });
+        //    }
+        //}
 
 
 

@@ -40,8 +40,9 @@
         <tbody>
     @foreach (var item in Model) {
                 <tr data-id="@item.IdActa">
-                <td >
-                    @Html.DisplayFor(modelItem => item.FechaSesion)
+                
+                <td>
+                    @item.FechaSesion.ToString("yyyy-MM-dd")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NumeroActa)

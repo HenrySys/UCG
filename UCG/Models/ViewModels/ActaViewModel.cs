@@ -1,5 +1,7 @@
 ﻿
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using static UCG.Models.TbActum;
 namespace UCG.Models.ViewModels
 {
@@ -9,9 +11,13 @@ namespace UCG.Models.ViewModels
 
         [Display(Name = "Asociacion")]
         public int? IdAsociacion { get; set; }
+
         [Display(Name = "Fecha de Acta")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
-        public DateOnly FechaSesion { get; set; }
+        public string FechaSesionTexto { get; set; } = null!; // Recibe el texto del input (yyyy-MM-dd)
+
+        [BindNever]
+        public DateOnly FechaSesion { get; set; } // Aquí guardas el DateOnly real
+
         [Display(Name = "Numero de acta")]
         public string? NumeroActa { get; set; }
         [Display(Name = "Descripcion")]
