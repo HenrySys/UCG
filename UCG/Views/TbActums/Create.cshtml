@@ -10,8 +10,10 @@
 <h1>Agregar Acta</h1>
 
 <hr />
-<input type="hidden" id="TempDataSuccessMessage" value="@TempData["SuccessMessage"]" />
-<input type="hidden" id="TempDataErrorMessage" value="@TempData["ErrorMessage"]" />
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 

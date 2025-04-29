@@ -56,6 +56,7 @@ namespace UCG.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+           
             var model = new ActaViewModel();
             ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
             return View(model);
@@ -68,7 +69,6 @@ namespace UCG.Controllers
             if (!await ParseFechaSesionAsync(model))
             {
                 TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
-                TempData.Keep("ErrorMessage");
                 await PrepararViewDataAsync(model);
                 return View(model);
             }
@@ -76,7 +76,6 @@ namespace UCG.Controllers
             if (!await DeserializarJsonAsync(model))
             {
                 TempData["ErrorMessage"] = "Error en los datos de asistencias o acuerdos.";
-                TempData.Keep("ErrorMessage");
                 await PrepararViewDataAsync(model);
                 return View(model);
             }
@@ -90,7 +89,6 @@ namespace UCG.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
-                TempData.Keep("ErrorMessage");
                 await PrepararViewDataAsync(model);
                 return View(model);
             }
@@ -110,13 +108,13 @@ namespace UCG.Controllers
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "El acta fue creada exitosamente.";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Create));
+
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 TempData["ErrorMessage"] = "Ocurrió un error al guardar el acta: " + ex.Message;
-                TempData.Keep("ErrorMessage");
                 await PrepararViewDataAsync(model);
                 return View(model);
             }

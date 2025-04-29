@@ -10,19 +10,18 @@
     const successMessage = $('#TempDataSuccessMessage').val();
     const errorMessage = $('#TempDataErrorMessage').val();
 
-    console.log('Success message:', successMessage); // Verificar el mensaje de éxito en la consola)
-console.log('Error message:', errorMessage); // Verificar el mensaje de error en la consola)
-
     if (successMessage) {
         Swal.fire({
             icon: 'success',
-            title: 'Éxito',
+            title: '¡Éxito!',
             text: successMessage,
-            confirmButtonText: 'Aceptar'
+            confirmButtonText: 'Ir al listado'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/TbActums/Index';
+            }
         });
-    }
-
-    if (errorMessage) {
+    } else if (errorMessage) {
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -318,4 +317,29 @@ console.log('Error message:', errorMessage); // Verificar el mensaje de error en
         $('#summernoteAcuerdo').summernote('code', descripcion);
         $('#detailModalAcuerdo').modal('show');
     });
+
+
+    const container = document.getElementById("tempDataSwal");
+    const success = container?.dataset.success;
+    const error = container?.dataset.error;
+
+    if (success && success !== "") {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: success,
+            confirmButtonText: 'Ir al listado'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/TbActums/Index';
+            }
+        });
+    } else if (error && error !== "") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error,
+            confirmButtonText: 'Aceptar'
+        });
+    }
 });

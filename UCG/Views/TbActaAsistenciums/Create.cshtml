@@ -10,6 +10,8 @@
 
 <h4>TbActaAsistencium</h4>
 <hr />
+<input type="hidden" id="TempDataSuccessMessage" value="@TempData["SuccessMessage"]" />
+<input type="hidden" id="TempDataErrorMessage" value="@TempData["ErrorMessage"]" />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
@@ -41,4 +43,9 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/ActaAsistenciaScripts/ActaAsistenciaCreate.js"></script>
 }
+
+

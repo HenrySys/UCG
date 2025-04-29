@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ValidationModels;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -56,17 +58,70 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdActaAsistencia,IdAsociado")] TbActaAsistencium tbActaAsistencium)
+        public async Task<IActionResult> Create(ActaAsistenciaViewModel model)
         {
-            if (ModelState.IsValid)
+            var validator = new ActaAsistenciaViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
             {
-                _context.Add(tbActaAsistencium);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActaAsistencium.IdAsociado);
-            return View(tbActaAsistencium);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario de asistencia.";
+                await PrepararViewDataAsync(model);
+                return View(model); 
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var nuevaAsistencia = MapearActaAsistencia(model);
+
+                _context.TbActaAsistencia.Add(nuevaAsistencia);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "La asistencia fue creada exitosamente.";
+                TempData["IdActa"] = model.IdActa;
+
+                return RedirectToAction(nameof(Create));
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar la asistencia: " + ex.Message;
+                await PrepararViewDataAsync(model);
+                return View(model); 
+            }
         }
+
+
+
+        private async Task PrepararViewDataAsync(ActaAsistenciaViewModel model)
+        {
+            ViewData["IdAsociado"] = new SelectList(
+                await _context.TbAsociados.ToListAsync(),
+                "IdAsociado",
+                "Nombre",
+                model.IdAsociado
+            );
+        }
+
+        private TbActaAsistencium MapearActaAsistencia(ActaAsistenciaViewModel model)
+        {
+            return new TbActaAsistencium
+            {
+                IdActa = model.IdActa,
+                IdAsociado = model.IdAsociado,
+                Fecha = model.Fecha
+            };
+        }
+
+
 
         // GET: TbActaAsistenciums/Edit/5
         public async Task<IActionResult> Edit(int? id)
