@@ -3,7 +3,7 @@
     const acuerdosCargados = JSON.parse($('#ActaAcuerdoJason').val() || '[]');
     $('#FechaSesionTexto').change(function () {
         var fechaSession = $('#FechaSesionTexto').val();
-        console.log('Fecha de la sesión:', fechaSession); // Verificar la fecha de la sesión en la consola)
+        console.log('Fecha de la sesión:', fechaSession); 
     });
 
 
