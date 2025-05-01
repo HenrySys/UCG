@@ -109,7 +109,6 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>Descripción</th>
                                                 <th>Monto</th>
                                             </tr>
                                         </thead>
@@ -118,7 +117,6 @@
                                             {
                                                 <tr data-id="@acuerdo.IdAcuerdo">
                                                     <td>@acuerdo.Nombre</td>
-                                                    <td>@Html.Raw(acuerdo.Descripcion)</td>
                                                     <td>₡@(acuerdo.MontoAcuerdo.HasValue ? acuerdo.MontoAcuerdo.Value.ToString("N2") : "0.00")</td>
                                                 </tr>
                                             }

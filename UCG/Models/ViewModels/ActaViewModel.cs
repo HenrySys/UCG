@@ -27,7 +27,7 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Monto total acordado")]
         public decimal? MontoTotalAcordado { get; set; }
         [Display(Name = "Asociado")]
-        public int IdAsociado { get; set; }
+        public int? IdAsociado { get; set; }
 
         public string ActaAsistenciaJason { get; set; } = null!;
 

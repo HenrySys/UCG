@@ -124,57 +124,92 @@
         $('#detailsTableAcuerdo tbody').empty();
         acuerdosCargados.forEach((a, index) => {
             $('#detailsTableAcuerdo tbody').append(`
-                <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-monto="${a.Monto}">
-                    <td>${a.Nombre}</td>
-                    <td>₡${parseFloat(a.Monto).toFixed(2)}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo" data-index="${index}">Editar</button>
-                        <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
-                    </td>
-                </tr>`);
+            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-monto="${a.Monto}">
+                <td>${a.Nombre}</td>
+                <td>₡${parseFloat(a.Monto).toFixed(2)}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo" data-index="${index}">Editar</button>
+                    <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
+                </td>
+            </tr>`);
         });
+        actualizarMontoTotalAcordado();
     }
+
 
     reconstruirAsistenciasUI();
     reconstruirAcuerdosUI();
 
+    function recolectarAsistencias() {
+        const asistencias = [];
+        const filas = $('#detailsTableAsistencia tbody tr');
+
+        filas.each(function () {
+            const fecha = $(this).find('td:eq(0)').text().trim();
+            const idAsociado = parseInt($(this).find('td:eq(1)').text().trim());
+
+            asistencias.push({
+                Fecha: fecha,
+                IdAsociado: idAsociado
+            });
+        });
+
+        return asistencias;
+    }
+
+    function recolectarAcuerdos() {
+        const acuerdos = [];
+        const filas = $('#detailsTableAcuerdo tbody tr');
+
+        filas.each(function () {
+            const fila = $(this);
+            const nombre = fila.find('td:eq(0)').text().trim();
+            const montoTexto = fila.find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
+            const descripcion = fila.data('descripcion');
+
+            acuerdos.push({
+                Nombre: nombre,
+                Descripcion: descripcion,
+                MontoAcuerdo: parseFloat(montoTexto) || 0
+            });
+        });
+
+        return acuerdos;
+    }
+
+    function actualizarMontoTotalAcordado() {
+        let total = 0;
+
+        $('#detailsTableAcuerdo tbody tr').each(function () {
+            const montoTexto = $(this).find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
+            const monto = parseFloat(montoTexto);
+            if (!isNaN(monto)) total += monto;
+        });
+
+        $('#montoTotalAcordado').val(total.toFixed(2));
+    }
+
     $('form').on('submit', function (e) {
         limpiarErrores();
 
-        var fecha = $('#FechaSesionTexto').val();
-       
-        console.log('Fecha de la sesión enviada:', fecha); 
-       
+        const asistencias = recolectarAsistencias();
+        const acuerdos = recolectarAcuerdos();
 
-        let asistencias = [];
-        const $filasAsistencia = $('#detailsTableAsistencia tbody tr');
-        if ($filasAsistencia.length === 0) {
+        if (asistencias.length === 0) {
             $('#detailsTableAsistencia').after('<div id="errorTablaAsistencia" class="text-danger mt-1">Debe agregar al menos una asistencia.</div>');
             e.preventDefault();
         } else {
-            $filasAsistencia.each(function () {
-                const fecha = $(this).find('td:eq(0)').text();
-                const idAsociado = $(this).find('td:eq(1)').text();
-                asistencias.push({ Fecha: fecha, IdAsociado: parseInt(idAsociado) });
-            });
             $('#ActaAsistenciaJason').val(JSON.stringify(asistencias));
         }
 
-        let acuerdos = [];
-        const $filasAcuerdo = $('#detailsTableAcuerdo tbody tr');
-        if ($filasAcuerdo.length === 0) {
+        if (acuerdos.length === 0) {
             $('#detailsTableAcuerdo').after('<div id="errorTablaAcuerdo" class="text-danger mt-1">Debe agregar al menos un acuerdo.</div>');
             e.preventDefault();
         } else {
-            $filasAcuerdo.each(function () {
-                const nombre = $(this).data('nombre');
-                const descripcion = $(this).data('descripcion');
-                const monto = $(this).data('monto');
-                acuerdos.push({ Nombre: nombre, Descripcion: descripcion, Monto: parseFloat(monto) });
-            });
             $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
         }
     });
+
 
     // Agregar asistencia
     $('#addDetailAsistenciaBtn').on('click', function () {
@@ -209,6 +244,7 @@
     // Eliminar fila
     $('#detailsTableAsistencia, #detailsTableAcuerdo').on('click', '.removeRow', function () {
         $(this).closest('tr').remove();
+        actualizarMontoTotalAcordado();
     });
 
     // === ACUERDO: SUMMERNOTE ===
@@ -269,6 +305,8 @@
             hayError = true;
         }
 
+
+
         if (hayError) return;
 
 
@@ -293,6 +331,8 @@
 
         limpiarCamposModalAcuerdo();
         $('#detailModalAcuerdo').modal('hide');
+
+        actualizarMontoTotalAcordado();
     });
 
     $('#detailsTableAcuerdo').on('click', '.btn-edit-acuerdo', function () {

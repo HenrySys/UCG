@@ -40,7 +40,7 @@ namespace UCG.Controllers
 
             var tbActum = await _context.TbActa
              .Include(a => a.TbActaAsistencias)
-                 .ThenInclude(a => a.IdAsociadoNavigation)
+             .ThenInclude(a => a.IdAsociadoNavigation)
              .Include(a => a.TbAcuerdos)
              .Include(a => a.IdAsociacionNavigation)
              .Include(a => a.IdAsociadoNavigation)
@@ -230,8 +230,6 @@ namespace UCG.Controllers
         }
 
 
-
-
         //[HttpGet]
         //public JsonResult ValidarAcuerdosPorAsociacion(string nombreAcuerdo, int idAsociacion)
         //{
@@ -279,60 +277,134 @@ namespace UCG.Controllers
             }
         }
 
-        // GET: TbActums/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null || _context.TbActa == null)
-            {
-                return NotFound();
-            }
+            var acta = await _context.TbActa
+                .Include(a => a.TbActaAsistencias)
+                .Include(a => a.TbAcuerdos)
+                .FirstOrDefaultAsync(a => a.IdActa == id);
 
-            var tbActum = await _context.TbActa.FindAsync(id);
-            if (tbActum == null)
-            {
+            if (acta is null)
                 return NotFound();
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActum.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActum.IdAsociado);
-            return View(tbActum);
+
+            var model = MapearActaViewModel(acta);
+
+            model.ActaAsistenciaJason = JsonConvert.SerializeObject(model.ActaAsistencia);
+            model.ActaAcuerdoJason = JsonConvert.SerializeObject(model.ActaAcuerdo);
+
+            await PrepararViewDataAsync(model);
+            return View(model);
         }
 
-        // POST: TbActums/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        private ActaViewModel MapearActaViewModel(TbActum acta)
+        {
+            return new ActaViewModel
+            {
+                IdActa = acta.IdActa,
+                IdAsociacion = acta.IdAsociacion,
+                IdAsociado = acta.IdAsociado,
+                FechaSesion = acta.FechaSesion,
+                FechaSesionTexto = acta.FechaSesion.ToString("yyyy-MM-dd"),
+                NumeroActa = acta.NumeroActa,
+                Descripcion = acta.Descripcion,
+                Estado = acta.Estado,
+                MontoTotalAcordado = acta.MontoTotalAcordado,
+                ActaAsistencia = acta.TbActaAsistencias.Select(a => new ActaAsistenciaViewModel
+                {
+                    IdAsociado = a.IdAsociado,
+                    Fecha = a.Fecha
+                }).ToList(),
+                ActaAcuerdo = acta.TbAcuerdos.Select(a => new AcuerdoViewModel
+                {
+                    Nombre = a.Nombre,
+                    Descripcion = a.Descripcion,
+                    MontoAcuerdo = a.MontoAcuerdo
+                }).ToList()
+            };
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdActa,IdAsociacion,IdAsociado,FechaSesion,NumeroActa,Descripcion,Estado,MontoTotalAcordado")] TbActum tbActum)
+        public async Task<IActionResult> Edit(int idActa, ActaViewModel model)
         {
-            if (id != tbActum.IdActa)
+            if (idActa != model.IdActa)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!await ParseFechaSesionAsync(model))
             {
-                try
-                {
-                    _context.Update(tbActum);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbActumExists(tbActum.IdActa))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
+                await PrepararViewDataAsync(model);
+                return View(model);
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActum.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActum.IdAsociado);
-            return View(tbActum);
+
+            if (!await DeserializarJsonAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en los datos de asistencias o acuerdos.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
+            var validator = new ActaViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var actaExistente = await _context.TbActa
+                    .Include(a => a.TbActaAsistencias)
+                    .Include(a => a.TbAcuerdos)
+                    .FirstOrDefaultAsync(a => a.IdActa == idActa);
+
+                if (actaExistente == null)
+                {
+                    return NotFound();
+                }
+
+                // Actualizar campos principales del acta
+                actaExistente.IdAsociacion = model.IdAsociacion;
+                actaExistente.IdAsociado = model.IdAsociado;
+                actaExistente.FechaSesion = model.FechaSesion;
+                actaExistente.NumeroActa = model.NumeroActa;
+                actaExistente.Descripcion = model.Descripcion;
+                actaExistente.Estado = model.Estado;
+                actaExistente.MontoTotalAcordado = model.MontoTotalAcordado;
+
+                // Reemplazar asistencias
+                _context.TbActaAsistencia.RemoveRange(actaExistente.TbActaAsistencias);
+                await GuardarAsistenciasAsync(model.ActaAsistencia, idActa);
+
+                // Reemplazar acuerdos
+                _context.TbAcuerdos.RemoveRange(actaExistente.TbAcuerdos);
+                await GuardarAcuerdosAsync(model.ActaAcuerdo, idActa);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El acta fue actualizada exitosamente.";
+                return RedirectToAction("Details", new { id = idActa });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el acta: " + ex.Message;
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbActums/Delete/5
         public async Task<IActionResult> Delete(int? id)
