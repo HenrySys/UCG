@@ -1,51 +1,76 @@
-﻿@using UCG.Models.ViewModels
+﻿@using UCG.Models.ViewModels;
 @using static UCG.Models.TbActaAsistencium;
-@model ActaAsistenciaViewModel
+@model ActaAsistenciaViewModel;
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Agregar Asistencia";
 }
 
-<h1>Create</h1>
-
-<h4>TbActaAsistencium</h4>
+<h1 class="text-center mb-4">Agregar Asistencia</h1>
 <hr />
-<input type="hidden" id="TempDataSuccessMessage" value="@TempData["SuccessMessage"]" />
-<input type="hidden" id="TempDataErrorMessage" value="@TempData["ErrorMessage"]" />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-				<label asp-for="IdActa" class="control-label"></label>
-				<select asp-for="IdActa" class ="form-select" asp-items="ViewBag.IdActa">
-                    <option disabled="" selected="">Seleccione un acta</option>
-                </select>
-            </div>
-     
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class ="form-select" asp-items="ViewBag.IdAsociado">
-                    <option disabled="" selected="">Seleccione un asociado</option>
-                </select>
-            </div>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-acta="@ViewData["IdActa"]">
+</div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Detalles de la Asistencia
             </div>
-        </form>
+            <div class="card-body">
+                <form asp-action="Create" data-mode="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @if (Model.IdActa != null && Model.IdActa > 0)
+                    {
+                        <input type="hidden" asp-for="IdActa" />
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label asp-for="IdActa" class="form-label"></label>
+                            <select asp-for="IdActa" id="IdActa" class="form-select" asp-items="@(ViewData["IdActa"] as SelectList)">
+                                <option disabled selected>Seleccione un acta</option>
+                            </select>
+                            <span asp-validation-for="IdActa" class="text-danger"></span>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+						<label asp-for="FechaTexto" class="form-label"></label>
+                        <input asp-for="FechaTexto"
+                               class="form-control"
+                               type="date"
+                               min="2000-01-01"
+                               max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="FechaTexto" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado" id="IdAsociado">
+                            <option disabled selected>Seleccione un asociado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <input type="submit" value="Guardar" class="btn btn-success" id="btnSubmit" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/ActaAsistenciaScripts/ActaAsistenciaCreate.js"></script>
 }
-
-

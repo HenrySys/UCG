@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using System.Security.Claims;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -54,10 +56,43 @@ namespace UCG.Controllers
         // GET: TbProyectoes/Create
         public IActionResult Create()
         {
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
-            return View();
+            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            var model = new ProyectoViewModel();
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                // Obtener el nombre de la asociación desde la base de datos
+                var Nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                .FirstOrDefault();
+
+                // Se mantiene seleccionable el usuario
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.Nombre = Nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+                ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
+                ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
+
+                return View(model);
+            }
+            else
+            {
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
+                ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
+                ViewBag.EsAdmin = false;
+                return View();
+            }
+            // ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
+            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
+            // ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado");
+            // return View();
         }
 
         // POST: TbProyectoes/Create

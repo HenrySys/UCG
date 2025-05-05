@@ -11,15 +11,6 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdConceptoMovimiento)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbConceptoMovimientos.AnyAsync(a => a.IdConceptoMovimiento == id);
-                })
-                .WithMessage("Ya existe un concepto con ese id.");
-
             RuleFor(x => x.TipoMovimiento)
                .NotNull().WithMessage("Debe seleccionar un movimiento.")
                .NotEmpty().WithMessage("Debe ingresar un movimiento.")

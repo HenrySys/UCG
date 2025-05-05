@@ -14,11 +14,9 @@ namespace UCG.Models.ViewModels
         public int? IdActa { get; set; }
 
         [Display(Name = "Periodo de Inicio")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly PeriodoInicio { get; set; }
 
         [Display(Name = "Periodo de Fin")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly PeriodoFin { get; set; }
 
         [Display(Name = "Nombre")]

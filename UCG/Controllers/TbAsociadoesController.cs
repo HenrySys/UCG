@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using UCG.Models;
+using UCG.Models.ValidationModels;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -48,27 +52,117 @@ namespace UCG.Controllers
         // GET: TbAsociadoes/Create
         public IActionResult Create()
         {
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "IdUsuario");
-            return View();
+            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            var model = new AsociadoViewModel();
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                // Obtener el nombre de la asociación desde la base de datos
+                var Nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                .FirstOrDefault();
+
+                // Se mantiene seleccionable el usuario
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.Nombre = Nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+
+                ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "NombreUsuario");
+
+                return View(model);
+            }
+            else{
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "NombreUsuario");
+                ViewBag.EsAdmin = false;
+                return View();
+            }
+            
         }
 
-        // POST: TbAsociadoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdAsociado,IdAsociacion,IdUsuario,Nacionalidad,Cedula,Apellido1,Apellido2,Nombre,FechaNacimiento,Sexo,EstadoCivil,Telefono,Correo,Direccion,Estado")] TbAsociado tbAsociado)
+        public async Task<IActionResult> Create(AsociadoViewModel model)
         {
-            if (ModelState.IsValid)
+            var validator = new AsociadoViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                _context.Add(tbAsociado);
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
+            model.FechaNacimiento = DateOnly.ParseExact(model.FechaTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var asociado = MapearAsociado(model);
+
+                _context.TbAsociados.Add(asociado);
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El asociado fue creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbAsociado.IdAsociacion);
-            ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "IdUsuario", tbAsociado.IdUsuario);
-            return View(tbAsociado);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Error al guardar el asociado: " + ex.Message;
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+        }
+
+        private TbAsociado MapearAsociado(AsociadoViewModel model)
+        {
+            return new TbAsociado
+            {
+
+                IdAsociacion = model.IdAsociacion.Value,
+                IdUsuario = model.IdUsuario,
+                Nacionalidad = model.Nacionalidad,
+                Cedula = model.Cedula,
+                Apellido1 = model.Apellido1,
+                Apellido2 = model.Apellido2,
+                Nombre = model.Nombre,
+                FechaNacimiento = model.FechaNacimiento,
+                Sexo = model.Sexo,
+                EstadoCivil = model.EstadoCivil,
+                Telefono = model.Telefono,
+                Correo = model.Correo,
+                Direccion = model.Direccion,
+                Estado = model.Estado
+            };
+        }
+
+
+        private async Task PrepararViewDataAsync(AsociadoViewModel model)
+        {
+            ViewData["IdAsociacion"] = new SelectList(
+               await _context.TbAsociacions.ToListAsync(),
+               "IdAsociacion",
+               "Nombre",
+               model?.IdAsociacion);
+
+            ViewData["IdUsuario"] = new SelectList(
+                await _context.TbUsuarios.ToListAsync(),
+                "IdUsuario",
+                "NombreUsuario", // Usa el nombre que de verdad quieres mostrar
+                model?.IdUsuario);
         }
 
         // GET: TbAsociadoes/Edit/5

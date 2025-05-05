@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using UCG.Models;
 
 namespace UCG.Controllers
@@ -47,8 +48,39 @@ namespace UCG.Controllers
         // GET: TbClientes/Create
         public IActionResult Create()
         {
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            return View();
+            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            var model = new TbCliente();
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                // Obtener el nombre de la asociación desde la base de datos
+                var Nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                .FirstOrDefault();
+
+                // Se mantiene seleccionable el usuario
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.Nombre = Nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+
+                ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "NombreUsuario");
+
+                return View(model);
+            }
+            else
+            {
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                ViewBag.EsAdmin = false;
+                return View();
+            }
+            //ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
+            //return View();
         }
 
         // POST: TbClientes/Create

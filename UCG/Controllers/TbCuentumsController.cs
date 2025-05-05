@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -47,8 +49,36 @@ namespace UCG.Controllers
         // GET: TbCuentums/Create
         public IActionResult Create()
         {
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            return View();
+            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            var model = new CuentumViewModel();
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                // Obtener el nombre de la asociación desde la base de datos
+                var Nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                .FirstOrDefault();
+
+                // Se mantiene seleccionable el usuario
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.Nombre = Nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+                return View(model);
+            }
+            else
+            {
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                ViewBag.EsAdmin = false;
+                return View();
+            }
+            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
+            // return View();
         }
 
         // POST: TbCuentums/Create

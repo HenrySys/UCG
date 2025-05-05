@@ -1,6 +1,12 @@
 ﻿$(document).ready(function () {
+    const modoVista = $('form').data('mode'); // Se puede usar en cualquier función después
+
     const asistenciasCargadas = JSON.parse($('#ActaAsistenciaJason').val() || '[]');
     const acuerdosCargados = JSON.parse($('#ActaAcuerdoJason').val() || '[]');
+
+    const idAsociacion = $('#tempDataSwal').data('asociacion');
+    
+
     $('#FechaSesionTexto').change(function () {
         var fechaSession = $('#FechaSesionTexto').val();
         console.log('Fecha de la sesión:', fechaSession); 
@@ -46,19 +52,13 @@
         });
     }
 
-    $('#IdAsociacion').change(function () {
-        const idAsociacion = $(this).val();
-        $('#detailsTableAsistencia tbody').empty();
-
-        if (!idAsociacion) return;
-
+    if (idAsociacion) {
         fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#IdAsociado', 'Seleccione un asociado', function (data, dropdown) {
             data.forEach(item => {
                 const nombreCompleto = `${item.nombre} ${item.apellido1}`;
                 dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
             });
         });
-
         $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function () {
             limpiarErrores();
             const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
@@ -81,7 +81,47 @@
                 }
             });
         });
-    });
+    } else {
+        $('#IdAsociacion').change(function () {
+            const idAsociacion = $(this).val();
+            $('#detailsTableAsistencia tbody').empty();
+
+            if (!idAsociacion) return;
+
+            fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#IdAsociado', 'Seleccione un asociado', function (data, dropdown) {
+                data.forEach(item => {
+                    const nombreCompleto = `${item.nombre} ${item.apellido1}`;
+                    dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
+                });
+            });
+
+            $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function () {
+                limpiarErrores();
+                const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
+                    return $(this).find('td:eq(1)').text();
+                }).get();
+
+                fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
+                    let agregados = 0;
+                    data.forEach(item => {
+                        if (!asociadosYaAgregados.includes(item.idAsociado.toString())) {
+                            const nombreCompleto = `${item.nombre} ${item.apellido1}`;
+                            dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
+                        } else agregados++;
+                    });
+                    if (agregados === data.length) {
+                        cerrarModalConMensaje('#detailModalAsistencia', {
+                            titulo: 'Todos agregados',
+                            texto: 'Todos los asociados ya han sido agregados a la lista.'
+                        });
+                    }
+                });
+            });
+        });
+
+    }
+
+   
 
     function mostrarErrorSwal(titulo, mensaje) {
         Swal.fire({ icon: 'warning', title: titulo, text: mensaje });
@@ -111,22 +151,30 @@
     function reconstruirAsistenciasUI() {
         $('#detailsTableAsistencia tbody').empty();
         asistenciasCargadas.forEach(a => {
+            const botones = (modoVista === 'Create') ? `
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
+                </td>
+            ` : '';
             $('#detailsTableAsistencia tbody').append(`
                 <tr>
                     <td>${a.Fecha}</td>
                     <td>${a.IdAsociado}</td>
-                    <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
+                    ${botones}
                 </tr>`);
         });
     }
 
     function reconstruirAcuerdosUI() {
         $('#detailsTableAcuerdo tbody').empty();
+
         acuerdosCargados.forEach((a, index) => {
+            
+                console.log(`Acuerdo ${index}:`, a);
             $('#detailsTableAcuerdo tbody').append(`
-            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-monto="${a.Monto}">
+            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-monto="${a.MontoAcuerdo}">
                 <td>${a.Nombre}</td>
-                <td>₡${parseFloat(a.Monto).toFixed(2)}</td>
+                <td>₡${parseFloat(a.MontoAcuerdo).toFixed(2)}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo" data-index="${index}">Editar</button>
                     <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>

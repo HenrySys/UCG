@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -67,6 +68,30 @@ namespace UCG.Controllers
             return View(tbAsociacion);
         }
 
+
+
+        //private Tb MapearAcuerdo(AcuerdoViewModel model)
+        //{
+        //    return new TbAcuerdo
+        //    {
+
+        //        IdAsociacion = model.IdActa.Value,
+        //        NumeroAcuerdo = model.NumeroAcuerdo,
+        //        Nombre = model.Nombre,
+        //        Descripcion = model.Descripcion,
+        //        MontoAcuerdo = model.MontoAcuerdo
+        //    };
+        //}
+
+
+        //private async Task PrepararViewDataAsync(AcuerdoViewModel model)
+        //{
+        //    ViewData["IdActa"] = new SelectList(
+        //        await _context.TbAsociacions.ToListAsync(),
+        //        "IdActa",
+        //        "NumeroActa",
+        //        model.IdActa);
+        //}
         // GET: TbAsociacions/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

@@ -5,6 +5,8 @@ namespace UCG.Models.ViewModels
 {
     public class AsociadoViewModel
     {
+        [Display(Name = "Fecha de nacimiento")]
+        public string? FechaTexto { get; set; } 
 
         public int IdAsociado { get; set; }
 
@@ -30,13 +32,12 @@ namespace UCG.Models.ViewModels
         public string? Nombre { get; set; }
 
         [Display(Name = "Fecha Nacimiento")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly FechaNacimiento { get; set; }
 
         [Display(Name = "Sexo")]
         public SexoDeAsociado? Sexo { get; set; }
 
-        [Display(Name = "EstadoCivil")]
+        [Display(Name = "Estado Civil")]
         public EstadoCivilDeAsociado? EstadoCivil { get; set; }
 
         [Display(Name = "Telefono")]

@@ -93,7 +93,11 @@ namespace UCG.Controllers
            {
                // Busca al usuario por correo
                TbUsuario? usuario_encontrado = await _context.TbUsuarios
+                    .Include(u => u.TbAsociados)
+                        .ThenInclude(a => a.IdAsociacionNavigation)
                    .FirstOrDefaultAsync(u => u.Correo == modelo.Correo);
+
+                var asociado = usuario_encontrado?.TbAsociados.FirstOrDefault();
 
                // Verifica si se encontró el usuario
                if (usuario_encontrado != null)
@@ -102,12 +106,22 @@ namespace UCG.Controllers
                    if (_hashingService.VeryfyHash(modelo.Contraseña, usuario_encontrado.Contraseña))
                    {
                        // Si la contraseña es correcta, crea los claims
-                       List<Claim> claims = new List<Claim>
-               {
-                   new Claim(ClaimTypes.Name, usuario_encontrado.NombreUsuario),
-                   new Claim(ClaimTypes.Role, usuario_encontrado.Rol.ToString())
-               };
-
+                        List<Claim> claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, usuario_encontrado.NombreUsuario),
+                            new Claim(ClaimTypes.Role, usuario_encontrado.Rol.ToString())
+                        };
+                        if (usuario_encontrado.Rol == TbUsuario.RolUsuario.Admin)
+                        {
+                            if (asociado != null)
+                            {
+                                claims.Add(new Claim("IdAsociado", asociado.IdAsociado.ToString()));
+                                if (asociado.IdAsociacion.HasValue)
+                                {
+                                    claims.Add(new Claim("IdAsociacion", asociado.IdAsociacion.ToString()));
+                                }
+                            }
+                        }
                        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                        AuthenticationProperties properties = new AuthenticationProperties()
                        {

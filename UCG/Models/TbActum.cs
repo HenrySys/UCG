@@ -15,7 +15,7 @@ public partial class TbActum
         Inactivo = 2,
 
         [Display(Name = "En Proceso")]
-        EnProceso = 3,
+        EnProceso = 0,
         
     }
     public int IdActa { get; set; }
@@ -25,7 +25,7 @@ public partial class TbActum
     [Display(Name = "Fecha de Sesion")]
     public DateOnly FechaSesion { get; set; }
 
-    [Display(Name = "Fecha de Acta")]
+    [Display(Name = "Numero de Acta")]
     public string? NumeroActa { get; set; }
 
     public string? Descripcion { get; set; }

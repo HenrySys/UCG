@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using UCG.Models;
+using UCG.Models.ValidationModels;
+using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
 {
@@ -44,29 +47,93 @@ namespace UCG.Controllers
             return View(tbAcuerdo);
         }
 
-        // GET: TbAcuerdoes/Create
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult Create(int? id)
         {
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-            return View();
+            if (id == null)
+            {
+                // Viene del menú general: mostrar combo con todas las actas
+                ViewData["IdActa"] = new SelectList(_context.TbActa.ToList(), "IdActa", "NumeroActa");
+                return View(new AcuerdoViewModel());
+            }
+
+            // Viene desde Detalle de Acta: fijar el IdActa
+            var acta = _context.TbActa.FirstOrDefault(a => a.IdActa == id);
+            var model = new AcuerdoViewModel
+            {
+                IdActa = id.Value
+            };
+
+            ViewData["IdActa"] = id; // Para pasarlo al JS si hace falta
+            return View(model);
         }
 
-        // POST: TbAcuerdoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdAcuerdo,IdActa,NumeroAcuerdo,Nombre,Descripcion,MontoAcuerdo")] TbAcuerdo tbAcuerdo)
+        public async Task<IActionResult> Create(AcuerdoViewModel model)
         {
-            if (ModelState.IsValid)
+            var validator = new AcuerdoViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                _context.Add(tbAcuerdo);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await PrepararViewDataAsync(model);
+                return View(model);
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbAcuerdo.IdActa);
-            return View(tbAcuerdo);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var nuevoAcuerdo = MapearAcuerdo(model);
+
+                _context.TbAcuerdos.Add(nuevoAcuerdo);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Acuerdo agregado correctamente.";
+                return RedirectToAction("Create", "TbAcuerdoes", new { id = model.IdActa });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar el acuerdo.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
         }
+
+        private TbAcuerdo MapearAcuerdo(AcuerdoViewModel model)
+        {
+            return new TbAcuerdo
+            {
+             
+                IdActa = model.IdActa.Value,
+                NumeroAcuerdo = model.NumeroAcuerdo,
+                Nombre = model.Nombre,
+                Descripcion = model.Descripcion,
+                MontoAcuerdo = model.MontoAcuerdo
+            };
+        }
+
+
+        private async Task PrepararViewDataAsync(AcuerdoViewModel model)
+        {
+            ViewData["IdActa"] = new SelectList(
+                await _context.TbAsociacions.ToListAsync(),
+                "IdActa",
+                "NumeroActa",
+                model.IdActa);
+        }
+
 
         // GET: TbAcuerdoes/Edit/5
         public async Task<IActionResult> Edit(int? id)

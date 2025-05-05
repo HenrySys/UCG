@@ -12,14 +12,12 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Asociacion")]
         public int? IdAsociacion { get; set; }
 
-        [Display(Name = "Fecha de Acta")]
-        public string FechaSesionTexto { get; set; } = null!; // Recibe el texto del input (yyyy-MM-dd)
+        public string? FechaSesionTexto { get; set; } // Recibe el texto del input (yyyy-MM-dd)
 
-        [BindNever]
-        public DateOnly FechaSesion { get; set; } // Aquí guardas el DateOnly real
 
         [Display(Name = "Numero de acta")]
         public string? NumeroActa { get; set; }
+
         [Display(Name = "Descripcion")]
         public string? Descripcion { get; set; }
         [Display(Name = "Estado")]
@@ -29,6 +27,9 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Asociado")]
         public int? IdAsociado { get; set; }
 
+        [BindNever]
+        public DateOnly FechaSesion { get; set; } // Aquí guardas el DateOnly real
+
         public string ActaAsistenciaJason { get; set; } = null!;
 
         public string ActaAcuerdoJason { get; set; } = null!;
@@ -36,9 +37,7 @@ namespace UCG.Models.ViewModels
         public List<AcuerdoViewModel> ActaAcuerdo { get; set; } = new();
 
         public List<ActaAsistenciaViewModel> ActaAsistencia { get; set; } = new ();
-
-    
-        
+   
 
     }
 }

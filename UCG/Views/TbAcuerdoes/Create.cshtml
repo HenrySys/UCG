@@ -3,54 +3,111 @@
 @model AcuerdoViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Agregar Acuerdo";
 }
 
-<h1>Create</h1>
-
-<h4>TbAcuerdo</h4>
+<h1 class="text-center mb-4">Agregar Acuerdo</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class ="form-select" asp-items="ViewBag.IdActa">
-                      <option disabled="" selected="">Seleccione un acta</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="NumeroAcuerdo" class="control-label"></label>
-                <input asp-for="NumeroAcuerdo" class="form-control" />
-                <span asp-validation-for="NumeroAcuerdo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MontoAcuerdo" class="control-label"></label>
-                <input asp-for="MontoAcuerdo" class="form-control" />
-                <span asp-validation-for="MontoAcuerdo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-acta="@ViewData["IdActa"]">
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-action="Create" data-mode="Create" id="miFormulario">
+    <div class="row g-4">
+        <!-- Card izquierda: IdActa Número, Nombre -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    Información del Acta
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @if (Model.IdActa != null && Model.IdActa > 0)
+                    {
+                       <input type="hidden" asp-for="IdActa" />
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label asp-for="IdActa" class="form-label"></label>
+                            <select asp-for="IdActa" id="IdActa" class="form-select" asp-items="@(ViewData["IdActa"] as SelectList)">
+                                <option disabled selected>Seleccione un acta</option>
+                            </select>
+                            <span asp-validation-for="IdActa" class="text-danger"></span>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label asp-for="NumeroAcuerdo" class="form-label"></label>
+                        <input asp-for="NumeroAcuerdo" class="form-control" />
+                        <span asp-validation-for="NumeroAcuerdo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card derecha: Descripción, Monto -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    Detalles del Acuerdo
+                </div>
+                <div class="card-body">
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
+                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
+                    </div>
+
+                 
+                    <div class="mb-3">
+                        <label asp-for="MontoAcuerdo" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="MontoAcuerdo"
+                                   type="number"
+                                   class="form-control"
+                                   min="0"
+                                   step="0.01"
+                                   inputmode="decimal"
+                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '')" />
+                        </div>
+                        <span asp-validation-for="MontoAcuerdo" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-4 d-flex justify-content-between">
+        <input type="submit" value="Guardar" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </div>
+</form>
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- TU SCRIPT personalizado (debe ir de último) -->
+    <script src="~/js/AcuerdoScripts/AcuerdoFormHandler.js"></script>
 }
+

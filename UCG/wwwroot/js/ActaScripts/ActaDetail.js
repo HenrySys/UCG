@@ -39,6 +39,14 @@
     });
 
 
+    $('#btnAgregarAcuerdos').click(function () {
+        var idActa = $(this).data("id"); // <-- aquí sí se obtiene correctamente el ID del botón
+        console.log("ID Acta:", idActa);
+
+        if (idActa) {
+            window.location.href = "/TbAcuerdoes/Create/" + idActa;
+        }
+    });
     $('#btnAgregarAsistencia').click(function () {
         var idActa = $(this).data("id"); // <-- aquí sí se obtiene correctamente el ID del botón
         console.log("ID Acta:", idActa);

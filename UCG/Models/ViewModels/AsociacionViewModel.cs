@@ -49,5 +49,7 @@ namespace UCG.Models.ViewModels
 
         [Display(Name = "Estado")]
         public EstadoDeAsociacion Estado { get; set; }
+
+        public UsuarioViewModel Usuario { get; set; } = new UsuarioViewModel();
     }
 }

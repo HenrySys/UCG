@@ -10,11 +10,13 @@
 <h1>Agregar Acta</h1>
 
 <hr />
+
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
-     data-error="@TempData["ErrorMessage"]">
+     data-error="@TempData["ErrorMessage"]"
+     data-asociacion="@ViewData["IdAsociacion"]">
 </div>
-<form asp-action="Create">
+<form asp-action="Create" data-mode="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="row g-3 mb-4">
@@ -27,9 +29,17 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
-                            <option disabled selected>Seleccione una asociación</option>
-                        </select>
+                        @if (ViewBag.EsAdmin == true)
+                            {
+                                <input type="text" class="form-control" value="@ViewBag.NombreAsociacion" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                            }
+                            else
+                            {
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
+                                    <option disabled selected>Seleccione una asociación</option>
+                                </select>
+                            }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
@@ -262,5 +272,5 @@
     </script>
 
     <!-- Tu script separado -->
-    <script src="~/js/ActaScripts/ActaCreate1.js"></script>
+    <script src="~/js/ActaScripts/ActaFormHandler.js"></script>
 }

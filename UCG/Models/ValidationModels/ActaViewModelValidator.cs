@@ -33,17 +33,19 @@ namespace UCG.Models.ValidationModels
 
             RuleFor(x => x.FechaSesion)
                 .NotNull().WithMessage("Debe ingresar una fecha de sesión.");
-                
-              
+
+
             RuleFor(x => x.NumeroActa)
-                .NotNull().WithMessage("Debe ingresar un número de acta.")
-                .NotEmpty().WithMessage("Debe ingresar un número de acta.")
-                .MaximumLength(100).WithMessage("El número de acta no puede superar los 100 caracteres.")
-                .MustAsync(async (numeroActa, cancellation) =>
-                {
-                    return !await _context.TbActa.AnyAsync(a => a.NumeroActa == numeroActa);
-                })
-                .WithMessage("Ya existe un acta con el número ingresado.");
+           .NotNull().WithMessage("Debe ingresar un número de acta.")
+           .NotEmpty().WithMessage("Debe ingresar un número de acta.")
+           .MaximumLength(100).WithMessage("El número de acta no puede superar los 100 caracteres.")
+           .MustAsync(async (model, numeroActa, cancellation) =>
+           {
+               return !await _context.TbActa
+                   .AnyAsync(a => a.NumeroActa == numeroActa && a.IdActa != model.IdActa);
+           })
+           .WithMessage("Ya existe un acta con el número ingresado.");
+
 
             RuleFor(x => x.Descripcion)
                 .NotNull().WithMessage("Debe ingresar una descripción.")

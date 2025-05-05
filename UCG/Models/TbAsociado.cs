@@ -73,7 +73,7 @@ public partial class TbAsociado
 
     public string Correo { get; set; } = null!;
 
-    public string Direccion { get; set; } = null!;
+    public string? Direccion { get; set; }
 
     public EstadoDeAsociado? Estado { get; set; } = null!;
 

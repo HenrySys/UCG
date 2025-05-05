@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using UCG.Models.ViewModels;
 
 namespace UCG.Models.ValidationModels
@@ -11,14 +12,7 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdAsociado)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbAsociados.AnyAsync(a => a.IdAsociado == id);
-                })
-                .WithMessage("Ya existe un asociado con ese id.");
+           
 
             RuleFor(x => x.IdAsociacion)
               .NotNull().WithMessage("Debe seleccionar una Asociación.")
@@ -34,9 +28,13 @@ namespace UCG.Models.ValidationModels
               .GreaterThan(0).WithMessage("Debe seleccionar un Usuario valido.")
                .MustAsync(async (id, cancellation) =>
                {
-                   return await _context.TbUsuarios.AnyAsync(a => a.IdUsuario == id && a.TbAsociados == null);
+                   return await _context.TbUsuarios.AnyAsync(u =>
+                       u.IdUsuario == id &&
+                       !_context.TbAsociados.Any(a => a.IdUsuario == u.IdUsuario));
                })
-               .WithMessage("El Usuario seleccionado no existe.");
+                .WithMessage("El usuario ya tiene un asociado asignado.");
+
+               
 
             RuleFor(x => x.Nacionalidad)
                 .IsInEnum().WithMessage("Debe seleccionar una Nacionalidad valido.")
@@ -67,9 +65,6 @@ namespace UCG.Models.ValidationModels
                 .NotEmpty().WithMessage("Debe ingresar un Nombre.")
                 .MaximumLength(100).WithMessage("El Nombre no puede superar los 100 caracteres.");
 
-            RuleFor(x => x.FechaNacimiento)
-                .NotNull().WithMessage("Debe seleccionar una fecha.")
-                .NotEmpty().WithMessage("Debe ingresar una fecha válida.");
 
             RuleFor(x => x.Sexo)
                 .IsInEnum().WithMessage("Debe ingresar una Sexo valido.")
@@ -109,6 +104,24 @@ namespace UCG.Models.ValidationModels
                 .IsInEnum().WithMessage("Debe seleccionar una estado valido.")
                 .NotEmpty().WithMessage("Debe ingresar un estado.");
 
+            RuleFor(x => x.FechaTexto)
+                .NotEmpty().WithMessage("Debe ingresar una fecha de asistencia.")
+                .Must(ValidarFechaTexto).WithMessage("La fecha debe tener el formato válido yyyy-MM-dd y estar entre el año 1940 y hoy.");
+
+        }
+
+        private bool ValidarFechaTexto(string? fechaTexto)
+        {
+            if (string.IsNullOrWhiteSpace(fechaTexto))
+                return false;
+
+            if (!DateOnly.TryParseExact(fechaTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fecha))
+                return false;
+
+            if (fecha > DateOnly.FromDateTime(DateTime.Today)) return false;
+            if (fecha < new DateOnly(1940, 1, 1)) return false;
+
+            return true;
         }
     }
 }

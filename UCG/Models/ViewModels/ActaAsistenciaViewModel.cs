@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using static UCG.Models.TbActaAsistencium;
 
@@ -14,7 +15,9 @@ namespace UCG.Models.ViewModels
         public int IdActa { get; set; }
 
         [Display(Name = "Fecha de Asistencia")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
+        public string? FechaTexto { get; set; } 
+
+        [BindNever]
         public DateOnly Fecha { get; set; }
 
     }

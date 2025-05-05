@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -56,10 +57,43 @@ namespace UCG.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-           
+            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
             var model = new ActaViewModel();
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                var nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                    .FirstOrDefault();
+
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.NombreAsociacion = nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+                ViewData["IdAsociado"] = new SelectList(
+                    _context.TbAsociados
+                        .Where(a => a.IdAsociacion == idAsociacion)
+                        .Select(a => new { a.IdAsociado, NombreCompleto = a.Nombre + " " + a.Apellido1 }),
+                    "IdAsociado",
+                    "NombreCompleto");
+            }
+            else
+            {
+                ViewBag.EsAdmin = false;
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                //ViewData["IdAsociado"] = new SelectList(Enumerable.Empty<SelectListItem>());
+            }
+
             return View(model);
+            // var model = new ActaViewModel();
+            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+            // return View(model);
         }
 
         [HttpPost]
@@ -394,7 +428,7 @@ namespace UCG.Controllers
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "El acta fue actualizada exitosamente.";
-                return RedirectToAction("Details", new { id = idActa });
+                return RedirectToAction(nameof(Edit));
             }
             catch (Exception ex)
             {
