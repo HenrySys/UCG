@@ -1,59 +1,82 @@
 ﻿@model UCG.Models.TbProyecto
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Proyecto";
 }
 
-<h1>Edit</h1>
-
-<h4>TbProyecto</h4>
+<h1 class="text-center mb-4">Editar Proyecto</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdProyecto" />
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="proyectoTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="info-tab" data-bs-toggle="tab" href="#info" role="tab">Información</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="asignacion-tab" data-bs-toggle="tab" href="#asignacion" role="tab">Asignaciones</a>
+                    </li>
+                </ul>
             </div>
-            <div class="form-group">
-                <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class="form-control" asp-items="ViewBag.IdActa"></select>
-                <span asp-validation-for="IdActa" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="IdProyecto" />
+                    <div class="tab-content" id="proyectoTabsContent">
+
+                        <!-- Tab 1: Información -->
+                        <div class="tab-pane fade show active" id="info" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="Nombre" class="form-label"></label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Descripcion" class="form-label"></label>
+                                <input asp-for="Descripcion" class="form-control" />
+                                <span asp-validation-for="Descripcion" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="MontoTotalDestinado" class="form-label"></label>
+                                <input asp-for="MontoTotalDestinado" class="form-control" />
+                                <span asp-validation-for="MontoTotalDestinado" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Asignaciones -->
+                        <div class="tab-pane fade" id="asignacion" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="IdAsociacion" class="form-label"></label>
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="IdActa" class="form-label"></label>
+                                <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa"></select>
+                                <span asp-validation-for="IdActa" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="IdAsociado" class="form-label"></label>
+                                <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado"></select>
+                                <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class="form-control" asp-items="ViewBag.IdAsociado"></select>
-                <span asp-validation-for="IdAsociado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MontoTotalDestinado" class="control-label"></label>
-                <input asp-for="MontoTotalDestinado" class="form-control" />
-                <span asp-validation-for="MontoTotalDestinado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

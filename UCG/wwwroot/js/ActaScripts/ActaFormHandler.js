@@ -52,7 +52,7 @@
         });
     }
 
-    if (idAsociacion) {
+    if (idAsociacion && parseInt(idAsociacion) > 0) {
         fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#IdAsociado', 'Seleccione un asociado', function (data, dropdown) {
             data.forEach(item => {
                 const nombreCompleto = `${item.nombre} ${item.apellido1}`;

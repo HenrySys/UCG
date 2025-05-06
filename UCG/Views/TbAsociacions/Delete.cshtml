@@ -1,105 +1,72 @@
 ﻿@model UCG.Models.TbAsociacion
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar Asociación";
 }
 
-<h1>Delete</h1>
+<h1 class="text-center mb-4">Eliminar Asociación</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                Confirmación de Eliminación
+            </div>
+            <div class="card-body">
+                <p class="text-danger">¿Estás seguro de que deseas eliminar esta asociación?</p>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>TbAsociacion</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CedulaJuridica)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CedulaJuridica)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CodigoRegistro)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CodigoRegistro)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaConstitucion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaConstitucion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefono)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefono)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fax)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fax)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Correo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Correo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Provincia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Provincia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Canton)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Canton)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Distrito)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Distrito)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Pueblo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Pueblo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Direccion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Direccion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="IdAsociacion" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Cédula Jurídica</dt>
+                    <dd class="col-sm-8 mb-3">@Model.CedulaJuridica</dd>
+
+                    <dt class="col-sm-4 mb-3">Código de Registro</dt>
+                    <dd class="col-sm-8 mb-3">@Model.CodigoRegistro</dd>
+
+                    <dt class="col-sm-4 mb-3">Nombre</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Constitución</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaConstitucion.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Teléfono</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Telefono</dd>
+
+                    <dt class="col-sm-4 mb-3">Fax</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Fax</dd>
+
+                    <dt class="col-sm-4 mb-3">Correo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Correo</dd>
+
+                    <dt class="col-sm-4 mb-3">Provincia</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Provincia</dd>
+
+                    <dt class="col-sm-4 mb-3">Cantón</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Canton</dd>
+
+                    <dt class="col-sm-4 mb-3">Distrito</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Distrito</dd>
+
+                    <dt class="col-sm-4 mb-3">Pueblo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Pueblo</dd>
+
+                    <dt class="col-sm-4 mb-3">Dirección</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Direccion</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdAsociacion" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

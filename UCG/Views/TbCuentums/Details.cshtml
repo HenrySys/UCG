@@ -1,56 +1,47 @@
 ﻿@model UCG.Models.TbCuentum
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Cuenta";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Cuenta</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">
+                Información de la Cuenta
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Tipo de Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">@Model.TipoCuenta</dd>
 
-<div>
-    <h4>TbCuentum</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoCuenta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoCuenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TituloCuenta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TituloCuenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroCuenta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumeroCuenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefono)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefono)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
-            @Html.DisplayFor(model => model.IdAsociacionNavigation.IdAsociacion)
-               </a>
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdCuenta">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4 mb-3">Título de la Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">@Model.TituloCuenta</dd>
+
+                    <dt class="col-sm-4 mb-3">Número de Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroCuenta</dd>
+
+                    <dt class="col-sm-4 mb-3">Teléfono</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Telefono</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                            @Model.IdAsociacionNavigation.Nombre
+                        </a>
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdCuenta" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

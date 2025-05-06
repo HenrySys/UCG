@@ -11,14 +11,7 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdCliente)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbClientes.AnyAsync(a => a.IdCliente == id);
-                })
-                .WithMessage("Ya existe un cliente con ese id.");
+          
 
             RuleFor(x => x.IdAsociacion)
               .NotNull().WithMessage("Debe seleccionar una Asociación.")

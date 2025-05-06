@@ -1,59 +1,71 @@
 ﻿@model UCG.Models.TbJuntaDirectiva
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Junta Directiva";
 }
 
-<h1>Edit</h1>
-
-<h4>TbJuntaDirectiva</h4>
+<h1 class="text-center mb-4">Editar Junta Directiva</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdJuntaDirectiva" />
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Formulario de Edición
             </div>
-            <div class="form-group">
-                <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class="form-control" asp-items="ViewBag.IdActa"></select>
-                <span asp-validation-for="IdActa" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="IdJuntaDirectiva" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdActa" class="form-label"></label>
+                        <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa"></select>
+                        <span asp-validation-for="IdActa" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PeriodoInicio" class="form-label"></label>
+                        <input asp-for="PeriodoInicio" class="form-control" type="date" />
+                        <span asp-validation-for="PeriodoInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PeriodoFin" class="form-label"></label>
+                        <input asp-for="PeriodoFin" class="form-control" type="date" />
+                        <span asp-validation-for="PeriodoFin" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <input asp-for="Estado" class="form-control" />
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="PeriodoInicio" class="control-label"></label>
-                <input asp-for="PeriodoInicio" class="form-control" />
-                <span asp-validation-for="PeriodoInicio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PeriodoFin" class="control-label"></label>
-                <input asp-for="PeriodoFin" class="form-control" />
-                <span asp-validation-for="PeriodoFin" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

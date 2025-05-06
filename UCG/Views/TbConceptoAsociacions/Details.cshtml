@@ -1,32 +1,37 @@
 ﻿@model UCG.Models.TbConceptoAsociacion
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Concepto de Asociación";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Concepto de Asociación</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Concepto Asociado
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                            @Model.IdAsociacionNavigation.Nombre
+                        </a>
+                    </dd>
 
-<div>
-    <h4>TbConceptoAsociacion</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
-            @Html.DisplayFor(model => model.IdAsociacionNavigation.Nombre)
-</a>
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdConceptoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdConceptoNavigation.IdConceptoMovimiento)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdConceptoAsociacion">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4 mb-3">Concepto</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @Model.IdConceptoNavigation.IdConceptoMovimiento
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdConceptoAsociacion" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

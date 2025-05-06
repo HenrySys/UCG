@@ -1,34 +1,40 @@
 ﻿@model UCG.Models.TbActaAsistencium
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Asistencia";
 }
 
-<h1>Edit</h1>
-
-<h4>TbActaAsistencium</h4>
+<h1 class="text-center mb-4">Editar Asistencia</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdActaAsistencia" />
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class="form-control" asp-items="ViewBag.IdAsociado"></select>
-                <span asp-validation-for="IdAsociado" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Formulario de Edición
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="IdActaAsistencia" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado"></select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

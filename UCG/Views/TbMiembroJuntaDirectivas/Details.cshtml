@@ -1,42 +1,37 @@
 ﻿@model UCG.Models.TbMiembroJuntaDirectiva
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Miembro de Junta Directiva";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Miembro de Junta Directiva</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Miembro de la Junta Directiva
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
 
-<div>
-    <h4>TbMiembroJuntaDirectiva</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdAsociadoNavigation.IdAsociado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdJuntaDirectivaNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdJuntaDirectivaNavigation.IdJuntaDirectiva)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdPuestoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdPuestoNavigation.IdPuesto)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdMiembrosJuntaDirectiva">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4 mb-3">Asociado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociadoNavigation.IdAsociado</dd>
+
+                    <dt class="col-sm-4 mb-3">Junta Directiva</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdJuntaDirectivaNavigation.IdJuntaDirectiva</dd>
+
+                    <dt class="col-sm-4 mb-3">Puesto</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdPuestoNavigation.IdPuesto</dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdMiembrosJuntaDirectiva" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

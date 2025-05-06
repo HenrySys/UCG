@@ -1,118 +1,106 @@
 ﻿@model UCG.Models.TbMovimiento
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Movimiento";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Movimiento</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Movimiento
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Asociado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociado</dd>
 
-<div>
-    <h4>TbMovimiento</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdAsociado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoMovimiento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoMovimiento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FuenteFondo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FuenteFondo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdProyecto)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdProyecto)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdCliente)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdCliente)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MetdodoPago)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MetdodoPago)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaMovimiento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.FechaMovimiento.ToString("dd/MM/yyyy")
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubtotalMovido)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubtotalMovido)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MontoTotalMovido)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MontoTotalMovido)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdActaNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation.IdActa">
-            @Html.DisplayFor(model => model.IdActaNavigation.NumeroActa)
-            </a>
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
-            @Html.DisplayFor(model => model.IdAsociacionNavigation.IdAsociacion)
-                </a>    
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdCategoriaMovimientoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdCategoriaMovimientoNavigation.IdCategoriaMovimiento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdCuentaNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdCuentaNavigation.IdCuenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdProveedorNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdProveedorNavigation.IdProveedor)
-        </dd>
-    </dl>
+                    <dt class="col-sm-4 mb-3">Tipo de Movimiento</dt>
+                    <dd class="col-sm-8 mb-3">@Model.TipoMovimiento</dd>
+
+                    <dt class="col-sm-4 mb-3">Fuente de Fondo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FuenteFondo</dd>
+
+                    <dt class="col-sm-4 mb-3">Proyecto</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdProyectoNavigation != null)
+                        {
+                            <a asp-controller="TbProyectos" asp-action="Details" asp-route-id="@Model.IdProyectoNavigation.IdProyecto">
+                                @Model.IdProyectoNavigation.IdProyecto
+                            </a>
+                        }
+                        else
+                        {
+                            <span>Sin proyecto</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Cliente</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdCliente != null)
+                        {
+                            <a asp-controller="TbClientes" asp-action="Details" asp-route-id="@Model.IdCliente">
+                                @Model.IdCliente
+                            </a>
+                        }
+                        else
+                        {
+                            <span>Sin cliente</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4 mb-3">Método de Pago</dt>
+                    <dd class="col-sm-8 mb-3">@Model.MetdodoPago</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Movimiento</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaMovimiento.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Subtotal Movido</dt>
+                    <dd class="col-sm-8 mb-3">@Model.SubtotalMovido</dd>
+
+                    <dt class="col-sm-4 mb-3">Monto Total Movido</dt>
+                    <dd class="col-sm-8 mb-3">@Model.MontoTotalMovido</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Número de Acta</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation.IdActa">
+                            @Model.IdActaNavigation.NumeroActa
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                            @Model.IdAsociacionNavigation.IdAsociacion
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Categoría de Movimiento</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdCategoriaMovimientoNavigation.IdCategoriaMovimiento</dd>
+
+                    <dt class="col-sm-4 mb-3">Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdCuentaNavigation.IdCuenta</dd>
+
+                    <dt class="col-sm-4 mb-3">Proveedor</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.IdProveedorNavigation != null ? Model.IdProveedorNavigation.IdProveedor.ToString() : "Sin proveedor")
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdMovimiento" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdMovimiento">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+

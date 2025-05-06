@@ -1,109 +1,151 @@
 ﻿@model UCG.Models.TbMovimiento
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Movimiento";
 }
 
-<h1>Edit</h1>
-
-<h4>TbMovimiento</h4>
+<h1 class="text-center mb-4">Editar Movimiento</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdMovimiento" />
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="editTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#general" role="tab">General</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="finanzas-tab" data-bs-toggle="tab" href="#finanzas" role="tab">Finanzas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="otros-tab" data-bs-toggle="tab" href="#otros" role="tab">Otros</a>
+                    </li>
+                </ul>
             </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <input asp-for="IdAsociado" class="form-control" />
-                <span asp-validation-for="IdAsociado" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="IdMovimiento" />
+                    <div class="tab-content" id="editTabsContent">
+                        <!-- Tab 1: General -->
+                        <div class="tab-pane fade show active" id="general" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="IdAsociacion" class="form-label"></label>
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdAsociado" class="form-label"></label>
+                                <input asp-for="IdAsociado" class="form-control" />
+                                <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="TipoMovimiento" class="form-label"></label>
+                                <input asp-for="TipoMovimiento" class="form-control" />
+                                <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdCategoriaMovimiento" class="form-label"></label>
+                                <select asp-for="IdCategoriaMovimiento" class="form-select" asp-items="ViewBag.IdCategoriaMovimiento"></select>
+                                <span asp-validation-for="IdCategoriaMovimiento" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="FuenteFondo" class="form-label"></label>
+                                <input asp-for="FuenteFondo" class="form-control" />
+                                <span asp-validation-for="FuenteFondo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Finanzas -->
+                        <div class="tab-pane fade" id="finanzas" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="IdProyecto" class="form-label"></label>
+                                <input asp-for="IdProyecto" class="form-control" />
+                                <span asp-validation-for="IdProyecto" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdCuenta" class="form-label"></label>
+                                <select asp-for="IdCuenta" class="form-select" asp-items="ViewBag.IdCuenta"></select>
+                                <span asp-validation-for="IdCuenta" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdActa" class="form-label"></label>
+                                <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa"></select>
+                                <span asp-validation-for="IdActa" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdProveedor" class="form-label"></label>
+                                <select asp-for="IdProveedor" class="form-select" asp-items="ViewBag.IdProveedor"></select>
+                                <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdCliente" class="form-label"></label>
+                                <input asp-for="IdCliente" class="form-control" />
+                                <span asp-validation-for="IdCliente" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Otros -->
+                        <div class="tab-pane fade" id="otros" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="Descripcion" class="form-label"></label>
+                                <input asp-for="Descripcion" class="form-control" />
+                                <span asp-validation-for="Descripcion" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="MetdodoPago" class="form-label"></label>
+                                <input asp-for="MetdodoPago" class="form-control" />
+                                <span asp-validation-for="MetdodoPago" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="FechaMovimiento" class="form-label"></label>
+                                <input asp-for="FechaMovimiento" class="form-control" />
+                                <span asp-validation-for="FechaMovimiento" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="SubtotalMovido" class="form-label"></label>
+                                <input asp-for="SubtotalMovido" class="form-control" />
+                                <span asp-validation-for="SubtotalMovido" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="MontoTotalMovido" class="form-label"></label>
+                                <input asp-for="MontoTotalMovido" class="form-control" />
+                                <span asp-validation-for="MontoTotalMovido" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Estado" class="form-label"></label>
+                                <input asp-for="Estado" class="form-control" />
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="TipoMovimiento" class="control-label"></label>
-                <input asp-for="TipoMovimiento" class="form-control" />
-                <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdCategoriaMovimiento" class="control-label"></label>
-                <select asp-for="IdCategoriaMovimiento" class="form-control" asp-items="ViewBag.IdCategoriaMovimiento"></select>
-                <span asp-validation-for="IdCategoriaMovimiento" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FuenteFondo" class="control-label"></label>
-                <input asp-for="FuenteFondo" class="form-control" />
-                <span asp-validation-for="FuenteFondo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdProyecto" class="control-label"></label>
-                <input asp-for="IdProyecto" class="form-control" />
-                <span asp-validation-for="IdProyecto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdCuenta" class="control-label"></label>
-                <select asp-for="IdCuenta" class="form-control" asp-items="ViewBag.IdCuenta"></select>
-                <span asp-validation-for="IdCuenta" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class="form-control" asp-items="ViewBag.IdActa"></select>
-                <span asp-validation-for="IdActa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdProveedor" class="control-label"></label>
-                <select asp-for="IdProveedor" class="form-control" asp-items="ViewBag.IdProveedor"></select>
-                <span asp-validation-for="IdProveedor" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdCliente" class="control-label"></label>
-                <input asp-for="IdCliente" class="form-control" />
-                <span asp-validation-for="IdCliente" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MetdodoPago" class="control-label"></label>
-                <input asp-for="MetdodoPago" class="form-control" />
-                <span asp-validation-for="MetdodoPago" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaMovimiento" class="control-label"></label>
-                <input asp-for="FechaMovimiento" class="form-control" />
-                <span asp-validation-for="FechaMovimiento" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SubtotalMovido" class="control-label"></label>
-                <input asp-for="SubtotalMovido" class="form-control" />
-                <span asp-validation-for="SubtotalMovido" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MontoTotalMovido" class="control-label"></label>
-                <input asp-for="MontoTotalMovido" class="form-control" />
-                <span asp-validation-for="MontoTotalMovido" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

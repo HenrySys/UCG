@@ -1,84 +1,113 @@
 ﻿@model UCG.Models.TbProveedor
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Proveedor";
 }
 
-<h1>Edit</h1>
-
-<h4>TbProveedor</h4>
+<h1 class="text-center mb-4">Editar Proveedor</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdProveedor" />
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="proveedorTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="empresa-tab" data-bs-toggle="tab" href="#empresa" role="tab">Empresa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="contacto-tab" data-bs-toggle="tab" href="#contacto" role="tab">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="otros-tab" data-bs-toggle="tab" href="#otros" role="tab">Otros</a>
+                    </li>
+                </ul>
             </div>
-            <div class="form-group">
-                <label asp-for="TipoProveedor" class="control-label"></label>
-                <input asp-for="TipoProveedor" class="form-control" />
-                <span asp-validation-for="TipoProveedor" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="IdProveedor" />
+                    <div class="tab-content" id="proveedorTabsContent">
+                        <!-- Tab 1: Empresa -->
+                        <div class="tab-pane fade show active" id="empresa" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="IdAsociacion" class="form-label"></label>
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="TipoProveedor" class="form-label"></label>
+                                <input asp-for="TipoProveedor" class="form-control" />
+                                <span asp-validation-for="TipoProveedor" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="NombreEmpresa" class="form-label"></label>
+                                <input asp-for="NombreEmpresa" class="form-control" />
+                                <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CedulaJuridica" class="form-label"></label>
+                                <input asp-for="CedulaJuridica" class="form-control" />
+                                <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Contacto -->
+                        <div class="tab-pane fade" id="contacto" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="NombreContacto" class="form-label"></label>
+                                <input asp-for="NombreContacto" class="form-control" />
+                                <span asp-validation-for="NombreContacto" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CedulaContacto" class="form-label"></label>
+                                <input asp-for="CedulaContacto" class="form-control" />
+                                <span asp-validation-for="CedulaContacto" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Direccion" class="form-label"></label>
+                                <input asp-for="Direccion" class="form-control" />
+                                <span asp-validation-for="Direccion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Otros -->
+                        <div class="tab-pane fade" id="otros" role="tabpanel">
+                            <div class="mb-3">
+                                <label asp-for="Telefono" class="form-label"></label>
+                                <input asp-for="Telefono" class="form-control" />
+                                <span asp-validation-for="Telefono" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Correo" class="form-label"></label>
+                                <input asp-for="Correo" class="form-control" />
+                                <span asp-validation-for="Correo" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Fax" class="form-label"></label>
+                                <input asp-for="Fax" class="form-control" />
+                                <span asp-validation-for="Fax" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Estado" class="form-label"></label>
+                                <input asp-for="Estado" class="form-control" />
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="NombreEmpresa" class="control-label"></label>
-                <input asp-for="NombreEmpresa" class="form-control" />
-                <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CedulaJuridica" class="control-label"></label>
-                <input asp-for="CedulaJuridica" class="form-control" />
-                <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NombreContacto" class="control-label"></label>
-                <input asp-for="NombreContacto" class="form-control" />
-                <span asp-validation-for="NombreContacto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CedulaContacto" class="control-label"></label>
-                <input asp-for="CedulaContacto" class="form-control" />
-                <span asp-validation-for="CedulaContacto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Direccion" class="control-label"></label>
-                <input asp-for="Direccion" class="form-control" />
-                <span asp-validation-for="Direccion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correo" class="control-label"></label>
-                <input asp-for="Correo" class="form-control" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Fax" class="control-label"></label>
-                <input asp-for="Fax" class="form-control" />
-                <span asp-validation-for="Fax" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

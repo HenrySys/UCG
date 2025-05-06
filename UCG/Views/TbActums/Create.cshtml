@@ -14,7 +14,7 @@
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
      data-error="@TempData["ErrorMessage"]"
-     data-asociacion="@ViewData["IdAsociacion"]">
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
 </div>
 <form asp-action="Create" data-mode="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>

@@ -1,49 +1,40 @@
 ﻿@model UCG.Models.TbDetalleMovimiento
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Movimiento";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Movimiento</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Movimiento
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Decripcion</dd>
 
-<div>
-    <h4>TbDetalleMovimiento</h4>
-    <hr />
-    <dl class="row">
-    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Decripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Decripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subtotal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subtotal)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdInformeEconomico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdInformeEconomico)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAcuerdoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdAcuerdoNavigation.IdAcuerdo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdMovimientoNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdMovimientoNavigation.IdMovimiento)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdDetalleMovimiento">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4 mb-3">Subtotal</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Subtotal</dd>
+
+                    <dt class="col-sm-4 mb-3">Informe Económico</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdInformeEconomico</dd>
+
+                    <dt class="col-sm-4 mb-3">Acuerdo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAcuerdoNavigation.IdAcuerdo</dd>
+
+                    <dt class="col-sm-4 mb-3">Movimiento</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdMovimientoNavigation.IdMovimiento</dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdDetalleMovimiento" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

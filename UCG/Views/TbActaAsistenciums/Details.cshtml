@@ -1,32 +1,36 @@
 ﻿@model UCG.Models.TbActaAsistencium
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Asistencia";
 }
 
-<h1>Details</h1>
+<h1 class="text-center mb-4">Detalle de Asistencia</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Información de la Asistencia
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Fecha</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
 
-<div>
-    <h4>TbActaAsistencium</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Fecha)
-        </dt>
-        <dd class="col-sm-10">
-			 @Model.Fecha.ToString("dd/MM/yyyy")
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-        </dt>
-        <dd class="col-sm-10">
-            <a asp-controller="TbAsociadoes" asp-action="Details" asp-route-id="@Model.IdAsociadoNavigation?.IdAsociado">
-                @Model.IdAsociadoNavigation?.Nombre
-            </a>
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdActaAsistencia">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4 mb-3">Asociado</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociadoes"
+                           asp-action="Details"
+                           asp-route-id="@Model.IdAsociadoNavigation?.IdAsociado">
+                            @Model.IdAsociadoNavigation?.Nombre
+                        </a>
+                    </dd>
+                </dl>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdActaAsistencia" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
