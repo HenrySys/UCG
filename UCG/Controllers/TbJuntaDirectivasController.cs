@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
+using UCG.Models.ValidationModels;
+using Newtonsoft.Json;
 
 namespace UCG.Controllers
 {
@@ -78,13 +80,11 @@ namespace UCG.Controllers
             else
             {
                 ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
                 ViewBag.EsAdmin = false;
                 return View();
             }
-            // ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            // return View();
+    
         }
 
         // POST: TbJuntaDirectivas/Create
@@ -92,18 +92,131 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdJuntaDirectiva,IdAsociacion,IdActa,PeriodoInicio,PeriodoFin,Nombre,Estado")] TbJuntaDirectiva tbJuntaDirectiva)
+        public async Task<IActionResult> Create(JuntaDirectivaViewModel model)
         {
-            if (ModelState.IsValid)
+            var validator = new JuntaDirectivaViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                _context.Add(tbJuntaDirectiva);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await PrepararViewDataAsync(model);
+                return View(model);
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbJuntaDirectiva.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbJuntaDirectiva.IdAsociacion);
-            return View(tbJuntaDirectiva);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var nuevaJunta = MapearJuntaDirectiva(model);
+               
+
+                _context.TbJuntaDirectivas.Add(nuevaJunta);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Junta Directiva creada correctamente.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar la junta directiva.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
         }
+        private TbJuntaDirectiva MapearJuntaDirectiva(JuntaDirectivaViewModel model)
+        {
+            return new TbJuntaDirectiva
+            {
+
+                IdAsociacion = model.IdAsociacion,
+                IdActa = model.IdActa,
+                PeriodoInicio = model.PeriodoInicio,
+                PeriodoFin = model.PeriodoFin,
+                Nombre = model.Nombre,
+                Estado = model.Estado
+            };
+        }
+
+        private async Task<bool> DeserializarJsonAsync(JuntaDirectivaViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.MiembrosJuntaJson))
+                    model.MiembroJunta = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.MiembrosJuntaJson);
+
+                    model.MiembroJunta ??= new();
+              
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al deserializar los datos: " + ex.Message;
+                return false;
+            }
+        }
+       
+        private async Task PrepararViewDataAsync(JuntaDirectivaViewModel model)
+        {
+            ViewData["IdActa"] = new SelectList(
+                await _context.TbAsociacions.ToListAsync(),
+                "IdActa",
+                "NumeroActa",
+                model.IdActa);
+
+            ViewData["IdAsociacion"] = new SelectList(
+               await _context.TbAsociacions.ToListAsync(),
+               "IdAsociacion", "Nombre", model.IdAsociacion);
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var asociados = _context.TbAsociados
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!asociados.Any())
+                {
+                    return Json(new { success = false, message = "No hay asociados disponibles." });
+                }
+
+                return Json(new { success = true, data = asociados });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
+            }
+        }
+
+        public JsonResult ObtenerActaPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var actas = _context.TbActa
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!actas.Any())
+                {
+                    return Json(new { success = false, message = "No hay actas disponibles." });
+                }
+
+                return Json(new { success = true, data = actas });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los actas: " + ex.Message });
+            }
+        }
+
 
         // GET: TbJuntaDirectivas/Edit/5
         public async Task<IActionResult> Edit(int? id)

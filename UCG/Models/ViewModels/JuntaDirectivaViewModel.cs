@@ -25,5 +25,10 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Estado")]
         public EstadoDeJuntaDirectiva? Estado { get; set; }
 
+        public string MiembrosJuntaJson { get; set; } = null!;
+
+        public List<ActaAsistenciaViewModel> MiembroJunta { get; set; } = new();
+
+
     }
 }

@@ -1,44 +1,64 @@
-﻿@model UCG.Models.TbJuntaDirectiva
+﻿@using UCG.Models.ViewModels;
+@using static UCG.Models.TbJuntaDirectiva;
+@model JuntaDirectivaViewModel;
 
 @{
     ViewData["Title"] = "Crear Junta Directiva";
 }
 
-<h1 class="text-center mb-4">Crear Junta Directiva</h1>
+<h1>Crear Junta Directiva</h1>
 <hr />
 
-<div class="row">
-    <!-- Columna izquierda: Datos de la junta -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow h-100">
-            <div class="card-header">
-                Información de la Junta Directiva
-            </div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
+ </div>
 
+<form asp-action="Create" data-mode="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row g-3 mb-4">
+        <!-- CARD 1: Información de la Junta -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">
+                    Información de la Junta Directiva
+                </div>
+                <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                        @if (ViewBag.EsAdmin == true)
+                        {
+                            <input type="text" class="form-control" value="@ViewBag.NombreAsociacion" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="IdActa" class="form-label"></label>
-                        <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa"></select>
+                        <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
+                            <option disabled selected>Seleccione un acta</option>
+                        </select>
                         <span asp-validation-for="IdActa" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="PeriodoInicio" class="form-label"></label>
-                        <input asp-for="PeriodoInicio" class="form-control" />
+                        <input asp-for="PeriodoInicio" class="form-control" type="date" />
                         <span asp-validation-for="PeriodoInicio" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="PeriodoFin" class="form-label"></label>
-                        <input asp-for="PeriodoFin" class="form-control" />
+                        <input asp-for="PeriodoFin" class="form-control" type="date" />
                         <span asp-validation-for="PeriodoFin" class="text-danger"></span>
                     </div>
 
@@ -47,27 +67,33 @@
                         <input asp-for="Nombre" class="form-control" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
-                </form>
+
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeJuntaDirectiva>()">
+                            <option disabled selected>Seleccione un estado</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Columna derecha: Miembros de la junta -->
-    <div class="col-12 col-md-6">
-        <div class="col-12">
-            <div class="card borde-secondary-emphasis shadow">
+        <!-- CARD 2: Miembros -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
                 <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
-                    <span>Miembros de la junta</span>
+                    <span>Miembros de la Junta</span>
                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalMiembrosJunta">
                         Agregar
                     </button>
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered table-sm" id="detailsTableMovimiento">
+                    <table class="table table-bordered table-sm" id="detailsTableMiembros">
                         <thead>
                             <tr>
-                                <th>Id Asociado</th>
-                                <th>Id Puesto</th>
+                                <th>Asociado</th>
+                                <th>Puesto</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -76,16 +102,59 @@
             </div>
         </div>
     </div>
-</div>
 
+    <!-- Botones -->
+    <div class="mt-4">
+        <input type="submit" value="Crear" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+    </div>
 
-<div class="mt-3">
-    <input type="submit" value="Crear" class="btn btn-success" />
-    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+    <input type="hidden" id="MiembrosJuntaJson" name="MiembrosJuntaJson" value="@Model.MiembrosJuntaJson" />
+</form>
+
+<!-- Modal Miembros -->
+<div class="modal fade" id="detailModalMiembrosJunta" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary-emphasis">
+                <h5 class="modal-title" id="detailModalLabel">Agregar Miembro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Asociado</label>
+                <select id="modalIdAsociado" class="form-select">
+                    <option value="0" disabled="" selected="">Seleccione un asociado</option>
+                </select>
+
+                <label class="form-label mt-3">Puesto</label>
+                <select id="modalIdPuesto" class="form-select">
+                    <option value="0" disabled="" selected="">Seleccione un puesto</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="addMiembroBtn" class="btn btn-success">Agregar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <script>
+        const rutasJuntaDirectiva = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbJuntaDirectivas")',
+            obtenerActas: '@Url.Action("ObtenerActasPorAsociacion", "TbJuntaDirectivas")',
+        };
+    </script>
+
+<script src="~/js/JuntaDirectivaScripts/JuntaDirectivaCreate.js"></script>
 }
