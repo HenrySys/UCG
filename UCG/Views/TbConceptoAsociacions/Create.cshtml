@@ -3,48 +3,64 @@
 @model ConceptoAsociacionViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Concepto de Asociación";
 }
 
-<h1>Create</h1>
-
-<h4>TbConceptoAsociacion</h4>
+<h1 class="text-center mb-4">Crear Concepto de Asociación</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                @if (ViewBag.EsAdmin == true)
-                {
-                    <input type="text" class="form-control" value="@ViewBag.Nombre" disabled />
-                    <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                }
-                else
-                {
-                    <select asp-for="IdAsociacion" class ="form-select" asp-items="ViewBag.IdAsociacion">
-                        <option disabled="" selected="">Seleccione una asociacion</option> 
-                    </select>
-                }
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Concepto
             </div>
-            <div class="form-group">
-                <label asp-for="IdConcepto" class="control-label"></label>
-                <select asp-for="IdConcepto" class ="form-select" asp-items="ViewBag.IdConcepto">
-                    <option disabled="" selected="">Seleccione un concepto</option>
-                </select>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdAsociacion" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            @if (ViewBag.EsAdmin == true)
+                            {
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                            }
+                            else
+                            {
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion">
+                                    <option disabled selected>Seleccione una asociación</option>
+                                </select>
+                            }
+                            <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdConcepto" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            <select asp-for="IdConcepto" class="form-select" asp-items="ViewBag.IdConcepto">
+                                <option disabled selected>Seleccione un concepto</option>
+                            </select>
+                            <span asp-validation-for="IdConcepto" class="text-danger"></span>
+                        </dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" value="Guardar Concepto" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

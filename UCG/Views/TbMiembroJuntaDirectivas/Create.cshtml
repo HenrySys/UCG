@@ -1,40 +1,60 @@
 ﻿@model UCG.Models.TbMiembroJuntaDirectiva
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Miembro de Junta Directiva";
 }
 
-<h1>Create</h1>
-
-<h4>TbMiembroJuntaDirectiva</h4>
+<h1 class="text-center mb-4">Crear Miembro de Junta Directiva</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdJuntaDirectiva" class="control-label"></label>
-                <select asp-for="IdJuntaDirectiva" class ="form-control" asp-items="ViewBag.IdJuntaDirectiva"></select>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Miembro
             </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class ="form-control" asp-items="ViewBag.IdAsociado"></select>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdJuntaDirectiva" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            <select asp-for="IdJuntaDirectiva" class="form-select" asp-items="ViewBag.IdJuntaDirectiva"></select>
+                            <span asp-validation-for="IdJuntaDirectiva" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdAsociado" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado"></select>
+                            <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdPuesto" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            <select asp-for="IdPuesto" class="form-select" asp-items="ViewBag.IdPuesto"></select>
+                            <span asp-validation-for="IdPuesto" class="text-danger"></span>
+                        </dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" value="Guardar Miembro" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="IdPuesto" class="control-label"></label>
-                <select asp-for="IdPuesto" class ="form-control" asp-items="ViewBag.IdPuesto"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

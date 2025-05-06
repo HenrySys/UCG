@@ -1,87 +1,102 @@
 ﻿@using UCG.Models.ViewModels
-@using static UCG.Models.TbProveedor;
+@using static UCG.Models.TbProveedor
 @model ProveedorViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Proveedor";
 }
 
-<h1>Create</h1>
-
-<h4>TbProveedor</h4>
+<h1 class="text-center mb-4">Crear Proveedor</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                @if (ViewBag.EsAdmin == true)
-                {
-                    <input type="text" class="form-control" value="@ViewBag.Nombre" disabled />
-                    <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                }
-                else
-                {
-                    <select asp-for="IdAsociacion" class ="form-select" asp-items="ViewBag.IdAsociacion">
-                        <option disabled="" selected="">Seleccione una asociacion</option> 
-                    </select>
-                }
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Proveedor
             </div>
-            <div class="form-group">
-                <label asp-for="NombreEmpresa" class="control-label"></label>
-                <input asp-for="NombreEmpresa" class="form-control" />
-                <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 mb-3"><label asp-for="IdAsociacion" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            @if (ViewBag.EsAdmin == true)
+                            {
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                            }
+                            else
+                            {
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion">
+                                    <option disabled selected>Seleccione una asociación</option>
+                                </select>
+                            }
+                            <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="NombreEmpresa" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="NombreEmpresa" class="form-control" />
+                            <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="CedulaJuridica" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="CedulaJuridica" class="form-control" />
+                            <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="NombreContacto" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="NombreContacto" class="form-control" />
+                            <span asp-validation-for="NombreContacto" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="CedulaContacto" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="CedulaContacto" class="form-control" />
+                            <span asp-validation-for="CedulaContacto" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="Direccion" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="Direccion" class="form-control" />
+                            <span asp-validation-for="Direccion" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="Telefono" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="Telefono" class="form-control" />
+                            <span asp-validation-for="Telefono" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="Correo" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="Correo" class="form-control" />
+                            <span asp-validation-for="Correo" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="Fax" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="Fax" class="form-control" />
+                            <span asp-validation-for="Fax" class="text-danger"></span>
+                        </dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" value="Guardar Proveedor" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="CedulaJuridica" class="control-label"></label>
-                <input asp-for="CedulaJuridica" class="form-control" />
-                <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NombreContacto" class="control-label"></label>
-                <input asp-for="NombreContacto" class="form-control" />
-                <span asp-validation-for="NombreContacto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CedulaContacto" class="control-label"></label>
-                <input asp-for="CedulaContacto" class="form-control" />
-                <span asp-validation-for="CedulaContacto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Direccion" class="control-label"></label>
-                <input asp-for="Direccion" class="form-control" />
-                <span asp-validation-for="Direccion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correo" class="control-label"></label>
-                <input asp-for="Correo" class="form-control" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Fax" class="control-label"></label>
-                <input asp-for="Fax" class="form-control" />
-                <span asp-validation-for="Fax" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
