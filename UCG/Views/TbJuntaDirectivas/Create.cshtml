@@ -16,7 +16,7 @@
  </div>
 
 <form asp-action="Create" data-mode="Create">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="row g-3 mb-4">
         <!-- CARD 1: Información de la Junta -->
@@ -30,7 +30,7 @@
                         <label asp-for="IdAsociacion" class="form-label"></label>
                         @if (ViewBag.EsAdmin == true)
                         {
-                            <input type="text" class="form-control" value="@ViewBag.NombreAsociacion" disabled />
+                            <input type="text" class="form-control" value="@ViewBag.Nombre" disabled />
                             <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
                         }
                         else
@@ -42,24 +42,31 @@
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
+                    @* <div class="mb-3">
                         <label asp-for="IdActa" class="form-label"></label>
-                        <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
+                        @if (ViewBag.EsAdmin == true || ViewBag.EsAdmin == false)
+						{
+                            <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
+                                <option disabled selected>Seleccione un acta</option>
+                            </select>
+						}
+						
+                        @* <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
                             <option disabled selected>Seleccione un acta</option>
-                        </select>
+                        </select> 
                         <span asp-validation-for="IdActa" class="text-danger"></span>
+                    </div> *@
+
+                    <div class="mb-3">
+                        <label asp-for="FechaPeriodoInicioTexto" class="form-label"></label>
+                        <input asp-for="FechaPeriodoInicioTexto" class="form-control" type="date" />
+                        <span asp-validation-for="FechaPeriodoInicioTexto" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="PeriodoInicio" class="form-label"></label>
-                        <input asp-for="PeriodoInicio" class="form-control" type="date" />
-                        <span asp-validation-for="PeriodoInicio" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="PeriodoFin" class="form-label"></label>
-                        <input asp-for="PeriodoFin" class="form-control" type="date" />
-                        <span asp-validation-for="PeriodoFin" class="text-danger"></span>
+                        <label asp-for="FechaPeriodoFinTexto" class="form-label"></label>
+                        <input asp-for="FechaPeriodoFinTexto" class="form-control" type="date" />
+                        <span asp-validation-for="FechaPeriodoFinTexto" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -128,8 +135,14 @@
 
                 <label class="form-label mt-3">Puesto</label>
                 <select id="modalIdPuesto" class="form-select">
-                    <option value="0" disabled="" selected="">Seleccione un puesto</option>
+                    <option value="0" disabled selected>Seleccione un puesto</option>
+                    @foreach (var item in (SelectList)ViewData["IdPuesto"])
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
                 </select>
+
+
             </div>
             <div class="modal-footer">
                 <button type="button" id="addMiembroBtn" class="btn btn-success">Agregar</button>
@@ -156,5 +169,5 @@
         };
     </script>
 
-<script src="~/js/JuntaDirectivaScripts/JuntaDirectivaCreate.js"></script>
+<script src="~/js/JuntaDirectivaScripts/JuntaDirectivaFormHandler.js"></script>
 }

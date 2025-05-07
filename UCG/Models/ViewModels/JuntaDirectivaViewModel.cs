@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using static UCG.Models.TbJuntaDirectiva;
 
@@ -5,6 +6,11 @@ namespace UCG.Models.ViewModels
 {
     public class JuntaDirectivaViewModel
     {
+        [Display(Name = "Periodo de Inicio")]
+        public string? FechaPeriodoInicioTexto { get; set; } 
+        [Display(Name = "Periodo de Fin")]
+        public string? FechaPeriodoFinTexto { get; set; }
+
         public int IdJuntaDirectiva { get; set; }
 
         [Display(Name = "Asociacion")]
@@ -13,11 +19,10 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Acta")]
         public int? IdActa { get; set; }
 
-        [Display(Name = "Periodo de Inicio")]
-        public DateOnly PeriodoInicio { get; set; }
-
-        [Display(Name = "Periodo de Fin")]
-        public DateOnly PeriodoFin { get; set; }
+		[BindNever]
+		public DateOnly PeriodoInicio { get; set; }
+		[BindNever]
+		public DateOnly PeriodoFin { get; set; }
 
         [Display(Name = "Nombre")]
         public string? Nombre { get; set; }
@@ -27,7 +32,7 @@ namespace UCG.Models.ViewModels
 
         public string MiembrosJuntaJson { get; set; } = null!;
 
-        public List<ActaAsistenciaViewModel> MiembroJunta { get; set; } = new();
+        public List<MiembroJuntaDirectivaViewModel> MiembroJunta { get; set; } = new();
 
 
     }

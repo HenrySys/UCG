@@ -10,6 +10,7 @@ using UCG.Models;
 using UCG.Models.ViewModels;
 using UCG.Models.ValidationModels;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace UCG.Controllers
 {
@@ -49,10 +50,9 @@ namespace UCG.Controllers
             return View(tbJuntaDirectiva);
         }
 
-        // GET: TbJuntaDirectivas/Create
+        [HttpGet]
         public IActionResult Create()
         {
-
             string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
             var model = new JuntaDirectivaViewModel();
 
@@ -61,39 +61,58 @@ namespace UCG.Controllers
                 var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
                 bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
 
-                // Obtener el nombre de la asociación desde la base de datos
-                var Nombre = _context.TbAsociacions
+                var nombre = _context.TbAsociacions
                     .Where(a => a.IdAsociacion == idAsociacion)
                     .Select(a => a.Nombre)
-                .FirstOrDefault();
+                    .FirstOrDefault();
 
-                // Se mantiene seleccionable el usuario
+                // Asignación igual que en Acta
                 ViewBag.IdAsociacion = idAsociacion;
-                ViewBag.Nombre = Nombre;
+                ViewBag.Nombre = nombre;
                 ViewBag.EsAdmin = true;
                 model.IdAsociacion = idAsociacion;
 
-                ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
 
-                return View(model);
+                // También podrías cargar los puestos si aplica
+                ViewData["IdPuesto"] = new SelectList(_context.TbPuestos, "IdPuesto", "Nombre");
             }
             else
             {
-                ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa");
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
                 ViewBag.EsAdmin = false;
-                return View();
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+                // Puedes dejar vacío el SelectList de asociados hasta que se seleccione una asociación
+                ViewData["IdAsociado"] = new SelectList(Enumerable.Empty<SelectListItem>());
+                ViewData["IdPuesto"] = new SelectList(_context.TbPuestos, "IdPuesto", "Nombre");
             }
-    
+
+            return View(model);
         }
 
-        // POST: TbJuntaDirectivas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(JuntaDirectivaViewModel model)
         {
+
+            if (!await DeserializarJsonAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en los datos de miembros.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
+            try
+            {
+                if (DateOnly.TryParseExact(model.FechaPeriodoInicioTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var inicio))
+                    model.PeriodoInicio = inicio;
+
+                if (DateOnly.TryParseExact(model.FechaPeriodoFinTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fin))
+                    model.PeriodoFin = fin;
+            }
+            catch { }
+
+        
+
             var validator = new JuntaDirectivaViewModelValidator(_context);
             var validationResult = await validator.ValidateAsync(model);
 
@@ -106,20 +125,24 @@ namespace UCG.Controllers
                 await PrepararViewDataAsync(model);
                 return View(model);
             }
+            
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 var nuevaJunta = MapearJuntaDirectiva(model);
-               
 
                 _context.TbJuntaDirectivas.Add(nuevaJunta);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // ← genera IdJuntaDirectiva
+
+                await GuardarMiembrosAsync(model.MiembroJunta, nuevaJunta.IdJuntaDirectiva);
+                await _context.SaveChangesAsync(); // ← guarda miembros
+
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "Junta Directiva creada correctamente.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Create");
             }
             catch (Exception)
             {
@@ -128,6 +151,7 @@ namespace UCG.Controllers
                 await PrepararViewDataAsync(model);
                 return View(model);
             }
+
         }
         private TbJuntaDirectiva MapearJuntaDirectiva(JuntaDirectivaViewModel model)
         {
@@ -143,12 +167,45 @@ namespace UCG.Controllers
             };
         }
 
+        [HttpPost]
+        public IActionResult ObtenerNombresMiembros([FromBody] List<MiembroJuntaDirectivaViewModel> miembros)
+        {
+            try
+            {
+                var idAsociados = miembros.Select(m => m.IdAsociado).Where(id => id.HasValue).Distinct().ToList();
+                var idPuestos = miembros.Select(m => m.IdPuesto).Where(id => id.HasValue).Distinct().ToList();
+
+                var asociados = _context.TbAsociados
+                    .Where(a => idAsociados.Contains(a.IdAsociado))
+                    .ToDictionary(a => a.IdAsociado, a => $"{a.Nombre} {a.Apellido1}");
+
+                var puestos = _context.TbPuestos
+                    .Where(p => idPuestos.Contains(p.IdPuesto))
+                    .ToDictionary(p => p.IdPuesto, p => p.Nombre);
+
+                var resultado = miembros.Select(m => new
+                {
+                    idAsociado = m.IdAsociado,
+                    nombreAsociado = m.IdAsociado.HasValue && asociados.ContainsKey(m.IdAsociado.Value) ? asociados[m.IdAsociado.Value] : null,
+                    idPuesto = m.IdPuesto,
+                    nombrePuesto = m.IdPuesto.HasValue && puestos.ContainsKey(m.IdPuesto.Value) ? puestos[m.IdPuesto.Value] : null
+                });
+
+                return Json(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Error al obtener nombres: " + ex.Message });
+            }
+        }
+
+
         private async Task<bool> DeserializarJsonAsync(JuntaDirectivaViewModel model)
         {
             try
             {
                 if (!string.IsNullOrWhiteSpace(model.MiembrosJuntaJson))
-                    model.MiembroJunta = JsonConvert.DeserializeObject<List<ActaAsistenciaViewModel>>(model.MiembrosJuntaJson);
+                    model.MiembroJunta = JsonConvert.DeserializeObject<List<MiembroJuntaDirectivaViewModel>>(model.MiembrosJuntaJson);
 
                     model.MiembroJunta ??= new();
               
@@ -160,7 +217,22 @@ namespace UCG.Controllers
                 return false;
             }
         }
-       
+
+        private async Task GuardarMiembrosAsync(List<MiembroJuntaDirectivaViewModel> miembros, int idJuntaDirectiva)
+        {
+            foreach (var miembro in miembros)
+            {
+                _context.TbMiembroJuntaDirectivas.Add(new TbMiembroJuntaDirectiva
+                {
+                    IdJuntaDirectiva = idJuntaDirectiva,
+                    IdAsociado = miembro.IdAsociado,
+                    IdPuesto = miembro.IdPuesto,
+                    Estado = TbMiembroJuntaDirectiva.EstadoDeMiembroJD.Activo
+                });
+            }
+        }
+
+
         private async Task PrepararViewDataAsync(JuntaDirectivaViewModel model)
         {
             ViewData["IdActa"] = new SelectList(
@@ -172,6 +244,12 @@ namespace UCG.Controllers
             ViewData["IdAsociacion"] = new SelectList(
                await _context.TbAsociacions.ToListAsync(),
                "IdAsociacion", "Nombre", model.IdAsociacion);
+
+            ViewData["IdPuesto"] = new SelectList(
+              await _context.TbPuestos.ToListAsync(),
+              "IdPuesto", "Nombre");
+
+            model.MiembrosJuntaJson = JsonConvert.SerializeObject(model.MiembroJunta ?? new());
         }
 
         [HttpGet]
@@ -196,6 +274,8 @@ namespace UCG.Controllers
             }
         }
 
+        [HttpGet]
+
         public JsonResult ObtenerActaPorAsociacion(int idAsociacion)
         {
             try
@@ -217,64 +297,121 @@ namespace UCG.Controllers
             }
         }
 
+		[HttpGet]
+		public async Task<IActionResult> Edit(int id)
+		{
+			var junta = await _context.TbJuntaDirectivas
+				.Include(j => j.TbMiembroJuntaDirectivas)
+				.FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
 
-        // GET: TbJuntaDirectivas/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.TbJuntaDirectivas == null)
-            {
-                return NotFound();
-            }
+			if (junta is null)
+				return NotFound();
 
-            var tbJuntaDirectiva = await _context.TbJuntaDirectivas.FindAsync(id);
-            if (tbJuntaDirectiva == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbJuntaDirectiva.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbJuntaDirectiva.IdAsociacion);
-            return View(tbJuntaDirectiva);
-        }
+			var model = new JuntaDirectivaViewModel
+			{
+				IdJuntaDirectiva = junta.IdJuntaDirectiva,
+				IdAsociacion = junta.IdAsociacion,
+				IdActa = junta.IdActa,
+				Nombre = junta.Nombre,
+				Estado = junta.Estado,
+				PeriodoInicio = junta.PeriodoInicio ?? default,
+				PeriodoFin = junta.PeriodoFin ?? default,
+				FechaPeriodoInicioTexto = (junta.PeriodoInicio ?? default).ToString("yyyy-MM-dd"),
+				FechaPeriodoFinTexto = (junta.PeriodoFin ?? default).ToString("yyyy-MM-dd"),
+				MiembroJunta = junta.TbMiembroJuntaDirectivas.Select(m => new MiembroJuntaDirectivaViewModel
+				{
+					IdAsociado = m.IdAsociado,
+					IdPuesto = m.IdPuesto,
+                    Estado = m.Estado,
+				}).ToList()
+			};
 
-        // POST: TbJuntaDirectivas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdJuntaDirectiva,IdAsociacion,IdActa,PeriodoInicio,PeriodoFin,Nombre,Estado")] TbJuntaDirectiva tbJuntaDirectiva)
-        {
-            if (id != tbJuntaDirectiva.IdJuntaDirectiva)
-            {
-                return NotFound();
-            }
+			model.MiembrosJuntaJson = JsonConvert.SerializeObject(model.MiembroJunta ?? new());
+			await PrepararViewDataAsync(model);
+			return View("Create", model);
+		}
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(tbJuntaDirectiva);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbJuntaDirectivaExists(tbJuntaDirectiva.IdJuntaDirectiva))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbJuntaDirectiva.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbJuntaDirectiva.IdAsociacion);
-            return View(tbJuntaDirectiva);
-        }
 
-        // GET: TbJuntaDirectivas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(int id, JuntaDirectivaViewModel model)
+		{
+			if (id != model.IdJuntaDirectiva)
+				return NotFound();
+
+			if (!await DeserializarJsonAsync(model))
+			{
+				TempData["ErrorMessage"] = "Error en los datos de miembros.";
+				await PrepararViewDataAsync(model);
+				return View("Create", model);
+			}
+
+			try
+			{
+				if (DateOnly.TryParseExact(model.FechaPeriodoInicioTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var inicio))
+					model.PeriodoInicio = inicio;
+
+				if (DateOnly.TryParseExact(model.FechaPeriodoFinTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fin))
+					model.PeriodoFin = fin;
+			}
+			catch { }
+
+			var validator = new JuntaDirectivaViewModelValidator(_context);
+			var validationResult = await validator.ValidateAsync(model);
+
+			foreach (var error in validationResult.Errors)
+				ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+			if (!ModelState.IsValid)
+			{
+				TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+				await PrepararViewDataAsync(model);
+				return View("Create", model);
+			}
+
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				var juntaExistente = await _context.TbJuntaDirectivas
+					.Include(j => j.TbMiembroJuntaDirectivas)
+					.FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
+
+				if (juntaExistente is null)
+					return NotFound();
+
+				// Actualiza los datos principales
+				juntaExistente.IdAsociacion = model.IdAsociacion;
+				juntaExistente.IdActa = model.IdActa;
+				juntaExistente.Nombre = model.Nombre;
+				juntaExistente.Estado = model.Estado;
+				juntaExistente.PeriodoInicio = model.PeriodoInicio;
+				juntaExistente.PeriodoFin = model.PeriodoFin;
+
+				// Borra los miembros antiguos
+				_context.TbMiembroJuntaDirectivas.RemoveRange(juntaExistente.TbMiembroJuntaDirectivas);
+				await GuardarMiembrosAsync(model.MiembroJunta, juntaExistente.IdJuntaDirectiva);
+
+				await _context.SaveChangesAsync();
+				await transaction.CommitAsync();
+
+				TempData["SuccessMessage"] = "La junta directiva fue actualizada correctamente.";
+				return RedirectToAction(nameof(Edit), new { id });
+			}
+			catch (Exception ex)
+			{
+				await transaction.RollbackAsync();
+				TempData["ErrorMessage"] = "Error al actualizar la junta directiva: " + ex.Message;
+				await PrepararViewDataAsync(model);
+				return View("Create", model);
+			}
+		}
+
+
+
+
+		// GET: TbJuntaDirectivas/Delete/5
+		public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.TbJuntaDirectivas == null)
             {

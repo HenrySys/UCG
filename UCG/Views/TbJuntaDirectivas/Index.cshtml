@@ -26,9 +26,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Estado)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdActaNavigation)
-                </th>
+               
                 <th>
                     @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
                 </th>
@@ -37,12 +35,13 @@
         </thead>
         <tbody>
     @foreach (var item in Model) {
-            <tr>
+                <tr data-id="@item.IdJuntaDirectiva">
                 <td>
-                    @Html.DisplayFor(modelItem => item.PeriodoInicio)
+                        @item.PeriodoInicio
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.PeriodoFin)
+                        @item.PeriodoFin
+
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Nombre)
@@ -50,9 +49,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Estado)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
-                </td>
+                
                 <td>
                     @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
                 </td>

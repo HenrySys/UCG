@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
+	var rol = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 }
+
 <head>
     <link href="~/css/Admin.css" rel="stylesheet" asp-append-version="true" />
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
@@ -46,11 +48,13 @@
 				<span class="text">Asociado</span>
 			</a>
 		</li>
+		@if(rol == "root"){
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbAsociacions" asp-action="Index">
 				<span class="text">Asociacion</span>
 			</a>
 		</li>
+		}
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbCuentums" asp-action="Index">
 				<span class="text">Cuenta</span>
@@ -91,11 +95,19 @@
 				<span class="text">Movimientos</span>
 				</a>
 		</li>
+		@if(rol == "root"){
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbJuntaDirectivas" asp-action="Index">
 				<span class="text">TbJuntaDirectivas</span>
 			</a>
 		</li>
+		}else{
+		<li class="active">
+			<a class="nav-link text-dark" asp-area="" asp-controller="TbJuntaDirectivas" asp-action="Create">
+				<span class="text">TbJuntaDirectivas</span>
+			</a>
+		</li>
+		}
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbMiembroJuntaDirectivas" asp-action="Index">
 				<span class="text">TbMiembroJuntaDirectivas</span>

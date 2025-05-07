@@ -1,11 +1,12 @@
 ﻿$(document).ready(function () {
 
-    const successMessage = $('#TempDataSuccessMessage').val();
-    const errorMessage = $('#TempDataErrorMessage').val();
-
     const idAsociacion = $('#tempDataSwal').data('asociacion');
+    const successMessage = $('#tempDataSwal').data('success');
+    const errorMessage = $('#tempDataSwal').data('error');
+    const modoVista = $('form').data('mode');
 
-
+    const asociadosMap = new Map();
+    const puestosMap = new Map();
 
     if (successMessage) {
         Swal.fire({
@@ -15,7 +16,7 @@
             confirmButtonText: 'Ir al listado'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '/TbJuntaDirectiva/Index';
+                window.location.href = '/TbJuntaDirectivas/Index';
             }
         });
     } else if (errorMessage) {
@@ -25,6 +26,50 @@
             text: errorMessage,
             confirmButtonText: 'Aceptar'
         });
+    }
+
+    const miembrosCargados = JSON.parse($('#MiembrosJuntaJson').val() || '[]');
+
+    // Obtener nombres reales desde el servidor
+    if (miembrosCargados.length > 0) {
+        $.ajax({
+            url: '/TbJuntaDirectivas/ObtenerNombresMiembros',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(miembrosCargados),
+            success: function (response) {
+                response.forEach(x => {
+                    if (x.idAsociado && x.nombreAsociado) asociadosMap.set(x.idAsociado.toString(), x.nombreAsociado);
+                    if (x.idPuesto && x.nombrePuesto) puestosMap.set(x.idPuesto.toString(), x.nombrePuesto);
+                });
+                reconstruirMiembrosUI(miembrosCargados);
+            },
+            error: function () {
+                reconstruirMiembrosUI(miembrosCargados);
+            }
+        });
+    } else {
+        reconstruirMiembrosUI(miembrosCargados);
+    }
+
+    function fetchDropdownData(url, data, dropdownSelector, placeholder, callback) {
+        $.ajax({
+            url,
+            data,
+            success: function (response) {
+                const dropdown = $(dropdownSelector).empty();
+                dropdown.append(`<option value="0" disabled selected>${placeholder}</option>`);
+                if (response.success) callback(response.data, dropdown);
+                else mostrarErrorSwal('Atención', response.message);
+            },
+            error: function (_, __, error) {
+                mostrarErrorSwal('Error', 'Error al cargar los datos: ' + error);
+            }
+        });
+    }
+
+    function mostrarErrorSwal(titulo, mensaje) {
+        Swal.fire({ icon: 'warning', title: titulo, text: mensaje });
     }
 
     function cerrarModalConMensaje(modalSelector, mensaje, icono = 'info') {
@@ -38,94 +83,110 @@
         $(modalSelector).modal('hide');
     }
 
-    function mostrarErrorSwal(title, text) {
-        Swal.fire({
-            icon: 'error',
-            title,
-            text,
-            confirmButtonText: 'Aceptar'
+    function limpiarErrores() {
+        $('.text-danger.mt-1').remove();
+        $('.is-invalid').removeClass('is-invalid');
+    }
+
+    function limpiarErroresMiembro() {
+        $('#modalIdAsociado').removeClass('is-invalid');
+        $('#modalIdPuesto').removeClass('is-invalid');
+        $('#errorAsociadoMiembro').remove();
+        $('#errorPuestoMiembro').remove();
+    }
+
+    function limpiarCamposModalMiembro() {
+        $('#modalIdAsociado').val('0');
+        $('#modalIdPuesto').val('0');
+    }
+
+    function prepararModalMiembro(asociacionId) {
+        limpiarErrores();
+
+        const asociadosYaAgregados = $('#detailsTableMiembros tbody tr').map(function () {
+            return $(this).data('id-asociado').toString();
+        }).get();
+
+        const puestosYaAgregados = $('#detailsTableMiembros tbody tr').map(function () {
+            return $(this).data('id-puesto').toString();
+        }).get();
+
+        fetchDropdownData(rutasJuntaDirectiva.obtenerAsociados, { idAsociacion: asociacionId }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
+            let agregados = 0;
+            data.forEach(item => {
+                const id = item.idAsociado.toString();
+                const nombreCompleto = `${item.nombre} ${item.apellido1}`;
+                asociadosMap.set(id, nombreCompleto);
+                if (!asociadosYaAgregados.includes(id)) {
+                    dropdown.append(`<option value="${id}">${nombreCompleto}</option>`);
+                } else {
+                    agregados++;
+                }
+            });
+            if (agregados === data.length) {
+                cerrarModalConMensaje('#detailModalMiembrosJunta', {
+                    titulo: 'Todos agregados',
+                    texto: 'Todos los asociados ya han sido agregados a la lista.'
+                });
+            }
+        });
+
+        $('#modalIdPuesto option').each(function () {
+            const val = $(this).val();
+            const text = $(this).text();
+            if (val !== '0') {
+                puestosMap.set(val, text);
+            }
+            if (puestosYaAgregados.includes(val)) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+
+        setTimeout(() => {
+            $('#modalIdPuesto').val('0');
+        }, 10);
+    }
+
+    function reconstruirMiembrosUI(miembros) {
+        $('#detailsTableMiembros tbody').empty();
+        miembros.forEach(m => {
+            const nombreAsociado = asociadosMap.get(m.IdAsociado?.toString()) || `(Asociado ${m.IdAsociado})`;
+            const nombrePuesto = puestosMap.get(m.IdPuesto?.toString()) || `(Puesto ${m.IdPuesto})`;
+
+            const botones = (modoVista === 'Create') ? `
+                <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
+            ` : '';
+            $('#detailsTableMiembros tbody').append(`
+                <tr data-id-asociado="${m.IdAsociado}" data-id-puesto="${m.IdPuesto}">
+                    <td>${nombreAsociado}</td>
+                    <td>${nombrePuesto}</td>
+                    ${botones}
+                </tr>`);
         });
     }
 
     if (idAsociacion && parseInt(idAsociacion) > 0) {
-        fetchDropdownData(rutasJuntaDirectiva.obtenerActas, { idAsociacion }, '#IdActa', 'Seleccione un acta', function (data, dropdown) {
-            data.forEach(item => {
-                dropdown.append(`<option value="${item.idActa}">${item.NumeroActa}</option>`);
-            });
-        });
-
         $('#detailModalMiembrosJunta').off('show.bs.modal').on('show.bs.modal', function () {
-            limpiarErrores();
-            const asociadosYaAgregados = $('#detailsTableMiembros tbody tr').map(function () {
-                return $(this).find('td:eq(1)').text();
-            }).get();
-
-            fetchDropdownData(rutasJuntaDirectiva.obtenerAsociados, { idAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
-                let agregados = 0;
-                data.forEach(item => {
-                    if (!asociadosYaAgregados.includes(item.idAsociado.toString())) {
-                        const nombreCompleto = `${item.nombre} ${item.apellido1}`;
-                        dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
-                    } else agregados++;
-                });
-                if (agregados === data.length) {
-                    cerrarModalConMensaje('#detailModalMiembrosJunta', {
-                        titulo: 'Todos agregados',
-                        texto: 'Todos los asociados ya han sido agregados a la lista.'
-                    });
-                }
-            });
+            prepararModalMiembro(idAsociacion);
         });
-
-
     } else {
-
-    }
-      
-
-    function fetchDropdownData(url, data, dropdownSelector, placeholder, callback) {
-        $.ajax({
-            url,
-            data,
-            success: function (response) {
-                const dropdown = $(dropdownSelector).empty();
-                dropdown.append(`<option disabled selected>${placeholder}</option>`);
-                if (response.success) callback(response.data, dropdown);
-                else mostrarErrorSwal('Atención', response.message);
-            },
-            error: function (_, __, error) {
-                mostrarErrorSwal('Error', 'Error al cargar los datos: ' + error);
-            }
-        });
-    }
-
-    function recolectarMiembrosJunta() {
-        const miembros = [];
-        const filas = $('#detailsTableMiembros tbody tr');
-
-        filas.each(function () {
-            const idAsociado = parseInt($(this).data('id-asociado'));
-            const idPuesto = parseInt($(this).data('id-puesto'));
-
-            miembros.push({
-                IdAsociado: idAsociado,
-                IdPuesto: idPuesto
+        $('#IdAsociacion').change(function () {
+            const nuevaAsociacion = $(this).val();
+            $('#detailsTableMiembros tbody').empty();
+            if (!nuevaAsociacion) return;
+            $('#detailModalMiembrosJunta').off('show.bs.modal').on('show.bs.modal', function () {
+                prepararModalMiembro(nuevaAsociacion);
             });
         });
-
-        return miembros;
     }
-
-    // Función para manejar miembros de la Junta Directiva
-    let filaMiembroEditando = null;
 
     $('#addMiembroBtn').on('click', function () {
         limpiarErroresMiembro();
 
         const idAsociado = $('#modalIdAsociado').val();
-        const nombreAsociado = $('#modalIdAsociado option:selected').text();
         const idPuesto = $('#modalIdPuesto').val();
-        const nombrePuesto = $('#modalIdPuesto option:selected').text();
 
         let hayError = false;
 
@@ -143,59 +204,64 @@
 
         if (hayError) return;
 
-        if (filaMiembroEditando !== null) {
-            filaMiembroEditando.attr('data-id-asociado', idAsociado);
-            filaMiembroEditando.attr('data-id-puesto', idPuesto);
-            filaMiembroEditando.find('td:eq(0)').text(nombreAsociado);
-            filaMiembroEditando.find('td:eq(1)').text(nombrePuesto);
-            filaMiembroEditando = null;
-        } else {
-            $('#detailsTableMiembros tbody').append(`
-                <tr data-id-asociado="${idAsociado}" data-id-puesto="${idPuesto}">
-                    <td>${nombreAsociado}</td>
-                    <td>${nombrePuesto}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-warning btn-edit-miembro">Editar</button>
-                        <button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button>
-                    </td>
-                </tr>`);
-        }
+        const nombreAsociado = asociadosMap.get(idAsociado) || `(Asociado ${idAsociado})`;
+        const nombrePuesto = puestosMap.get(idPuesto) || `(Puesto ${idPuesto})`;
 
-        actualizarMiembrosJson();
+        $('#detailsTableMiembros tbody').append(`
+            <tr data-id-asociado="${idAsociado}" data-id-puesto="${idPuesto}">
+                <td>${nombreAsociado}</td>
+                <td>${nombrePuesto}</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button>
+                </td>
+            </tr>`);
+
         limpiarCamposModalMiembro();
         $('#detailModalMiembrosJunta').modal('hide');
     });
 
-    $('#detailsTableMiembros').on('click', '.btn-edit-miembro', function () {
+    $('#detailModalMiembrosJunta').on('hidden.bs.modal', function () {
+        limpiarCamposModalMiembro();
         limpiarErroresMiembro();
-        filaMiembroEditando = $(this).closest('tr');
-
-        const idAsociado = filaMiembroEditando.data('id-asociado');
-        const idPuesto = filaMiembroEditando.data('id-puesto');
-
-        $('#modalIdAsociado').val(idAsociado);
-        $('#modalIdPuesto').val(idPuesto);
-
-        $('#detailModalMiembrosJunta').modal('show');
     });
 
     $('#detailsTableMiembros').on('click', '.removeRow', function () {
         $(this).closest('tr').remove();
-        actualizarMiembrosJson();
     });
 
-    function limpiarErroresMiembro() {
-        $('#modalIdAsociado').removeClass('is-invalid');
-        $('#modalIdPuesto').removeClass('is-invalid');
-        $('#errorAsociadoMiembro').remove();
-        $('#errorPuestoMiembro').remove();
+    function recolectarMiembrosJunta() {
+        const miembros = [];
+        $('#detailsTableMiembros tbody tr').each(function () {
+            const idAsociado = $(this).data('id-asociado');
+            const idPuesto = $(this).data('id-puesto');
+            miembros.push({ IdAsociado: idAsociado, IdPuesto: idPuesto });
+        });
+        return miembros;
     }
 
-    function limpiarCamposModalMiembro() {
-        $('#modalIdAsociado').val('0');
-        $('#modalIdPuesto').val('0');
-    }
+    $('form').on('submit', function (e) {
+        limpiarErrores();
 
-    
+        const miembros = recolectarMiembrosJunta();
+        const nombreJunta = $('#Nombre').val().trim();
 
+        let error = false;
+
+        if (miembros.length === 0) {
+            $('#detailsTableMiembros').after('<div class="text-danger mt-1">Debe agregar al menos 6 miembros.</div>');
+            error = true;
+        }
+
+        if (!/^[A-Z][a-zA-Z\s]{4,}$/.test(nombreJunta)) {
+            $('#Nombre').addClass('is-invalid')
+                .after('<div class="text-danger mt-1">El nombre debe iniciar con mayúscula y tener al menos 5 caracteres.</div>');
+            error = true;
+        }
+
+        if (error) {
+            e.preventDefault();
+        } else {
+            $('#MiembrosJuntaJson').val(JSON.stringify(miembros));
+        }
+    });
 });

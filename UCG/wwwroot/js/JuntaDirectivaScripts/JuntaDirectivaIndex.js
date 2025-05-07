@@ -17,11 +17,10 @@
         }
     });
     $('#miTabla tbody').on('click', 'tr', function () {
-        var idAsociado = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Asociado:", idAsociado);
+        var idJunta = $(this).data("id"); // Obtener ID de la fila seleccionada
 
-        if (idAsociado) {
-            window.location.href = "/TbAsociadoes/Details/" + idAsociado;
+        if (idJunta) {
+            window.location.href = "/TbJuntaDirectivas/Details/" + idJunta;
         }
     });
 
