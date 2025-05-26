@@ -1,0 +1,89 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.spacer {
+    height: 8rem;
+}
+
+.union-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    flex-wrap: wrap;
+}
+
+.union-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    width: 350px;
+    min-height: 250px;
+    justify-content: center;
+}
+
+    .union-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+    }
+
+    .union-card i {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        color: #ff782c;
+    }
+
+    .union-card h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 2rem;
+    }
+
+    .union-card p {
+        color: #666;
+        line-height: 1.5;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+@media (max-width: 768px) {
+    .union-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .union-card {
+        width: 80%;
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .union-card {
+        width: 90%;
+        padding: 25px 15px;
+    }
+
+        .union-card i {
+            font-size: 3rem;
+        }
+
+        .union-card h3 {
+            font-size: 1.8rem;
+        }
+}

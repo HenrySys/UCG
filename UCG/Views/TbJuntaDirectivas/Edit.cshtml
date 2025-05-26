@@ -1,45 +1,58 @@
-﻿@model UCG.Models.TbJuntaDirectiva
+﻿@using UCG.Models.ViewModels;
+@using static UCG.Models.TbJuntaDirectiva;
+@model JuntaDirectivaViewModel;
 
 @{
     ViewData["Title"] = "Editar Junta Directiva";
 }
 
-<h1 class="text-center mb-4">Editar Junta Directiva</h1>
+<h1>Editar Junta Directiva</h1>
 <hr />
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Formulario de Edición
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="IdJuntaDirectiva" />
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
+</div>
 
+<form asp-action="Edit" method="post" data-mode="Edit">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input type="hidden" asp-for="IdJuntaDirectiva" />
+
+    <div class="row g-3 mb-4">
+        <!-- CARD 1: Información de la Junta -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">
+                    Información de la Junta Directiva
+                </div>
+                <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                        @if (ViewBag.EsAdmin == true)
+                        {
+                            <input type="text" class="form-control" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" redonly />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion" redonly>
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="IdActa" class="form-label"></label>
-                        <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa"></select>
-                        <span asp-validation-for="IdActa" class="text-danger"></span>
+                        <label asp-for="FechaPeriodoInicioTexto" class="form-label"></label>
+                        <input asp-for="FechaPeriodoInicioTexto" class="form-control" type="date" />
+                        <span asp-validation-for="FechaPeriodoInicioTexto" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="PeriodoInicio" class="form-label"></label>
-                        <input asp-for="PeriodoInicio" class="form-control" type="date" />
-                        <span asp-validation-for="PeriodoInicio" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="PeriodoFin" class="form-label"></label>
-                        <input asp-for="PeriodoFin" class="form-control" type="date" />
-                        <span asp-validation-for="PeriodoFin" class="text-danger"></span>
+                        <label asp-for="FechaPeriodoFinTexto" class="form-label"></label>
+                        <input asp-for="FechaPeriodoFinTexto" class="form-control" type="date" />
+                        <span asp-validation-for="FechaPeriodoFinTexto" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -50,15 +63,73 @@
 
                     <div class="mb-3">
                         <label asp-for="Estado" class="form-label"></label>
-                        <input asp-for="Estado" class="form-control" />
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeJuntaDirectiva>()">
+                            <option disabled selected>Seleccione un estado</option>
+                        </select>
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-warning">Editar</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-                    </div>
-                </form>
+        <!-- CARD 2: Miembros -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
+                    <span>Miembros de la Junta</span>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalMiembrosJunta">
+                        Agregar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="detailsTableMiembros">
+                        <thead>
+                            <tr>
+                                <th>Asociado</th>
+                                <th>Puesto</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-warning">Editar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+
+    <input type="hidden" id="MiembrosJuntaJson" name="MiembrosJuntaJson" value="@Model.MiembrosJuntaJson" />
+</form>
+
+<!-- Modal Miembros -->
+<div class="modal fade" id="detailModalMiembrosJunta" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary-emphasis">
+                <h5 class="modal-title" id="detailModalLabel">Agregar Miembro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Asociado</label>
+                <select id="modalIdAsociado" class="form-select">
+                    <option value="0" disabled selected>Seleccione un asociado</option>
+                </select>
+
+                <label class="form-label mt-3">Puesto</label>
+                <select id="modalIdPuesto" class="form-select">
+                    <option value="0" disabled selected>Seleccione un puesto</option>
+                    @foreach (var item in (SelectList)ViewData["IdPuesto"])
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="addMiembroBtn" class="btn btn-success">Agregar</button>
             </div>
         </div>
     </div>
@@ -70,8 +141,6 @@
     }
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 

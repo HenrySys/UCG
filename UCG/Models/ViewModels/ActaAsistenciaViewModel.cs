@@ -19,6 +19,9 @@ namespace UCG.Models.ViewModels
 
         [BindNever]
         public DateOnly Fecha { get; set; }
-
+        [BindNever]
+        public string? Nombre { get; set; }
+        [BindNever]
+        public string? Apellido1 { get; set; }
     }
 }

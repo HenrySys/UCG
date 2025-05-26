@@ -1,14 +1,21 @@
 ﻿@using UCG.Models.ViewModels
 @using static UCG.Models.TbCuentum
 
-@model UCG.Models.TbCuentum
+@model CuentumViewModel
 
 @{
     ViewData["Title"] = "Crear Cuenta";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+
 }
 
 <h1 class="text-center mb-4">Crear Cuenta</h1>
 <hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
 
 <div class="row justify-content-center">
     <div class="col-lg-6">
@@ -23,16 +30,18 @@
                     <dl class="row">
                         <dt class="col-sm-4 mb-3"><label asp-for="IdAsociacion" class="form-label"></label></dt>
                         <dd class="col-sm-8 mb-3">
-                            @if (ViewBag.EsAdmin == true)
+                            @if (!Convert.ToBoolean(ViewBag.EsAdmin))
                             {
-                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                                <!-- Usuario NO es admin → puede elegir -->
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                    <option disabled selected>Seleccione una asociación</option>
+                                </select>
                             }
                             else
                             {
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion">
-                                    <option disabled selected>Seleccione una asociación</option>
-                                </select>
+                                <!-- Usuario ES admin → asociación fija -->
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
                             }
                             <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                         </dd>
@@ -62,6 +71,12 @@
                             <input asp-for="Telefono" class="form-control" />
                             <span asp-validation-for="Telefono" class="text-danger"></span>
                         </dd>
+
+                        <dt class="col-sm-4 mb-3"><label asp-for="Saldo" class="form-label"></label></dt>
+                        <dd class="col-sm-8 mb-3">
+                            <input asp-for="Saldo" class="form-control" />
+                            <span asp-validation-for="Saldo" class="text-danger"></span>
+                        </dd>
                     </dl>
 
                     <div class="d-flex justify-content-between mt-4">
@@ -78,4 +93,10 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- TU SCRIPT personalizado (debe ir de último) -->
+    <script src="~/js/CuentaScripts/CuentaFormHandler.js"></script>
 }

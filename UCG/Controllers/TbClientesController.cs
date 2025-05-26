@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using UCG.Models;
+using UCG.Models.ViewModels;
+using UCG.Models.ValidationModels;
 
 namespace UCG.Controllers
 {
@@ -45,113 +47,179 @@ namespace UCG.Controllers
             return View(tbCliente);
         }
 
-        // GET: TbClientes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
-            var model = new TbCliente();
+            var model = new ClienteViewModel();
+            await ConfigurarAsociacionClienteAsync(model);
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ClienteViewModel model)
+        {
+            var validator = new ClienteViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionClienteAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var nuevoCliente = MapearCliente(model);
+                _context.TbClientes.Add(nuevoCliente);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Cliente creado correctamente.";
+                return RedirectToAction(nameof(Create));
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar el cliente.";
+                await ConfigurarAsociacionClienteAsync(model);
+                return View(model);
+            }
+        }
+
+
+        private TbCliente MapearCliente(ClienteViewModel model)
+        {
+            return new TbCliente
+            {
+                IdCliente = model.IdCliente,
+                IdAsociacion = model.IdAsociacion.Value,
+                Apellido1 = model.Apellido1,
+                Apellido2 = model.Apellido2,
+                Nombre = model.Nombre,
+                Cedula = model.Cedula,
+                Telefono = model.Telefono,
+                Correo = model.Correo,
+                Direccion = model.Direccion,
+                Estado = model.Estado.Value
+            };
+        }
+
+
+
+        private async Task ConfigurarAsociacionClienteAsync(ClienteViewModel model)
+        {
+            var rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
             if (rol == "Admin")
             {
                 var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
-                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+                if (int.TryParse(idAsociacionClaim, out int idAsociacion))
+                {
+                    var nombre = await _context.TbAsociacions
+                        .Where(a => a.IdAsociacion == idAsociacion)
+                        .Select(a => a.Nombre)
+                        .FirstOrDefaultAsync();
 
-                // Obtener el nombre de la asociación desde la base de datos
-                var Nombre = _context.TbAsociacions
-                    .Where(a => a.IdAsociacion == idAsociacion)
-                    .Select(a => a.Nombre)
-                .FirstOrDefault();
-
-                // Se mantiene seleccionable el usuario
-                ViewBag.IdAsociacion = idAsociacion;
-                ViewBag.Nombre = Nombre;
-                ViewBag.EsAdmin = true;
-                model.IdAsociacion = idAsociacion;
-
-
-                ViewData["IdUsuario"] = new SelectList(_context.TbUsuarios, "IdUsuario", "NombreUsuario");
-
-                return View(model);
+                    model.IdAsociacion = idAsociacion;
+                    ViewBag.IdAsociacion = idAsociacion;
+                    ViewBag.Nombre = nombre;
+                    ViewBag.EsAdmin = true;
+                }
             }
             else
             {
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
                 ViewBag.EsAdmin = false;
-                return View();
+                ViewBag.IdAsociacion = new SelectList(
+                    await _context.TbAsociacions.ToListAsync(),
+                    "IdAsociacion", "Nombre", model.IdAsociacion);
             }
-            //ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            //return View();
         }
 
-        // POST: TbClientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdCliente,IdAsociacion,Apellido1,Apellido2,Nombre,Cedula,Telefono,Correo,Direccion,Estado")] TbCliente tbCliente)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(tbCliente);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCliente.IdAsociacion);
-            return View(tbCliente);
-        }
-
-        // GET: TbClientes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TbClientes == null)
-            {
                 return NotFound();
-            }
 
-            var tbCliente = await _context.TbClientes.FindAsync(id);
-            if (tbCliente == null)
-            {
+            var entidad = await _context.TbClientes.FindAsync(id);
+            if (entidad == null)
                 return NotFound();
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCliente.IdAsociacion);
-            return View(tbCliente);
+
+            var model = new ClienteViewModel
+            {
+                IdCliente = entidad.IdCliente,
+                IdAsociacion = entidad.IdAsociacion,
+                Apellido1 = entidad.Apellido1,
+                Apellido2 = entidad.Apellido2,
+                Nombre = entidad.Nombre,
+                Cedula = entidad.Cedula,
+                Telefono = entidad.Telefono,
+                Correo = entidad.Correo,
+                Direccion = entidad.Direccion,
+                Estado = entidad.Estado
+            };
+
+            await ConfigurarAsociacionClienteAsync(model);
+            return View(model);
         }
 
-        // POST: TbClientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdCliente,IdAsociacion,Apellido1,Apellido2,Nombre,Cedula,Telefono,Correo,Direccion,Estado")] TbCliente tbCliente)
+        public async Task<IActionResult> Edit(ClienteViewModel model)
         {
-            if (id != tbCliente.IdCliente)
+            var validator = new ClienteViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionClienteAsync(model);
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                try
-                {
-                    _context.Update(tbCliente);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbClienteExists(tbCliente.IdCliente))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var cliente = await _context.TbClientes.FirstOrDefaultAsync(c => c.IdCliente == model.IdCliente);
+                if (cliente == null)
+                    return NotFound();
+
+                cliente.IdAsociacion = model.IdAsociacion!.Value;
+                cliente.Apellido1 = model.Apellido1!;
+                cliente.Apellido2 = model.Apellido2;
+                cliente.Nombre = model.Nombre!;
+                cliente.Cedula = model.Cedula!;
+                cliente.Telefono = model.Telefono!;
+                cliente.Correo = model.Correo;
+                cliente.Direccion = model.Direccion!;
+                cliente.Estado = model.Estado!.Value;
+
+                _context.Update(cliente);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Cliente actualizado correctamente.";
+                return RedirectToAction(nameof(Edit));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCliente.IdAsociacion);
-            return View(tbCliente);
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el cliente.";
+                await ConfigurarAsociacionClienteAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbClientes/Delete/5
         public async Task<IActionResult> Delete(int? id)

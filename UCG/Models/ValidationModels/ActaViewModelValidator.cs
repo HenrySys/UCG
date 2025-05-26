@@ -22,9 +22,19 @@ namespace UCG.Models.ValidationModels
                 })
                 .WithMessage("El asociado seleccionado no existe o no pertenece a la asociación elegida.");
 
+            RuleFor(x => x.IdFolio)
+              .NotNull().WithMessage("Debe seleccionar un Asociado.")
+              .GreaterThan(0).WithMessage("Debe seleccionar un Asociado válido.")
+              .MustAsync(async (model, id, cancellation) =>
+              {
+                  return await _context.TbFolios
+                      .AnyAsync(a => a.IdFolio == id && a.IdAsociacion == model.IdAsociacion);
+              })
+              .WithMessage("El folio seleccionado no existe o no pertenece a la asociación elegida.");
+
             RuleFor(x => x.IdAsociacion)
-                .NotNull().WithMessage("Debe seleccionar una Asociación.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una Asociación válida.")
+                .NotNull().WithMessage("Debe seleccionar un Folio.")
+                .GreaterThan(0).WithMessage("Debe seleccionar un Folio válido.")
                 .MustAsync(async (id, cancellation) =>
                 {
                     return await _context.TbAsociacions.AnyAsync(a => a.IdAsociacion == id);
@@ -56,9 +66,11 @@ namespace UCG.Models.ValidationModels
                 .IsInEnum().WithMessage("Debe seleccionar un estado válido.")
                 .NotEmpty().WithMessage("Debe seleccionar un estado.");
 
-            RuleFor(x => x.MontoTotalAcordado)
-                .GreaterThanOrEqualTo(0).WithMessage("El monto total acordado debe ser un valor mayor o igual a ₡0.")
-                .LessThanOrEqualTo(9999999999).WithMessage("El monto total acordado no puede superar ₡9,999,999,999.");
+            RuleFor(x => x.Tipo)
+                .IsInEnum().WithMessage("Debe seleccionar un tipo válido.")
+                .NotEmpty().WithMessage("Debe seleccionar un tipo.");
+
+
         }
     }
 }

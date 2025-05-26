@@ -1,0 +1,48 @@
+﻿@model UCG.Models.TbFolio
+
+@{
+    ViewData["Title"] = "Eliminar Folio";
+}
+
+<h1 class="text-center mb-4">Eliminar Folio</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                Confirmación de Eliminación
+            </div>
+            <div class="card-body">
+                <p class="text-danger">¿Estás seguro de que deseas eliminar este folio?</p>
+
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Fecha de Emisión</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaEmision.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Número de Folio</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroFolio</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociacionNavigation?.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociadoNavigation?.Nombre</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdFolio" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

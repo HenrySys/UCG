@@ -1,0 +1,59 @@
+﻿@model IEnumerable<UCG.Models.TbMovimientoIngreso>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaIngreso)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MontoTotalIngresado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaIngreso)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MontoTotalIngresado)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdMovimientoIngreso">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdMovimientoIngreso">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdMovimientoIngreso">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

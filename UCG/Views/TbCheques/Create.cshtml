@@ -1,0 +1,148 @@
+﻿@model UCG.Models.ViewModels.ChequeViewModel
+
+@{
+    ViewData["Title"] = "Crear Cheque";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var cuentas = ViewData["IdCuenta"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociadoAutoriza"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+}
+
+<h1 class="text-center mb-4">Crear Cheque</h1>
+<hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">Formulario de Cheque</div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <!-- ASOCIACIÓN -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <!-- ASOCIADO -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociadoAutoriza" class="form-label"></label>
+                        <select asp-for="IdAsociadoAutoriza" class="form-select" asp-items="asociados" id="IdAsociadoAutoriza">
+                            <option disabled selected>Seleccione un autorizado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociadoAutoriza" class="text-danger"></span>
+                    </div>
+
+                    <!-- CUENTA -->
+                    <div class="mb-3">
+                        <label asp-for="IdCuenta" class="form-label"></label>
+                        <select asp-for="IdCuenta" class="form-select" asp-items="cuentas" id="IdCuenta">
+                            <option disabled selected>Seleccione una cuenta</option>
+                        </select>
+                        <span asp-validation-for="IdCuenta" class="text-danger"></span>
+                    </div>
+
+                    <!-- RESTO DE CAMPOS -->
+                    <div class="mb-3">
+                        <label asp-for="NumeroCheque" class="form-label"></label>
+                        <input asp-for="NumeroCheque" class="form-control" />
+                        <span asp-validation-for="NumeroCheque" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoEmision" class="form-label"></label>
+                        <input asp-for="FechaTextoEmision" type="date" class="form-control" />
+                        <span asp-validation-for="FechaTextoEmision" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoPago" class="form-label"></label>
+                        <input asp-for="FechaTextoPago" type="date" class="form-control" />
+                        <span asp-validation-for="FechaTextoPago" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoCobro" class="form-label"></label>
+                        <input asp-for="FechaTextoCobro" type="date" class="form-control" />
+                        <span asp-validation-for="FechaTextoCobro" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoAnulacion" class="form-label"></label>
+                        <input asp-for="FechaTextoAnulacion" type="date" class="form-control" />
+                        <span asp-validation-for="FechaTextoAnulacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Beneficiario" class="form-label"></label>
+                        <input asp-for="Beneficiario" class="form-control" />
+                        <span asp-validation-for="Beneficiario" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Monto" class="form-label"></label>
+                        <input asp-for="Monto" class="form-control" />
+                        <span asp-validation-for="Monto" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<UCG.Models.TbCheque.EstadoCheque>()">
+                            <option disabled selected>Seleccione un estado</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const rutasFolio = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbCheques")',
+            obtenerCuentas: '@Url.Action("ObtenerCuentasPorAsociacion", "TbCheques")',
+        };
+    </script>
+
+    <script src="~/js/ChequeScripts\ChequeFormHandler.js"></script>
+
+}

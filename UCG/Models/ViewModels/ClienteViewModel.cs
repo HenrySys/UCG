@@ -35,7 +35,6 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Estado")]
         public EstadoDeCliente? Estado { get; set; }
 
-        [Display(Name = "TipoCliente")]
-        public TipoDeCliente? TipoCliente { get; set; }
+
     }
 }

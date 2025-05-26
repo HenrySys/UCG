@@ -1,0 +1,59 @@
+﻿@model UCG.Models.TbFinancistum
+
+@{
+    ViewData["Title"] = "Detalle del Financista";
+}
+
+<h1 class="text-center mb-4">Detalle del Financista</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Financista
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Nombre</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Tipo de Entidad</dt>
+                    <dd class="col-sm-8 mb-3">@Model.TipoEntidad</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4 mb-3">Teléfono</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Telefono</dd>
+
+                    <dt class="col-sm-4 mb-3">Correo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Correo</dd>
+
+                    <dt class="col-sm-4 mb-3">Sitio Web</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (!string.IsNullOrWhiteSpace(Model.SitioWeb))
+                        {
+                            <a href="@Model.SitioWeb" target="_blank">@Model.SitioWeb</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No especificado</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                            @Model.IdAsociacionNavigation.Nombre
+                        </a>
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.IdFinancista" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

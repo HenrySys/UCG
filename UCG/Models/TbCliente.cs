@@ -12,40 +12,32 @@ public partial class TbCliente
         Activo = 1,
 
         [Display(Name = "Inactivo")]
-        Inactivo = 2
-    }
+        Inactivo = 2,
 
-    public enum TipoDeCliente{
-        [Display(Name = "Donante")]
-        Donante = 1,
-        [Display(Name = "Colaborador")]
-        Colaborador = 2,
-        [Display(Name = "Cliente")]
-        Cliente = 3
     }
 
     public int IdCliente { get; set; }
 
     public int? IdAsociacion { get; set; }
-
+    [Display(Name = "Primer Apellido")]
     public string Apellido1 { get; set; } = null!;
-
+    [Display(Name = "Segundo Apellido")]
     public string? Apellido2 { get; set; }
-
+    [Display(Name = "Nombre")]
     public string Nombre { get; set; } = null!;
-
+    [Display(Name = "Cedula")]
     public string Cedula { get; set; } = null!;
-
+    [Display(Name = "Telefono")]
     public string Telefono { get; set; } = null!;
-
+    [Display(Name = "Correo")]
     public string? Correo { get; set; }
-
+    [Display(Name = "Direccion")]
     public string Direccion { get; set; } = null!;
-
+    [Display(Name = "Estado")]
     public EstadoDeCliente? Estado { get; set; } = null!;
+    [Display(Name = "Tipo Cliente")]
 
-    public TipoDeCliente? TipoCliente { get; set; }
-
-    [Display(Name = "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
+
+    public virtual ICollection<TbDocumentoIngreso> TbDocumentoIngresos { get; } = new List<TbDocumentoIngreso>();
 }

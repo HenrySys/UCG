@@ -1,0 +1,116 @@
+﻿@model UCG.Models.ViewModels.ActividadViewModel
+
+@{
+    ViewData["Title"] = "Crear Actividad";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var actas = ViewData["IdActa"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+}
+
+<h1 class="text-center mb-4">Crear Actividad</h1>
+<hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Formulario de Actividad
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- ASOCIACIÓN -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <!-- ASOCIADO -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
+                            <option disabled selected>Seleccione un autorizado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdActa" class="form-label"></label>
+                        <select asp-for="IdActa" class="form-select" asp-items="actas" id="IdActa">
+                            <option disabled selected>Seleccione un acta</option>
+                        </select>
+                        <span asp-validation-for="IdActa" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoActividad" class="form-label"></label>
+                        <input asp-for="FechaTextoActividad" type="date" class="form-control" />
+                        <span asp-validation-for="FechaTextoActividad" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Razon" class="form-label"></label>
+                        <input asp-for="Razon" class="form-control" />
+                        <span asp-validation-for="Razon" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Lugar" class="form-label"></label>
+                        <input asp-for="Lugar" class="form-control" />
+                        <span asp-validation-for="Lugar" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <input asp-for="Observaciones" class="form-control" />
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const rutasFolio = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActividads")',
+            obtenerActas: '@Url.Action("ObtenerActasPorAsociacion", "TbActividads")'
+        };
+    </script>
+    <script src="~/js/ActividadScripts/ActividadFormHandler.js"></script>
+}

@@ -40,6 +40,7 @@
                         </div>
                     }
 
+
                     <div class="mb-3">
                         <label asp-for="NumeroAcuerdo" class="form-label"></label>
                         <input asp-for="NumeroAcuerdo" class="form-control" />
@@ -47,10 +48,21 @@
                     </div>
 
                     <div class="mb-3">
+                        <label asp-for="Tipo" class="form-label"></label>
+                        <select asp-for="Tipo" class="form-control" asp-items="Html.GetEnumSelectList<TipoDeAcuerdo>()">
+                            <option value="" disabled selected>Seleccione un tipo de acuerdo</option>
+                        </select>
+							
+                        <span asp-validation-for="Tipo" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="mb-3">
                         <label asp-for="Nombre" class="form-label"></label>
                         <input asp-for="Nombre" class="form-control" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
-                    </div>
+                    </div>    
+
                 </div>
             </div>
         </div>
@@ -66,22 +78,6 @@
                         <label for="summernoteAcuerdo" class="form-label">Descripción</label>
                         <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
                         <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
-                    </div>
-
-                 
-                    <div class="mb-3">
-                        <label asp-for="MontoAcuerdo" class="form-label"></label>
-                        <div class="input-group">
-                            <span class="input-group-text">₡</span>
-                            <input asp-for="MontoAcuerdo"
-                                   type="number"
-                                   class="form-control"
-                                   min="0"
-                                   step="0.01"
-                                   inputmode="decimal"
-                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '')" />
-                        </div>
-                        <span asp-validation-for="MontoAcuerdo" class="text-danger"></span>
                     </div>
                 </div>
             </div>

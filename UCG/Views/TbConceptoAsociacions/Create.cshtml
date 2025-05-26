@@ -4,11 +4,17 @@
 
 @{
     ViewData["Title"] = "Crear Concepto de Asociación";
+    var conceptos = ViewBag.IdConcepto as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
 <h1 class="text-center mb-4">Crear Concepto de Asociación</h1>
 <hr />
 
+<div id="tempDataSwal"
+	 data-success="@TempData["SuccessMessage"]"
+	 data-error="@TempData["ErrorMessage"]">
+</div>
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <div class="card shadow">
@@ -24,33 +30,50 @@
                             <label asp-for="IdAsociacion" class="form-label"></label>
                         </dt>
                         <dd class="col-sm-8 mb-3">
-                            @if (ViewBag.EsAdmin == true)
+                            @if (!Convert.ToBoolean(ViewBag.EsAdmin))
                             {
-                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                            }
-                            else
-                            {
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion">
+                                <!-- Usuario NO es admin → puede elegir -->
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
                                     <option disabled selected>Seleccione una asociación</option>
                                 </select>
                             }
+                            else
+                            {
+                                <!-- Usuario ES admin → asociación fija -->
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                            }
                             <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                         </dd>
+
 
                         <dt class="col-sm-4 mb-3">
                             <label asp-for="IdConcepto" class="form-label"></label>
                         </dt>
                         <dd class="col-sm-8 mb-3">
-                            <select asp-for="IdConcepto" class="form-select" asp-items="ViewBag.IdConcepto">
-                                <option disabled selected>Seleccione un concepto</option>
-                            </select>
+                            @if (conceptos.Any())
+                            {
+                                <select asp-for="IdConcepto" class="form-select" asp-items="conceptos">
+                                    <option disabled selected>Seleccione un concepto</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <p class="text-danger">No hay conceptos disponibles para seleccionar.</p>
+                            }
                             <span asp-validation-for="IdConcepto" class="text-danger"></span>
+                        </dd>
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="DescripcionPersonalizada" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            <textarea asp-for="DescripcionPersonalizada" class="form-control"></textarea>
+                            <span asp-validation-for="DescripcionPersonalizada" class="text-danger"></span>
                         </dd>
                     </dl>
 
                     <div class="d-flex justify-content-between mt-4">
-                        <input type="submit" value="Guardar Concepto" class="btn btn-primary" />
+                        <input type="submit" value="Guardar" class="btn btn-success" />
                         <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
                     </div>
                 </form>
@@ -63,4 +86,15 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/ConceptoAsociacionScripts/ConceptoAsociacionFormHandler.js"></script>
+
+
 }

@@ -1,0 +1,131 @@
+﻿@model IEnumerable<UCG.Models.TbAsociado>
+
+@{
+    ViewData["Title"] = "IndexAsociadosPdf";
+}
+@{
+    Layout = null;
+}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte de Asociaciados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: navy;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aqui va el nombre de la Asociacion</h1>
+    <h2>Lista de Asociados</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cedula)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Apellido1)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Apellido2)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nombre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FechaNacimiento)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Correo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EstadoCivil)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Sexo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Telefono)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Correo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Direccion)
+                </th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Cedula)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Apellido1)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Apellido2)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nombre)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FechaNacimiento)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Sexo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EstadoCivil)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Telefono)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Correo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Direccion)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Direccion)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
+

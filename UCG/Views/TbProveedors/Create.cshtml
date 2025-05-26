@@ -4,10 +4,17 @@
 
 @{
     ViewData["Title"] = "Crear Proveedor";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+
 }
 
 <h1 class="text-center mb-4">Crear Proveedor</h1>
 <hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
 
 <div class="row justify-content-center">
     <div class="col-lg-6">
@@ -22,16 +29,18 @@
                     <dl class="row">
                         <dt class="col-sm-4 mb-3"><label asp-for="IdAsociacion" class="form-label"></label></dt>
                         <dd class="col-sm-8 mb-3">
-                            @if (ViewBag.EsAdmin == true)
+                            @if (!Convert.ToBoolean(ViewBag.EsAdmin))
                             {
-                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                                <!-- Usuario NO es admin → puede elegir -->
+                                <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                    <option disabled selected>Seleccione una asociación</option>
+                                </select>
                             }
                             else
                             {
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion">
-                                    <option disabled selected>Seleccione una asociación</option>
-                                </select>
+                                <!-- Usuario ES admin → asociación fija -->
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
                             }
                             <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                         </dd>

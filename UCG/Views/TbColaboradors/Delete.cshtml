@@ -1,0 +1,48 @@
+﻿@model UCG.Models.TbColaborador
+
+@{
+    ViewData["Title"] = "Eliminar Colaborador";
+}
+
+<h1 class="text-center mb-4">Eliminar Colaborador</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                Confirmación de Eliminación
+            </div>
+            <div class="card-body">
+                <p class="text-danger">¿Estás seguro de que deseas eliminar este colaborador?</p>
+
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociacionNavigation.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Nombre</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Cédula</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Cedula</dd>
+
+                    <dt class="col-sm-4 mb-3">Teléfono</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Telefono</dd>
+
+                    <dt class="col-sm-4 mb-3">Correo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Correo</dd>
+
+                    <dt class="col-sm-4 mb-3">Observaciones</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Observaciones</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdColaborador" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

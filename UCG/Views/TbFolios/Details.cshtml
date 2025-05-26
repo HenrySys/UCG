@@ -1,0 +1,51 @@
+﻿@model UCG.Models.TbFolio
+
+@{
+    ViewData["Title"] = "Detalle del Folio";
+}
+
+<h1 class="text-center mb-4">Detalle del Folio</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Folio
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Fecha de Emisión</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaEmision.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Número de Folio</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroFolio</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                            @Model.IdAsociacionNavigation.Nombre
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Asociado</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociados" asp-action="Details" asp-route-id="@Model.IdAsociadoNavigation.IdAsociado">
+                            @Model.IdAsociadoNavigation.Nombre
+                        </a>
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.IdFolio" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

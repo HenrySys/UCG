@@ -1,0 +1,95 @@
+﻿@model IEnumerable<UCG.Models.TbFactura>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NumeroFactura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaEmision)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MontoTotal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ArchivoUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NombreArchivo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaSubida)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdColaboradorNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdProveedorNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumeroFactura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaEmision)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MontoTotal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ArchivoUrl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NombreArchivo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaSubida)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdColaboradorNavigation.IdColaborador)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdProveedorNavigation.IdProveedor)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdFactura">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdFactura">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdFactura">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

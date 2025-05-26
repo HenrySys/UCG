@@ -1,0 +1,82 @@
+﻿@model UCG.Models.TbCheque
+
+@{
+    ViewData["Title"] = "Detalle del Cheque";
+}
+
+<h1 class="text-center mb-4">Detalle del Cheque</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Cheque
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Número de Cheque</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroCheque</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Emisión</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaEmision.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Pago</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaPago.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Cobro</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.FechaCobro.HasValue ? Model.FechaCobro.Value.ToString("dd/MM/yyyy") : "No registrado")
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Anulación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.FechaAnulacion.HasValue ? Model.FechaAnulacion.Value.ToString("dd/MM/yyyy") : "No registrado")
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Beneficiario</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Beneficiario</dd>
+
+                    <dt class="col-sm-4 mb-3">Monto</dt>
+                    <dd class="col-sm-8 mb-3">₡@Model.Monto.ToString("N2")</dd>
+
+                    <dt class="col-sm-4 mb-3">Monto Restante</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.MontoRestante.HasValue ? "₡" + Model.MontoRestante.Value.ToString("N2") : "No registrado")
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Observaciones</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Observaciones</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation?.IdAsociacion">
+                            @Model.IdAsociacionNavigation?.Nombre
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbCuenta" asp-action="Details" asp-route-id="@Model.IdCuentaNavigation?.IdCuenta">
+                            @Model.IdCuentaNavigation?.TituloCuenta
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Asociado que Autoriza</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociados" asp-action="Details" asp-route-id="@Model.IdAsociadoAutorizaNavigation?.IdAsociado">
+                            @Model.IdAsociadoAutorizaNavigation?.Nombre
+                        </a>
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.IdCheque" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

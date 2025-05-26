@@ -1,0 +1,69 @@
+﻿@model IEnumerable<UCG.Models.TbCheque>
+
+@{
+    ViewData["Title"] = "Cheques";
+}
+
+<h1 class="text-center mb-4">Listado de Cheques</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Nuevo Cheque</a>
+</p>
+
+<div class="table-responsive">
+    <table id="miTabla" class="table table-striped table-hover display">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.NumeroCheque)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaEmision)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaPago)</th>
+                <th>@Html.DisplayNameFor(model => model.Beneficiario)</th>
+                <th>@Html.DisplayNameFor(model => model.Monto)</th>
+                <th>@Html.DisplayNameFor(model => model.Estado)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaCobro)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaAnulacion)</th>
+                <th>@Html.DisplayNameFor(model => model.Observaciones)</th>
+                <th>@Html.DisplayNameFor(model => model.MontoRestante)</th>
+                <th>@Html.DisplayNameFor(model => model.IdAsociacionNavigation)</th>
+                <th>@Html.DisplayNameFor(model => model.IdAsociadoAutorizaNavigation)</th>
+                <th>@Html.DisplayNameFor(model => model.IdCuentaNavigation)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-id="@item.IdCheque">
+                    <td>@item.NumeroCheque</td>
+                    <td>@item.FechaEmision.ToString("dd/MM/yyyy")</td>
+                    <td>@item.FechaPago.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Beneficiario</td>
+                    <td>₡@item.Monto.ToString("N2")</td>
+                    <td>@item.Estado</td>
+                    <td>@(item.FechaCobro.HasValue ? item.FechaCobro.Value.ToString("dd/MM/yyyy") : "—")</td>
+                    <td>@(item.FechaAnulacion.HasValue ? item.FechaAnulacion.Value.ToString("dd/MM/yyyy") : "—")</td>
+                    <td>@item.Observaciones</td>
+                    <td>@(item.MontoRestante.HasValue ? "₡" + item.MontoRestante.Value.ToString("N2") : "—")</td>
+                    <td>@item.IdAsociacionNavigation?.Nombre</td>
+                    <td>@item.IdAsociadoAutorizaNavigation?.Nombre</td>
+                    <td>@item.IdCuentaNavigation?.TituloCuenta</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.IdCheque" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Details" asp-route-id="@item.IdCheque" class="btn btn-sm btn-info">Detalle</a>
+                        <a asp-action="Delete" asp-route-id="@item.IdCheque" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/js/ChequeScripts/ChequeIndex.js"></script>
+}

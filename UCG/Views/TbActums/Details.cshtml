@@ -33,8 +33,6 @@
                         <dt class="col-sm-4 mb-3">Estado:</dt>
                         <dd class="col-sm-8 mb-3">@Model.Estado.ToString()</dd>
 
-                        <dt class="col-sm-4 mb-3">Monto total acordado:</dt>
-                        <dd class="col-sm-8 mb-3">₡@(Model.MontoTotalAcordado.HasValue ? Model.MontoTotalAcordado.Value.ToString("N2") : "0.00")</dd>
 
                         <dt class="col-sm-4 mb-3">Asociación:</dt>
                         <dd class="col-sm-8 mb-3">
@@ -109,7 +107,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>Monto</th>
+                                                <th>Descripcion</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -117,7 +115,11 @@
                                             {
                                                 <tr data-id="@acuerdo.IdAcuerdo">
                                                     <td>@acuerdo.Nombre</td>
-                                                    <td>₡@(acuerdo.MontoAcuerdo.HasValue ? acuerdo.MontoAcuerdo.Value.ToString("N2") : "0.00")</td>
+                                                    <td>
+                                                        <span data-bs-toggle="tooltip" title="@acuerdo.Descripcion">
+                                                            @acuerdo.Descripcion
+                                                        </span>
+                                                    </td>
                                                 </tr>
                                             }
                                         </tbody>

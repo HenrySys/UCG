@@ -20,7 +20,7 @@ namespace UCG.Models.ViewModels
         public string? TituloCuenta { get; set; }
 
         [Display(Name = "Numero Cuenta")]
-        public int? NumeroCuenta { get; set; }
+        public string? NumeroCuenta { get; set; }
 
         [Display(Name = "Telefono")]
         public string? Telefono { get; set; }
@@ -29,7 +29,10 @@ namespace UCG.Models.ViewModels
         public EstadoDeCuenta? Estado { get; set; }
 
         [Display(Name = "Banco")]
-        public BancoDeCuenta? Banco { get; set; }
+        public BancoDeCuenta Banco { get; set; }
+
+        [Display(Name = "Saldo")]
+        public decimal Saldo { get; set; }
 
     }
 }

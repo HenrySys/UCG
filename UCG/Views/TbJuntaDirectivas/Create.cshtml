@@ -15,7 +15,7 @@
      data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
  </div>
 
-<form asp-action="Create" data-mode="Create">
+<form asp-action="Create" data-mode="Create" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="row g-3 mb-4">
@@ -35,7 +35,7 @@
                         }
                         else
                         {
-                            <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion" >
                                 <option disabled selected>Seleccione una asociación</option>
                             </select>
                         }

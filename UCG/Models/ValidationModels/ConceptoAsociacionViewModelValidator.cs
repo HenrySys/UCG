@@ -9,16 +9,7 @@ namespace UCG.Models.ValidationModels
         private readonly UcgdbContext _context;
         public ConceptoAsociacionViewModelValidator(UcgdbContext context)
         {
-            _context = context;
-
-            RuleFor(x => x.IdConceptoAsociacion)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbConceptoAsociacions.AnyAsync(a => a.IdConceptoAsociacion == id );
-                })
-                .WithMessage("Ya existe un concepto con ese id.");
+            _context = context;        
 
             RuleFor(x => x.IdConcepto)
                 .NotNull().WithMessage("Debe de tener un id de concepto.")
@@ -38,14 +29,17 @@ namespace UCG.Models.ValidationModels
                })
                .WithMessage("La asociación seleccionada no existe.");
 
-            RuleFor(x => new { x.IdConcepto, x.IdAsociacion })
-                .MustAsync(async (ids, cancellation) =>
-                {
-                    return !await _context.TbConceptoAsociacions
-                        .AnyAsync(a => a.IdConcepto == ids.IdConcepto && a.IdAsociacion == ids.IdAsociacion);
-                })
-                .WithMessage("Ya existe un concepto de asociación con el mismo IdConcepto e IdAsociacion.");
+           
 
+            RuleFor(x => x.DescripcionPersonalizada)
+                .Cascade(CascadeMode.Stop)
+                .MaximumLength(200).WithMessage("La descripción no puede superar los 200 caracteres.")
+                .MinimumLength(3).When(x => !string.IsNullOrWhiteSpace(x.DescripcionPersonalizada))
+                    .WithMessage("La descripción debe tener al menos 3 caracteres.")
+                .Must(desc => string.IsNullOrWhiteSpace(desc) || !desc.All(char.IsDigit))
+                    .WithMessage("La descripción no puede ser completamente numérica.")
+                .Must(desc => string.IsNullOrWhiteSpace(desc) || desc.Trim().Length > 0)
+                    .WithMessage("La descripción no puede estar vacía o contener solo espacios.");
 
         }
     }

@@ -1,0 +1,47 @@
+﻿@model UCG.Models.TbColaborador
+
+@{
+    ViewData["Title"] = "Detalle del Colaborador";
+}
+
+<h1 class="text-center mb-4">Detalle del Colaborador</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Información del Colaborador
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacion">
+                            @Model.IdAsociacionNavigation.Nombre
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Nombre</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Cédula</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Cedula</dd>
+
+                    <dt class="col-sm-4 mb-3">Teléfono</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Telefono</dd>
+
+                    <dt class="col-sm-4 mb-3">Correo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Correo</dd>
+
+                    <dt class="col-sm-4 mb-3">Observaciones</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Observaciones</dd>
+                </dl>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.IdColaborador" class="btn btn-warning">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

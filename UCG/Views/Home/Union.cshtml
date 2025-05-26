@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="~/css/Union.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="spacer"></div>
+
+    <div class="union-container">
+        <a class="union-card" asp-area="" asp-controller="TbUsuarios" asp-action="Index">
+            <i class='bx bx-user-circle'></i>
+            <h3>Usuarios</h3>
+            <p>Administración de usuarios del sistema</p>
+        </a>
+
+        <a class="union-card" asp-area="" asp-controller="TbAsociacions" asp-action="Index">
+            <i class='bx bx-buildings'></i>
+            <h3>Asociación</h3>
+            <p>Gestión de asociaciones</p>
+        </a>
+
+        <!-- Pdfs-->
+        <a class="union-card btn-download" asp-area="" asp-controller="AsociacionPdf" asp-action="Index">
+            <i class='bx bxs-cloud-download'></i>
+            <h3>Generar Asociaciones PDF</h3>
+            <p>Exportar información</p>
+        </a>
+    </div>
+</body>
+</html>

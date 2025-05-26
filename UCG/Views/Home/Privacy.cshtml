@@ -29,11 +29,6 @@
 			</a>
 		</li>
 		<li class="active">
-			<a class="nav-link text-dark" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">
-				<span class="text">Categoria Movimiento</span>
-			</a>
-		</li>
-		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoMovimientoes" asp-action="Index">
 				<span class="text">Concepto Movimiento</span>
 			</a>
@@ -60,16 +55,7 @@
 				<span class="text">Cuenta</span>
 			</a>
 		</li>
-		<li class="active">
-			<a class="nav-link text-dark" asp-area="" asp-controller="TbProyectoes" asp-action="Index">
-				<span class="text">Proyecto</span>
-			</a>
-		</li>
-		<li class="active">
-			<a class="nav-link text-dark" asp-area="" asp-controller="TbDetalleMovimientoes" asp-action="Index">
-				<span class="text">Detalle Movimiento</span>
-			</a>
-		</li>
+
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbActums" asp-action="Index">
 				
@@ -90,11 +76,7 @@
 				
 			</a>
 		</li>
-		<li class="active">
-			<a class="nav-link text-dark" asp-area="" asp-controller="TbMovimientoes" asp-action="Index">
-				<span class="text">Movimientos</span>
-				</a>
-		</li>
+
 		@if(rol == "root"){
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbJuntaDirectivas" asp-action="Index">
@@ -114,13 +96,15 @@
 			</a>
 		</li>
 
-
-	
-
-
 		<li class="active">
 			<a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoAsociacions" asp-action="Index">
 				<span class="text">Conceptos de movimientos de Asociacion</span>
+
+			</a>
+		</li>
+		<li class="active">
+			<a class="nav-link text-dark" asp-area="" asp-controller="TbColaboradors" asp-action="Index">
+				<span class="text">Colaboradores</span>
 
 			</a>
 		</li>
@@ -177,7 +161,7 @@
 				<i class='bx bxs-cloud-download'></i>
 					<span class="text">PDF </span>
 
-				</a>
+			</a>
 		
 
 

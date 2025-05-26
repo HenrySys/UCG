@@ -7,17 +7,15 @@ namespace UCG.Models.ViewModels
     {
         public int IdConceptoMovimiento { get; set; }
 
-        [Display(Name = "Asociacion")]
-        [Required]
-        public int IdAsociacion { get; set; }
-
-        [Display(Name = "Tipo de movimiento")]
-        [Required]
-        public TiposDeConceptoMovimientos TipoMovimiento { get; set; }
-
-        [Display(Name = "Concepto de movimiento")]
-        [Required]
+        
+        [Display(Name= "Tipo Movimiento")]
+        public TiposDeConceptoMovimientos? TipoMovimiento { get; set; }
+        [Display(Name= "Concepto Movimiento")]
         public string? Concepto { get; set; }
+        [Display(Name= "Origen Ingreso")]
+        public TipoDeOrigenIngreso? TipoOrigenIngreso { get; set; }
+        [Display(Name= "Emisor Egreso")]
+        public TipoDeOrigenEgreso? TipoEmisorEgreso { get; set; }
 
 
 

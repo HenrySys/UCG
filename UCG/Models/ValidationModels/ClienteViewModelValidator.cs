@@ -23,15 +23,17 @@ namespace UCG.Models.ValidationModels
                .WithMessage("La Asociación seleccionada no existe.");
 
 
-            RuleFor(x => x.Cedula)
-                .NotNull().WithMessage("Debe ingresar una Cedula.")
-                .NotEmpty().WithMessage("Debe ingresar una Cedula.")
-                .MaximumLength(100).WithMessage("La cedula no puede superar los 100 caracteres.")
-                .MustAsync(async (cedula, cancellation) =>
+           RuleFor(x => x.Cedula)
+                .NotEmpty().WithMessage("La cédula es obligatoria.")
+                .MaximumLength(20).WithMessage("La cédula no puede superar los 20 caracteres.")
+                .MustAsync(async (model, cedula, cancellation) =>
                 {
-                    return !await _context.TbClientes.AnyAsync(a => a.Cedula == cedula);
+                    if (string.IsNullOrWhiteSpace(cedula)) return true;
+                    return !await _context.TbClientes
+                        .AnyAsync(c => c.Cedula == cedula && c.IdCliente != model.IdCliente && c.IdAsociacion == model.IdAsociacion);
                 })
-                .WithMessage("Ya existe un Cliente con la cedula seleccionada.");
+                .WithMessage("Ya existe un Cliente con la cédula seleccionada.");
+
 
             RuleFor(x => x.Apellido1)
                 .NotNull().WithMessage("Debe ingresar su primer Apellido.")
@@ -51,24 +53,28 @@ namespace UCG.Models.ValidationModels
 
 
             RuleFor(x => x.Telefono)
-                .NotNull().WithMessage("Debe ingresar un Telefono.")
-                .NotEmpty().WithMessage("Debe ingresar un Telefono.")
-                .MaximumLength(100).WithMessage("El Telfono no puede superar los 100 caracteres.")
-                .MustAsync(async (telefono, cancellation) =>
+                .MaximumLength(20)
+                .MustAsync(async (model, telefono, cancellation) =>
                 {
-                    return !await _context.TbClientes.AnyAsync(a => a.Telefono == telefono);
+                    if (string.IsNullOrWhiteSpace(telefono)) return true;
+                    return !await _context.TbClientes
+                        .AnyAsync(c => c.Telefono == telefono && c.IdCliente != model.IdCliente && c.IdAsociacion == model.IdAsociacion);
                 })
-                .WithMessage("Ya existe un asociado con el telefono seleccionado.");
+                .WithMessage("Ya existe un Cliente con el teléfono seleccionado.");
 
-            RuleFor(x => x.Correo)
-                .NotNull().WithMessage("Debe ingresar un Correo.")
-                .NotEmpty().WithMessage("Debe ingresar un Correo.")
-                .MaximumLength(100).WithMessage("El Correo no puede superar los 100 caracteres.")
-                .MustAsync(async (correo, cancellation) =>
-                 {
-                     return !await _context.TbClientes.AnyAsync(a => a.Correo == correo);
-                 })
-               .WithMessage("Ya existe un asociado con el correo seleccionado.");
+             RuleFor(x => x.Correo)
+                    .MaximumLength(100)
+                    .EmailAddress()
+                    .When(x => !string.IsNullOrWhiteSpace(x.Correo))
+                    .WithMessage("Debe ingresar un correo válido.")
+                    .MustAsync(async (model, correo, cancellation) =>
+                    {
+                        if (string.IsNullOrWhiteSpace(correo)) return true;
+                        return !await _context.TbClientes
+                            .AnyAsync(c => c.Correo == correo && c.IdCliente != model.IdCliente && c.IdAsociacion == model.IdAsociacion);
+                    })
+                    .WithMessage("Ya existe un Cliente con el correo seleccionado.");
+
 
             RuleFor(x => x.Direccion)
                 .NotNull().WithMessage("Debe ingresar una Direccion.")

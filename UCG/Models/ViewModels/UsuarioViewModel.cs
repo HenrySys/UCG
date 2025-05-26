@@ -8,7 +8,10 @@ namespace UCG.Models.ViewModels
 
        public int IdUsuario { get; set; }
 
-       [Display(Name = "Nombre de usuario")]
+       [Display(Name = "Asociación")]
+       public int? IdAsociacion { get; set; }
+
+        [Display(Name = "Nombre de usuario")]
        public string? NombreUsuario { get; set; }
 
        [DataType(DataType.Password)]

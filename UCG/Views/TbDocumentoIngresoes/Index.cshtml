@@ -1,0 +1,95 @@
+﻿@model IEnumerable<UCG.Models.TbDocumentoIngreso>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NumComprobante)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaComprobante)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MetodoPago)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Monto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdActividadNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdClienteNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdConceptoAsociacionNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCuentaNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdFinancistaNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdMovimientoIngresoNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumComprobante)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaComprobante)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MetodoPago)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Monto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdActividadNavigation.IdActividad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdClienteNavigation.IdCliente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdConceptoAsociacionNavigation.IdConceptoAsociacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCuentaNavigation.IdCuenta)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdFinancistaNavigation.IdFinancista)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdMovimientoIngresoNavigation.IdMovimientoIngreso)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdDocumentoIngreso">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdDocumentoIngreso">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdDocumentoIngreso">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

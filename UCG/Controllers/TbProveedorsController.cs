@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
+using UCG.Models.ValidationModels;
 
 namespace UCG.Controllers
 {
@@ -47,109 +48,182 @@ namespace UCG.Controllers
         }
 
         // GET: TbProveedors/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
             var model = new ProveedorViewModel();
+            await ConfigurarAsociacionProveedorAsync(model);
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ProveedorViewModel model)
+        {
+            var validator = new ProveedorViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionProveedorAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var nuevoProveedor = MapearProveedor(model);
+                _context.TbProveedors.Add(nuevoProveedor);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Proveedor creado correctamente.";
+                return RedirectToAction(nameof(Create));
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar el proveedor.";
+                await ConfigurarAsociacionProveedorAsync(model);
+                return View(model);
+            }
+        }
+
+        private TbProveedor MapearProveedor(ProveedorViewModel model)
+        {
+            return new TbProveedor
+            {
+                IdProveedor = model.IdProveedor,
+                IdAsociacion = model.IdAsociacion!.Value,
+                TipoProveedor = model.TipoProveedor!.Value,
+                NombreEmpresa = model.NombreEmpresa!,
+                CedulaJuridica = model.CedulaJuridica!,
+                NombreContacto = model.NombreContacto!,
+                CedulaContacto = model.CedulaContacto!,
+                Telefono = model.Telefono!,
+                Correo = model.Correo!,
+                Direccion = model.Direccion!,
+                Fax = model.Fax!,
+                Estado = model.Estado
+            };
+        }
+
+        private async Task ConfigurarAsociacionProveedorAsync(ProveedorViewModel model)
+        {
+            var rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
             if (rol == "Admin")
             {
                 var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
-                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+                if (int.TryParse(idAsociacionClaim, out int idAsociacion))
+                {
+                    var nombre = await _context.TbAsociacions
+                        .Where(a => a.IdAsociacion == idAsociacion)
+                        .Select(a => a.Nombre)
+                        .FirstOrDefaultAsync();
 
-                // Obtener el nombre de la asociación desde la base de datos
-                var Nombre = _context.TbAsociacions
-                    .Where(a => a.IdAsociacion == idAsociacion)
-                    .Select(a => a.Nombre)
-                .FirstOrDefault();
-
-                // Se mantiene seleccionable el usuario
-                ViewBag.IdAsociacion = idAsociacion;
-                ViewBag.Nombre = Nombre;
-                ViewBag.EsAdmin = true;
-                model.IdAsociacion = idAsociacion;
-
-                return View(model);
+                    model.IdAsociacion = idAsociacion;
+                    ViewBag.IdAsociacion = idAsociacion;
+                    ViewBag.Nombre = nombre;
+                    ViewBag.EsAdmin = true;
+                }
             }
             else
             {
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
                 ViewBag.EsAdmin = false;
-                return View();
+                ViewBag.IdAsociacion = new SelectList(
+                    await _context.TbAsociacions.ToListAsync(),
+                    "IdAsociacion", "Nombre", model.IdAsociacion);
             }
-            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            // return View();
         }
 
-        // POST: TbProveedors/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdProveedor,IdAsociacion,TipoProveedor,NombreEmpresa,CedulaJuridica,NombreContacto,CedulaContacto,Direccion,Telefono,Correo,Fax,Estado")] TbProveedor tbProveedor)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(tbProveedor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbProveedor.IdAsociacion);
-            return View(tbProveedor);
-        }
-
-        // GET: TbProveedors/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TbProveedors == null)
-            {
                 return NotFound();
-            }
 
-            var tbProveedor = await _context.TbProveedors.FindAsync(id);
-            if (tbProveedor == null)
-            {
+            var entidad = await _context.TbProveedors.FindAsync(id);
+            if (entidad == null)
                 return NotFound();
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbProveedor.IdAsociacion);
-            return View(tbProveedor);
+
+            var model = new ProveedorViewModel
+            {
+                IdProveedor = entidad.IdProveedor,
+                IdAsociacion = entidad.IdAsociacion,
+                TipoProveedor = entidad.TipoProveedor,
+                NombreEmpresa = entidad.NombreEmpresa,
+                CedulaJuridica = entidad.CedulaJuridica,
+                NombreContacto = entidad.NombreContacto,
+                CedulaContacto = entidad.CedulaContacto,
+                Telefono = entidad.Telefono,
+                Correo = entidad.Correo,
+                Direccion = entidad.Direccion,
+                Fax = entidad.Fax,
+                Estado = entidad.Estado!.Value
+            };
+
+            await ConfigurarAsociacionProveedorAsync(model);
+            return View(model);
         }
 
-        // POST: TbProveedors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdProveedor,IdAsociacion,TipoProveedor,NombreEmpresa,CedulaJuridica,NombreContacto,CedulaContacto,Direccion,Telefono,Correo,Fax,Estado")] TbProveedor tbProveedor)
+        public async Task<IActionResult> Edit(ProveedorViewModel model)
         {
-            if (id != tbProveedor.IdProveedor)
+            var validator = new ProveedorViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionProveedorAsync(model);
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    _context.Update(tbProveedor);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbProveedorExists(tbProveedor.IdProveedor))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var proveedor = await _context.TbProveedors
+                    .FirstOrDefaultAsync(p => p.IdProveedor == model.IdProveedor);
+
+                if (proveedor == null)
+                    return NotFound();
+
+                proveedor.IdAsociacion = model.IdAsociacion!.Value;
+                proveedor.TipoProveedor = model.TipoProveedor!.Value;
+                proveedor.NombreEmpresa = model.NombreEmpresa!;
+                proveedor.CedulaJuridica = model.CedulaJuridica!;
+                proveedor.NombreContacto = model.NombreContacto!;
+                proveedor.CedulaContacto = model.CedulaContacto!;
+                proveedor.Telefono = model.Telefono!;
+                proveedor.Correo = model.Correo!;
+                proveedor.Direccion = model.Direccion!;
+                proveedor.Fax = model.Fax!;
+                proveedor.Estado = model.Estado;
+
+                _context.Update(proveedor);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Proveedor actualizado correctamente.";
+                return RedirectToAction(nameof(Edit), new { id = model.IdProveedor });
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbProveedor.IdAsociacion);
-            return View(tbProveedor);
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el proveedor.";
+                await ConfigurarAsociacionProveedorAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbProveedors/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -1,0 +1,92 @@
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbFinancistum;
+@model FinancistaViewModel
+
+@{
+    ViewData["Title"] = "Editar Financista";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+}
+
+<h1 class="text-center mb-4">Editar Financista</h1>
+<hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Formulario de Edición
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="IdFinancista" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones"></select>
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TipoEntidad" class="form-label"></label>
+                        <select asp-for="TipoEntidad" class="form-select" asp-items="Html.GetEnumSelectList<TipoEntidades>()">
+                            <option disabled selected>Seleccione un tipo de entidad</option>
+                        </select>
+                        <span asp-validation-for="TipoEntidad" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SitioWeb" class="form-label"></label>
+                        <input asp-for="SitioWeb" class="form-control" />
+                        <span asp-validation-for="SitioWeb" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/FinancistaScripts/FinancistaFormHandler.js"></script>
+}

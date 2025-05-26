@@ -21,16 +21,17 @@ namespace UCG.Models.ValidationModels
                 })
                 .WithMessage("El acta seleccionada no existe.");
 
-            // Validación: Número de Acuerdo
             RuleFor(x => x.NumeroAcuerdo)
-                .NotEmpty().WithMessage("Debe ingresar el número del acuerdo.")
-                .MaximumLength(20).WithMessage("El número del acuerdo no debe superar los 20 caracteres.")
-                .MustAsync(async (NumeroAcuerdo, _) =>
-                {
-                    return !string.IsNullOrWhiteSpace(NumeroAcuerdo) &&
-                           !await _context.TbAcuerdos.AnyAsync(a => a.NumeroAcuerdo == NumeroAcuerdo);
-                })
-                .WithMessage("Ya existe un acuerdo con ese nombre.");
+            .NotEmpty().WithMessage("Debe ingresar el número del acuerdo.")
+            .MaximumLength(20).WithMessage("El número del acuerdo no debe superar los 20 caracteres.")
+            .MustAsync(async (viewModel, numeroAcuerdo, _) =>
+            {
+                return !string.IsNullOrWhiteSpace(numeroAcuerdo) &&
+                       !await _context.TbAcuerdos
+                           .AnyAsync(a => a.NumeroAcuerdo == numeroAcuerdo && a.IdActa == viewModel.IdActa);
+            })
+            .WithMessage("Ya existe un acuerdo con ese número en esta acta.");
+
 
             // Validación: Nombre del Acuerdo
             RuleFor(x => x.Nombre)
@@ -49,10 +50,9 @@ namespace UCG.Models.ValidationModels
                 .NotEmpty().WithMessage("Debe ingresar una descripción.")
                 .MaximumLength(500).WithMessage("La descripción no puede superar los 500 caracteres.");
 
-            // Validación: Monto
-            RuleFor(x => x.MontoAcuerdo)
-                .NotNull().WithMessage("Debe ingresar el monto del acuerdo.")
-                .GreaterThanOrEqualTo(0).WithMessage("El monto debe ser mayor o igual a ?0.");
+            RuleFor(x => x.Tipo)
+              .IsInEnum().WithMessage("Debe seleccionar un tipo válido.")
+              .NotEmpty().WithMessage("Debe seleccionar un tipo.");
         }
     }
 }

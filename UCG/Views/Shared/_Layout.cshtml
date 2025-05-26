@@ -1,4 +1,8 @@
-﻿
+﻿@{
+    var rol = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,153 +12,130 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/UCG.styles.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/css/site.scss" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
 
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">UCG</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                       @*  @if (User.IsInRole("Admin") || User.IsInRole("root"))
-                        {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbClientes" asp-action="Index">Clientes</a>
-                        </li>
-                        }
-                        @if (User.IsInRole("root")){
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbUsuarios" asp-action="Index">Usuarios</a>
-                        </li>
-                        }
-                        @if (User.IsInRole("Admin") || User.IsInRole("root")){
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">Categoria Movimiento</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoMovimientoes" asp-action="Index">Concepto Movimiento</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbProveedors" asp-action="Index">Proveedor</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociadoes" asp-action="Index">Asociado</a>
-                        </li>
-                        }
-                        @if (User.IsInRole("root")){
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAsociacions" asp-action="Index">Asociacion</a>
-                        </li>
-                        }
-                        @if (User.IsInRole("Admin") || User.IsInRole("root"))
-                        {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbCuentums" asp-action="Index">Cuenta</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbProyectoes" asp-action="Index">Proyecto</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbDetalleMovimientoes" asp-action="Index">Detalle Movimiento</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbActums" asp-action="Index">Acta</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbActaAsistenciums" asp-action="Index">Acta Asistencia</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbAcuerdoes" asp-action="Index">Acuerdo</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbMovimientoes" asp-action="Index">Movimientos</a>
-                        </li>
-                        }
-                        @if (User.IsInRole("root")){
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AsociacionPdf" asp-action="Index">PDF Asociaciones
 
+    <!--========== HEADER ==========-->
+    <header class="header">
+        <div class="header__container">
+
+            <a asp-controller="Home" asp-action="Index" class="header__logo">UCAG</a>
+
+            @* <div class="header__search">
+                <input type="search" placeholder="Search" class="header__input">
+                <i class='bx bx-search header__icon'></i>
+            </div> *@
+
+            <a href="#" class=" nav-link text-decoration-none px-3 py-1 rounded-4 fw-bold" style="background-color: rgba(255, 120, 44, 1); color: #fff !important; font-weight: 600; border-radius: 12px;">
+                @email
+            </a>
+
+            <div class="header__toggle">
+                <i class='bx bx-menu' id="header-toggle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!--========== NAV ==========-->
+    <div class="nav" id="navbar">
+        <nav class="nav__container">
+            <div>
+                <a asp-controller="Home" asp-action="Index" class="nav__link nav__logo">
+                    <i class='bx bxs-disc nav__icon'></i>
+                    <span class="nav__logo-name">UCAG</span>
+                </a>
+
+                <div class="nav__list">
+                    <div class="nav__items">
+                        <h3 class="nav__subtitle">Panel de Control</h3>
+
+                        <a asp-controller="Home" asp-action="Index" class="nav__link active">
+                            <i class='bx bx-home nav__icon'></i>
+                            <span class="nav__name">Inicio</span>
+                        </a>
+
+                        <div class="nav__dropdown">
+                            <a style="color: #58555E;" class="nav__link">
+                                <i class='bx bx-user nav__icon'></i>
+                                <span class="nav__name">Cuenta</span>
+                                <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
                             </a>
-                        </li>
-                        }
-                        @if (User.IsInRole("Admin") || User.IsInRole("root"))
-                        {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TbConceptoAsociacions" asp-action="Index">
-                                Conceptos de movimientos de Asociacion
 
-                            </a>
-                        </li>
-                        } *@
-
-
-
-                    </ul>
-
-                    @if (!(User.Identity?.IsAuthenticated ?? false))
-                    {
-
-                        <div class="d-flex flex-column align-items-center gap-3 flex-lg-row">
-                            <a class="nav-link text-dark text-decoration-none fw-bold" asp-controller="Acceso" asp-action="LogIn">Ingresar</a>
-                            <a class="nav-link text-white text-decoration-none px-3 py-1 rounded-4 fw-bold"
-                               asp-controller="Acceso" asp-action="Registrarse"
-                               style="background-color: rgba(255, 120, 44, 1); font-weight: 600; border-radius: 12px;">
-                                Registrarse
-                            </a>
+                            <div class="nav__dropdown-collapse">
+                                <div class="nav__dropdown-content">
+                                    <a asp-controller="Acceso" asp-action="LogIn" class="nav__dropdown-item">Ingresar</a>
+                                    @* <a asp-controller="Acceso" asp-action="Registrarse" class="nav__dropdown-item">Unirse</a> *@
+                                </div>
+                            </div>
                         </div>
-                    }
-                    else
-                    {
 
-                        <div class="d-flex flex-column align-items-center gap-3 flex-lg-row">
+                        @* <a style="color: #58555E;" class="nav__link">
+                            <i class='bx bx-message-rounded nav__icon'></i>
+                            <span class="nav__name">Messages</span>
+                        </a> *@
+                    </div>
 
-                            <a href="#" class=" nav-link text-dark text-decoration-none px-3 py-1 rounded-4 fw-bold" style="background-color: rgba(255, 120, 44, 1); color: #fff; font-weight: 600; border-radius: 12px;">
-                                @User.Identity.Name
+                    <div class="nav__items">
+                        <h3 class="nav__subtitle">Menu</h3>
+
+                        @* <div class="nav__dropdown">
+                            <a class="nav__link" style="color: #58555E;">
+                                <i class='bx bx-bell nav__icon'></i>
+                                <span class="nav__name">Notifications</span>
+                                <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
                             </a>
 
+                            <div class="nav__dropdown-collapse">
+                                <div class="nav__dropdown-content">
+                                    <a href="#" class="nav__dropdown-item">Blocked</a>
+                                    <a href="#" class="nav__dropdown-item">Silenced</a>
+                                    <a href="#" class="nav__dropdown-item">Publish</a>
+                                    <a href="#" class="nav__dropdown-item">Program</a>
+                                </div>
+                            </div>
 
-                            <a asp-controller="Home" asp-action="Salir" class="text-dark text-decoration-none px-3 py-1 rounded-4 fw-bold" style="color: #000; font-weight: 600;">
-                                <i class="fa-solid fa-right-from-bracket"></i> 
+                        </div> *@
+
+                        
+
+                        @* @if (rol == "root")
+                        { *@
+                            <a asp-controller="Home" asp-action="Union" class="nav__link">
+                                <i class='bx bx-universal-access nav__icon'></i>
+                                <span class="nav__name">Unión</span>
                             </a>
+                        @* } *@
 
+                        @* @if (rol == "root" || rol == "Admin")
+                        { *@
+                            <a asp-controller="Home" asp-action="Asociacion" class="nav__link">
+                                <i class='bx bx-group nav__icon'></i>
+                                <span class="nav__name">Asociación</span>
+                            </a>
+                        @* } *@
 
-                            @if (User.IsInRole("admin"))
-                            {
-                                <a asp-controller="Admin" asp-action="Index" style="color: #000; font-weight: 600;">
-                                    <i class="fa-solid fa-gears"></i>
-                                </a>
-                            }
-                        </div>
-                    }
+                    </div>
                 </div>
             </div>
+
+            <a class="nav__link nav__logout" style="color: #58555E;" asp-controller="Home" asp-action="Salir">
+                <i class='bx bx-log-out nav__icon'></i>
+                <span class="nav__name">Log Out</span>
+            </a>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - UCG - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+
+    @RenderBody()
+
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

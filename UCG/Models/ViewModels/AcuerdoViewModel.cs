@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using static UCG.Models.TbProveedor;
+using static UCG.Models.TbAcuerdo;
 
 namespace UCG.Models.ViewModels
 {
@@ -11,6 +11,9 @@ namespace UCG.Models.ViewModels
 
         [Display(Name = "Numero Acuerdo")]
         public string? NumeroAcuerdo { get; set; }
+
+        [Display(Name = "Tipo Acuerdo")]
+        public TipoDeAcuerdo? Tipo { get; set; }
 
         [Display(Name = "Nombre Acuerdo")]
         public string? Nombre { get; set; }

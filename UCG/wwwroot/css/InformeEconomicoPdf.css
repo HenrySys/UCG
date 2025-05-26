@@ -1,0 +1,51 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 4px;
+    text-align: left;
+}
+
+.header-title {
+    text-align: center;
+    font-weight: bold;
+}
+
+.sub-title {
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.section {
+    margin: 20px 0;
+}
+
+.blue {
+    background-color: #0073e6;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.highlight {
+    background-color: #0033cc;
+    color: white;
+    font-weight: bold;
+}
+
+.table-no-border td {
+    border: none;
+}
+
+.firmas {
+    margin-top: 30px;
+}

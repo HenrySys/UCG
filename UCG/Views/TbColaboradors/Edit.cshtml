@@ -1,0 +1,81 @@
+﻿@using UCG.Models.ViewModels;
+@model ColaboradorViewModel
+
+@{
+    ViewData["Title"] = "Editar Colaborador";
+}
+
+<h1 class="text-center mb-4">Editar Colaborador</h1>
+<hr />
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Formulario de Edición
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="IdColaborador" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Cedula" class="form-label"></label>
+                        <input asp-for="Cedula" class="form-control" />
+                        <span asp-validation-for="Cedula" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/ColaboradorScripts/ColaboradorFormHandler.js"></script>
+}

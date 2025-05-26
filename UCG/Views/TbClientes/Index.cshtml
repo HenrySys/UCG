@@ -71,7 +71,7 @@
                 @Html.DisplayFor(modelItem => item.Estado)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.IdAsociacion)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.IdCliente">Edit</a> |

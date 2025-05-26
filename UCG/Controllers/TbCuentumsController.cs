@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
+using UCG.Models.ValidationModels;
 
 namespace UCG.Controllers
 {
@@ -46,110 +47,177 @@ namespace UCG.Controllers
             return View(tbCuentum);
         }
 
-        // GET: TbCuentums/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            string rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
             var model = new CuentumViewModel();
+            await ConfigurarAsociacionCuentaAsync(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CuentumViewModel model)
+        {
+            var validator = new CuentumViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionCuentaAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var nuevaCuenta = MapearCuenta(model);
+                _context.TbCuenta.Add(nuevaCuenta);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Cuenta creada correctamente.";
+                return RedirectToAction(nameof(Create));
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar la cuenta.";
+                await ConfigurarAsociacionCuentaAsync(model);
+                return View(model);
+            }
+        }
+
+
+        private TbCuentum MapearCuenta(CuentumViewModel model)
+        {
+            return new TbCuentum
+            {
+                IdCuenta = model.IdCuenta,
+                IdAsociacion = model.IdAsociacion.Value,
+                IdAsociado = model.IdAsociado.Value,
+                TipoCuenta = model.TipoCuenta.Value,
+                TituloCuenta = model.TituloCuenta,
+                NumeroCuenta = model.NumeroCuenta!,
+                Telefono = model.Telefono!,
+                Estado = model.Estado!.Value,
+                Banco = model.Banco,
+                Saldo = model.Saldo
+            };
+        }
+
+        private async Task ConfigurarAsociacionCuentaAsync(CuentumViewModel model)
+        {
+            var rol = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
             if (rol == "Admin")
             {
                 var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
-                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+                if (int.TryParse(idAsociacionClaim, out int idAsociacion))
+                {
+                    var nombre = await _context.TbAsociacions
+                        .Where(a => a.IdAsociacion == idAsociacion)
+                        .Select(a => a.Nombre)
+                        .FirstOrDefaultAsync();
 
-                // Obtener el nombre de la asociación desde la base de datos
-                var Nombre = _context.TbAsociacions
-                    .Where(a => a.IdAsociacion == idAsociacion)
-                    .Select(a => a.Nombre)
-                .FirstOrDefault();
-
-                // Se mantiene seleccionable el usuario
-                ViewBag.IdAsociacion = idAsociacion;
-                ViewBag.Nombre = Nombre;
-                ViewBag.EsAdmin = true;
-                model.IdAsociacion = idAsociacion;
-
-                return View(model);
+                    model.IdAsociacion = idAsociacion;
+                    ViewBag.IdAsociacion = idAsociacion;
+                    ViewBag.Nombre = nombre;
+                    ViewBag.EsAdmin = true;
+                }
             }
             else
             {
-                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
                 ViewBag.EsAdmin = false;
-                return View();
+                ViewBag.IdAsociacion = new SelectList(
+                    await _context.TbAsociacions.ToListAsync(),
+                    "IdAsociacion", "Nombre", model.IdAsociacion);
             }
-            // ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion");
-            // return View();
         }
 
-        // POST: TbCuentums/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdCuenta,IdAsociacion,TipoCuenta,TituloCuenta,NumeroCuenta,Telefono,Estado")] TbCuentum tbCuentum)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(tbCuentum);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCuentum.IdAsociacion);
-            return View(tbCuentum);
-        }
-
-        // GET: TbCuentums/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TbCuenta == null)
-            {
                 return NotFound();
-            }
 
-            var tbCuentum = await _context.TbCuenta.FindAsync(id);
-            if (tbCuentum == null)
-            {
+            var cuenta = await _context.TbCuenta.FindAsync(id);
+            if (cuenta == null)
                 return NotFound();
-            }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCuentum.IdAsociacion);
-            return View(tbCuentum);
+
+            var model = new CuentumViewModel
+            {
+                IdCuenta = cuenta.IdCuenta,
+                IdAsociacion = cuenta.IdAsociacion,
+                IdAsociado = cuenta.IdAsociado,
+                TipoCuenta = cuenta.TipoCuenta,
+                TituloCuenta = cuenta.TituloCuenta,
+                NumeroCuenta = cuenta.NumeroCuenta,
+                Telefono = cuenta.Telefono,
+                Estado = cuenta.Estado,
+                Banco = cuenta.Banco!.Value 
+            };
+
+            await ConfigurarAsociacionCuentaAsync(model);
+            return View(model);
         }
 
-        // POST: TbCuentums/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdCuenta,IdAsociacion,TipoCuenta,TituloCuenta,NumeroCuenta,Telefono,Estado")] TbCuentum tbCuentum)
+        public async Task<IActionResult> Edit(int id, CuentumViewModel model)
         {
-            if (id != tbCuentum.IdCuenta)
-            {
+            if (id != model.IdCuenta)
                 return NotFound();
+
+            var validator = new CuentumViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionCuentaAsync(model);
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    _context.Update(tbCuentum);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbCuentumExists(tbCuentum.IdCuenta))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var cuentaExistente = await _context.TbCuenta.FindAsync(id);
+                if (cuentaExistente == null)
+                    return NotFound();
+
+                // Actualizar campos manualmente
+                cuentaExistente.IdAsociacion = model.IdAsociacion.Value;
+                cuentaExistente.IdAsociado = model.IdAsociado.Value;
+                cuentaExistente.TipoCuenta = model.TipoCuenta.Value;
+                cuentaExistente.TituloCuenta = model.TituloCuenta;
+                cuentaExistente.NumeroCuenta = model.NumeroCuenta;
+                cuentaExistente.Telefono = model.Telefono;
+                cuentaExistente.Estado = model.Estado.Value;
+                cuentaExistente.Banco = model.Banco;
+
+                _context.Update(cuentaExistente);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Cuenta actualizada correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbCuentum.IdAsociacion);
-            return View(tbCuentum);
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar la cuenta.";
+                await ConfigurarAsociacionCuentaAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbCuentums/Delete/5
         public async Task<IActionResult> Delete(int? id)

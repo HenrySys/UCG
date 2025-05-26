@@ -23,8 +23,21 @@
 
                     <dt class="col-sm-4 mb-3">Concepto</dt>
                     <dd class="col-sm-8 mb-3">
-                        @Model.IdConceptoNavigation.IdConceptoMovimiento
+                        @Model.IdConceptoNavigation.Concepto
                     </dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (!string.IsNullOrWhiteSpace(Model.DescripcionPersonalizada))
+                        {
+                            @Model.DescripcionPersonalizada
+                        }
+                        else
+                        {
+                            <span class="text-muted">No se registró ninguna descripción.</span>
+                        }
+                    </dd>
+                    
                 </dl>
 
                 <div class="d-flex justify-content-between mt-4">

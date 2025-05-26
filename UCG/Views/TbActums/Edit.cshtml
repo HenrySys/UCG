@@ -2,18 +2,21 @@
 @using static UCG.Models.TbActum;
 @model ActaViewModel;
 
-
 @{
     ViewData["Title"] = "Edit";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var folios = ViewData["IdFolio"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
 <h1>Edit</h1>
- 
+
 <h4>TbActum</h4>
 <hr />
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
      data-error="@TempData["ErrorMessage"]">
+    
 </div>
 <form asp-action="Edit" data-mode="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -29,7 +32,7 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
+                        <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" >
                             <option disabled selected>Seleccione una asociación</option>
                         </select>
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
@@ -37,10 +40,18 @@
 
                     <div class="mb-3">
                         <label asp-for="IdAsociado" class="form-label"></label>
-                        <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado" id="IdAsociado">
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
                             <option disabled selected>Seleccione un asociado</option>
                         </select>
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdFolio" class="form-label"></label>
+                        <select asp-for="IdFolio" class="form-select" asp-items="folios" id="IdFolio">
+                            <option disabled selected>Seleccione un folio</option>
+                        </select>
+                        <span asp-validation-for="IdFolio" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -69,7 +80,6 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-
                 </div>
             </div>
         </div>
@@ -88,7 +98,6 @@
                             <div class="card borde-secondary-emphasis shadow">
                                 <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
                                     <span>Asistencias</span>
-                                    
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-bordered table-sm" id="detailsTableAsistencia">
@@ -118,7 +127,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>Monto</th>
+                                                <th>Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -127,19 +136,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="MontoTotalAcordado" class="form-label"></label>
-                            <div class="input-group" id="montTA">
-                                <span class="input-group-text">₡</span>
-                                <input type="number" asp-for="MontoTotalAcordado" class="form-control" placeholder="Ingrese el monto del acuerdo"
-                                       disabled readonly
-                                       min="0"
-                                       step="0.01"
-                                       inputmode="decimal"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')" id="montoTotalAcordado" />
-                                <span asp-validation-for="MontoTotalAcordado" class="text-danger"></span>
-                            </div>
-                        </div>
                     </div> <!-- End row g-3 -->
                 </div>
             </div>
@@ -157,7 +153,6 @@
     <input type="hidden" id="ActaAcuerdoJason" name="ActaAcuerdoJason" value="@Model.ActaAcuerdoJason" />
 </form>
 
-
 <!-- Modal Acuerdo -->
 <div class="modal fade" id="detailModalAcuerdo" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -167,14 +162,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <!-- Campo para el nombre del acuerdo -->
                 <div class="mb-3">
                     <label for="nombreAcuerdo" class="form-label">Nombre del Acuerdo</label>
                     <input type="text" class="form-control" id="nombreAcuerdo" placeholder="Ingrese el nombre del acuerdo" required>
                 </div>
-
-                <!-- Campo para la descripcion del acuerdo -->
-
                 <div class="mb-3 " id="descripcionAcuerdo">
                     <label for="summernoteAcuerdo" class="form-label">Descripción</label>
                     <div class="input-group">
@@ -182,27 +173,7 @@
                         <textarea id="summernoteAcuerdo" class="form-control" rows="5" required></textarea>
                     </div>
                 </div>
-
-                <!-- Campo para el monto del acuerdo -->
-
-                <div class="mb-3">
-                    <label for="montoAcuerdo" class="form-label">Monto del Acuerdo</label>
-                    <div class="input-group" id="montoe">
-                        <span class="input-group-text">₡</span>
-                        <input type="number"
-                               class="form-control"
-                               id="montoAcuerdo"
-                               placeholder="Ingrese el monto del acuerdo"
-                               required
-                               min="0"
-                               step="0.01"
-                               inputmode="decimal"
-                               oninput="this.value = this.value.replace(/[^0-9.]/g, '')" />
-                    </div>
-                </div>
             </div>
-
-
             <div class="modal-footer">
                 <button type="button" id="addDetailAcuerdoBtn" class="btn btn-success">Agregar</button>
             </div>
@@ -210,33 +181,23 @@
     </div>
 </div>
 
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <!-- jQuery primero (antes que Summernote) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Summernote CSS y JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
     <script>
         const rutasMovimiento = {
             obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActums")',
+            obtenerFolios: '@Url.Action("ObtenerFoliosPorAsociacion", "TbActums")',
         };
-
     </script>
 
-    <!-- Tu script separado -->
-    <script src="~/js/ActaScripts/ActaFormHandler.js"></script>
+    <script src="~/js/ActaScripts/ActaFormH.js"></script>
 }

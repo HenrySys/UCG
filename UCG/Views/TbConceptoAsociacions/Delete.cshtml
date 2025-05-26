@@ -17,10 +17,22 @@
 
                 <dl class="row">
                     <dt class="col-sm-4 mb-3">Asociación</dt>
-                    <dd class="col-sm-8 mb-3">@Model.IdAsociacionNavigation?.IdAsociacion</dd>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociacionNavigation?.Nombre</dd>
 
                     <dt class="col-sm-4 mb-3">Concepto de Movimiento</dt>
-                    <dd class="col-sm-8 mb-3">@Model.IdConceptoNavigation?.IdConceptoMovimiento</dd>
+                    <dd class="col-sm-8 mb-3">@Model.IdConceptoNavigation?.Concepto</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (!string.IsNullOrWhiteSpace(Model.DescripcionPersonalizada))
+                        {
+                            @Model.DescripcionPersonalizada
+                        }
+                        else
+                        {
+                            <span class="text-muted">No se registró ninguna descripción.</span>
+                        }
+                    </dd>
                 </dl>
 
                 <form asp-action="Delete" method="post">

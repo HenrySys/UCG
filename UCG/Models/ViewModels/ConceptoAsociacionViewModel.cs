@@ -12,5 +12,8 @@ namespace UCG.Models.ViewModels
 
         [Display(Name = "Concepto")]
         public int? IdConcepto { get; set; }
+
+        [Display(Name= "Descripcion")]
+        public string? DescripcionPersonalizada { get; set; }
     }
 }

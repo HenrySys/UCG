@@ -5,6 +5,9 @@
 
 @{
     ViewData["Title"] = "Create";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var folios = ViewData["IdFolio"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
 <h1>Agregar Acta</h1>
@@ -27,29 +30,48 @@
                     Información del Acta
                 </div>
                 <div class="card-body">
+                    <!-- ASOCIACIÓN -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        @if (ViewBag.EsAdmin == true)
-                            {
-                                <input type="text" class="form-control" value="@ViewBag.NombreAsociacion" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                            }
-                            else
-                            {
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion" id="IdAsociacion">
-                                    <option disabled selected>Seleccione una asociación</option>
-                                </select>
-                            }
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="IdAsociado" class="form-label"></label>
-                        <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado" id="IdAsociado">
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
                             <option disabled selected>Seleccione un asociado</option>
                         </select>
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
                     </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdFolio" class="form-label"></label>
+                        <select asp-for="IdFolio" class="form-select" asp-items="folios" id="IdFolio">
+                            <option disabled selected>Seleccione un folio</option>
+                        </select>
+                        <span asp-validation-for="IdFolio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Tipo" class="form-label"></label>
+                        <select asp-for="Tipo" class="form-control" asp-items="Html.GetEnumSelectList<TipoDeActa>()">
+                            <option value="" disabled selected>Seleccione un tipo de acuerdo</option>
+                        </select>
+
+                        <span asp-validation-for="Tipo" class="text-danger"></span>
+                    </div>
+
 
                     <div class="mb-3">
                         <label asp-for="FechaSesionTexto" class="form-label"></label>
@@ -127,8 +149,9 @@
                                     <table class="table table-bordered table-sm" id="detailsTableAcuerdo">
                                         <thead>
                                             <tr>
+                                                <th>Tipo</th>
                                                 <th>Nombre</th>
-                                                <th>Monto</th>
+                                                <th>Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -137,19 +160,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="MontoTotalAcordado" class="form-label"></label>
-                            <div class="input-group" id="montTA">
-                                <span class="input-group-text">₡</span>
-                                <input type="number" asp-for="MontoTotalAcordado" class="form-control" placeholder="Ingrese el monto del acuerdo"
-                                       disabled readonly
-                                       min="0"
-                                       step="0.01"
-                                       inputmode="decimal"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')" id="montoTotalAcordado"/>
-                                <span asp-validation-for="MontoTotalAcordado" class="text-danger"></span>
-                            </div>
-                        </div>
+                       
                     </div> <!-- End row g-3 -->
                 </div>
             </div>
@@ -206,6 +217,18 @@
                     <input type="text" class="form-control" id="nombreAcuerdo" placeholder="Ingrese el nombre del acuerdo" required>
                 </div>
 
+                <!-- Tipo de Acuerdo -->
+                <div class="mb-3">
+                    <label for="tipoAcuerdo" class="form-label">Tipo de Acuerdo</label>
+                    <select class="form-select" id="tipoAcuerdo" required>
+                        <option disabled selected>Seleccione un tipo</option>
+                        <option value="1">Compra</option>
+                        <option value="2">Pago</option>
+                        <option value="3">Ordinario</option>
+                    </select>
+                </div>
+
+
                 <!-- Campo para la descripcion del acuerdo -->
 
                 <div class="mb-3 " id="descripcionAcuerdo">
@@ -215,26 +238,8 @@
                         <textarea id="summernoteAcuerdo" class="form-control" rows="5" required></textarea>
                     </div>
                 </div>
-
-                <!-- Campo para el monto del acuerdo -->
-
-                <div class="mb-3">
-                    <label for="montoAcuerdo" class="form-label">Monto del Acuerdo</label>
-                    <div class="input-group" id="montoe">
-                        <span class="input-group-text">₡</span>
-                        <input type="number"
-                               class="form-control"
-                               id="montoAcuerdo"
-                               placeholder="Ingrese el monto del acuerdo"
-                               required
-                               min="0"
-                               step="0.01"
-                               inputmode="decimal"
-                               oninput="this.value = this.value.replace(/[^0-9.]/g, '')" />
-                    </div>
-                </div>
+   
             </div>
-
 
             <div class="modal-footer">
                 <button type="button" id="addDetailAcuerdoBtn" class="btn btn-success">Agregar</button>
@@ -267,10 +272,11 @@
     <script>
         const rutasMovimiento = {
             obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActums")',
+            obtenerFolios: '@Url.Action("ObtenerFoliosPorAsociacion", "TbActums")',
         };
       
     </script>
 
     <!-- Tu script separado -->
-    <script src="~/js/ActaScripts/ActaFormHandler.js"></script>
+    <script src="~/js/ActaScripts/ActaFormH.js"></script>
 }

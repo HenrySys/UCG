@@ -10,7 +10,7 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<div >
+<div class=" table-responsive" >
     <table id="miTabla" class="table table-striped table-hover display compact">
         <thead>
             <tr>
@@ -99,10 +99,10 @@
                     @Html.DisplayFor(modelItem => item.Estado)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.IdAsociacion)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdUsuarioNavigation.IdUsuario)
+                    @Html.DisplayFor(modelItem => item.IdUsuarioNavigation!.IdUsuario)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.IdAsociado">Edit</a> |

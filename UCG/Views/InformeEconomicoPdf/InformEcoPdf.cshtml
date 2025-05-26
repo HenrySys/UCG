@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "InformEcoPdf";
+}
+@{
+    Layout = null;
+    string formato(decimal valor) => valor.ToString("C", new System.Globalization.CultureInfo("es-CR"));
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Informe Económico</title>
+    <link rel="stylesheet" href="~/css/InformeEconomicoPdf.css" />
+</head>
+<body>
+    <div class="section">
+        <h2 class="header-title">Dirección Nacional de Desarrollo de la Comunidad</h2>
+        <p class="sub-title">
+            Formulario declaración de Informe Económico Anual<br />
+            Del 1 de Enero al 31 de Diciembre del año: ___________
+        </p>
+    </div>
+
+    <div class="section">
+        <p>
+            Señor(a) _____________________________, portador(a) del documento de identidad número _______________________ (cédula identidad o residencia),
+            en el cargo de la presidencia y señor(a) _____________________________, portador(a) del documento de identidad número _______________________,
+            en el cargo de la tesorería, de la organización comunal denominada _____________________________,
+            cédula jurídica N° _____________________________,
+            advertidos del delito de perjurio contemplado en el artículo 309 del Código Penal, declaramos que la información brindada en este formulario corresponde al detalle de todos los movimientos económicos realizados durante el año ________________, mismos que son legítimos y verdaderos.
+        </p>
+        <p>
+            Nº código de registro ___________, provincia ___________, cantón ___________, distrito ___________<br />
+            Para notificaciones: Número de teléfono ___________ Número de Fax ___________ Correo electrónico ___________
+        </p>
+    </div>
+
+    <div class="section">
+        <strong>Debe adjuntar una copia del Estado de Cuenta emitido por la entidad bancaria con corte al 31 de diciembre del último año</strong>
+    </div>
+
+    <table>
+        <thead>
+            <tr class="blue">
+                <th>Entradas</th>
+                <th>Monto en colones</th>
+                <th>Salidas</th>
+                <th>Monto en colones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 1; i <= 15; i++)
+            {
+                <tr>
+                    <td>@i.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+            <tr class="highlight">
+                <td>Total de entradas en el período</td>
+                <td>₡</td>
+                <td>Total de salidas en el período</td>
+                <td>₡</td>
+            </tr>
+            <tr class="highlight">
+                <td>Saldo inicial del período</td>
+                <td>₡</td>
+                <td>Saldo final en caja al 31 de diciembre</td>
+                <td>₡</td>
+            </tr>
+            <tr class="highlight">
+                <td>Total de entradas más el saldo inicial del período</td>
+                <td>₡</td>
+                <td>Total de salidas más el saldo final del período</td>
+                <td>₡</td>
+            </tr>
+        </tbody>
+    </table>
+        
+</body>
+
+</html>

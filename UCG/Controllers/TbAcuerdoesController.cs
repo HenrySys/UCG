@@ -101,7 +101,7 @@ namespace UCG.Controllers
                 TempData["SuccessMessage"] = "Acuerdo agregado correctamente.";
                 return RedirectToAction("Create", "TbAcuerdoes", new { id = model.IdActa });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 TempData["ErrorMessage"] = "Ocurrió un error al guardar el acuerdo.";
@@ -116,11 +116,11 @@ namespace UCG.Controllers
             return new TbAcuerdo
             {
              
-                IdActa = model.IdActa.Value,
+                IdActa = model.IdActa!.Value,
                 NumeroAcuerdo = model.NumeroAcuerdo,
                 Nombre = model.Nombre,
                 Descripcion = model.Descripcion,
-                MontoAcuerdo = model.MontoAcuerdo
+                Tipo = model.Tipo,
             };
         }
 

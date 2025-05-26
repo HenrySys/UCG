@@ -1,0 +1,73 @@
+﻿@model UCG.Models.TbCheque
+
+@{
+    ViewData["Title"] = "Eliminar Cheque";
+}
+
+<h1 class="text-center mb-4">Eliminar Cheque</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                Confirmación de Eliminación
+            </div>
+            <div class="card-body">
+                <p class="text-danger">¿Estás seguro de que deseas eliminar este cheque?</p>
+
+                <dl class="row">
+                    <dt class="col-sm-4 mb-3">Número de Cheque</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroCheque</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Emisión</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaEmision.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Pago</dt>
+                    <dd class="col-sm-8 mb-3">@Model.FechaPago.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4 mb-3">Beneficiario</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Beneficiario</dd>
+
+                    <dt class="col-sm-4 mb-3">Monto</dt>
+                    <dd class="col-sm-8 mb-3">₡@Model.Monto.ToString("N2")</dd>
+
+                    <dt class="col-sm-4 mb-3">Monto Restante</dt>
+                    <dd class="col-sm-8 mb-3">@(Model.MontoRestante.HasValue ? "₡" + Model.MontoRestante.Value.ToString("N2") : "No registrado")</dd>
+
+                    <dt class="col-sm-4 mb-3">Estado</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Cobro</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.FechaCobro.HasValue ? Model.FechaCobro.Value.ToString("dd/MM/yyyy") : "No registrado")
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Fecha de Anulación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @(Model.FechaAnulacion.HasValue ? Model.FechaAnulacion.Value.ToString("dd/MM/yyyy") : "No registrado")
+                    </dd>
+
+                    <dt class="col-sm-4 mb-3">Observaciones</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Observaciones</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociacionNavigation?.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Cuenta</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdCuentaNavigation?.TituloCuenta</dd>
+
+                    <dt class="col-sm-4 mb-3">Asociado que Autoriza</dt>
+                    <dd class="col-sm-8 mb-3">@Model.IdAsociadoAutorizaNavigation?.Nombre</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdCheque" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

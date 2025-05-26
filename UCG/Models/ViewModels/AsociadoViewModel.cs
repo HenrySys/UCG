@@ -50,7 +50,7 @@ namespace UCG.Models.ViewModels
         public string? Direccion { get; set; }
 
         [Display(Name = "Estado")]
-        public EstadoDeAsociado Estado { get; set; }
+        public EstadoDeAsociado? Estado { get; set; }
 
     }
 }

@@ -1,17 +1,7 @@
 ﻿$(document).ready(function () {
-    const modoVista = $('form').data('mode'); // Se puede usar en cualquier función después
 
     const asistenciasCargadas = JSON.parse($('#ActaAsistenciaJason').val() || '[]');
     const acuerdosCargados = JSON.parse($('#ActaAcuerdoJason').val() || '[]');
-
-    const idAsociacion = $('#tempDataSwal').data('asociacion');
-    
-
-    $('#FechaSesionTexto').change(function () {
-        var fechaSession = $('#FechaSesionTexto').val();
-        console.log('Fecha de la sesión:', fechaSession); 
-    });
-
 
     const successMessage = $('#TempDataSuccessMessage').val();
     const errorMessage = $('#TempDataErrorMessage').val();
@@ -121,8 +111,6 @@
 
     }
 
-   
-
     function mostrarErrorSwal(titulo, mensaje) {
         Swal.fire({ icon: 'warning', title: titulo, text: mensaje });
     }
@@ -144,7 +132,7 @@
 
     function limpiarCamposModalAcuerdo() {
         $('#nombreAcuerdo').val('');
-        $('#montoAcuerdo').val('');
+        //$('#montoAcuerdo').val('');
         $('#summernoteAcuerdo').summernote('destroy');
     }
 
@@ -172,9 +160,9 @@
             
                 console.log(`Acuerdo ${index}:`, a);
             $('#detailsTableAcuerdo tbody').append(`
-            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-monto="${a.MontoAcuerdo}">
+            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" /*data-monto="${a.MontoAcuerdo}"*/>
                 <td>${a.Nombre}</td>
-                <td>₡${parseFloat(a.MontoAcuerdo).toFixed(2)}</td>
+                //<td>₡${parseFloat(a.MontoAcuerdo).toFixed(2)}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo" data-index="${index}">Editar</button>
                     <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
@@ -212,30 +200,30 @@
         filas.each(function () {
             const fila = $(this);
             const nombre = fila.find('td:eq(0)').text().trim();
-            const montoTexto = fila.find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
+            //const montoTexto = fila.find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
             const descripcion = fila.data('descripcion');
 
             acuerdos.push({
                 Nombre: nombre,
                 Descripcion: descripcion,
-                MontoAcuerdo: parseFloat(montoTexto) || 0
+            //    MontoAcuerdo: parseFloat(montoTexto) || 0
             });
         });
 
         return acuerdos;
     }
 
-    function actualizarMontoTotalAcordado() {
-        let total = 0;
+    //function actualizarMontoTotalAcordado() {
+    //    let total = 0;
 
-        $('#detailsTableAcuerdo tbody tr').each(function () {
-            const montoTexto = $(this).find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
-            const monto = parseFloat(montoTexto);
-            if (!isNaN(monto)) total += monto;
-        });
+    //    $('#detailsTableAcuerdo tbody tr').each(function () {
+    //        const montoTexto = $(this).find('td:eq(1)').text().replace(/[₡,]/g, '').trim();
+    //        const monto = parseFloat(montoTexto);
+    //        if (!isNaN(monto)) total += monto;
+    //    });
 
-        $('#montoTotalAcordado').val(total.toFixed(2));
-    }
+    //    $('#montoTotalAcordado').val(total.toFixed(2));
+    //}
 
     $('form').on('submit', function (e) {
         limpiarErrores();
@@ -322,8 +310,8 @@
         const nombre = $('#nombreAcuerdo').val().trim();
         const descripcionHtml = $('#summernoteAcuerdo').summernote('code');
         const descripcionTexto = $('<div>').html(descripcionHtml).text().trim();
-        const monto = $('#montoAcuerdo').val().trim();
-        const montoNumerico = parseFloat(monto);
+        //const monto = $('#montoAcuerdo').val().trim();
+        //const montoNumerico = parseFloat(monto);
 
         let hayError = false;
 
@@ -347,11 +335,11 @@
             hayError = true;
         }
 
-        if (!monto || isNaN(montoNumerico) || montoNumerico < 0) {
-            $('#montoe').addClass('is-invalid')
-                .after('<div id="errorMontoAcuerdo" class="text-danger mt-1">Ingrese un monto válido (número positivo).</div>');
-            hayError = true;
-        }
+        //if (!monto || isNaN(montoNumerico) || montoNumerico < 0) {
+        //    $('#montoe').addClass('is-invalid')
+        //        .after('<div id="errorMontoAcuerdo" class="text-danger mt-1">Ingrese un monto válido (número positivo).</div>');
+        //    hayError = true;
+        //}
 
 
 
@@ -361,15 +349,15 @@
         if (filaAcuerdoEditando !== null) {
             filaAcuerdoEditando.attr('data-nombre', nombre);
             filaAcuerdoEditando.attr('data-descripcion', descripcionHtml);
-            filaAcuerdoEditando.attr('data-monto', monto);
+            //filaAcuerdoEditando.attr('data-monto', monto);
             filaAcuerdoEditando.find('td:eq(0)').text(nombre);
-            filaAcuerdoEditando.find('td:eq(1)').text(`₡${parseFloat(monto).toFixed(2)}`);
+            //filaAcuerdoEditando.find('td:eq(1)').text(`₡${parseFloat(monto).toFixed(2)}`);
             filaAcuerdoEditando = null;
         } else {
             $('#detailsTableAcuerdo tbody').append(`
-              <tr data-nombre="${nombre}" data-descripcion="${descripcionHtml}" data-monto="${monto}">
+              <tr data-nombre="${nombre}" data-descripcion="${descripcionHtml}"/* data-monto="${monto}"*/>
                 <td>${nombre}</td>
-                <td>₡${parseFloat(monto).toFixed(2)}</td>
+                //<td>₡${parseFloat(monto).toFixed(2)}</td>
                 <td>
                   <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo">Editar</button>
                   <button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button>
@@ -389,10 +377,10 @@
 
         const nombre = filaAcuerdoEditando.data('nombre');
         const descripcion = filaAcuerdoEditando.data('descripcion');
-        const monto = filaAcuerdoEditando.data('monto');
+        //const monto = filaAcuerdoEditando.data('monto');
 
         $('#nombreAcuerdo').val(nombre);
-        $('#montoAcuerdo').val(monto);
+        //$('#montoAcuerdo').val(monto);
         $('#summernoteAcuerdo').summernote({
             height: 125,
             placeholder: 'Escriba el acuerdo aquí...',
@@ -407,27 +395,5 @@
     });
 
 
-    const container = document.getElementById("tempDataSwal");
-    const success = container?.dataset.success;
-    const error = container?.dataset.error;
-
-    if (success && success !== "") {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: success,
-            confirmButtonText: 'Ir al listado'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/TbActums/Index';
-            }
-        });
-    } else if (error && error !== "") {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error,
-            confirmButtonText: 'Aceptar'
-        });
-    }
+   
 });

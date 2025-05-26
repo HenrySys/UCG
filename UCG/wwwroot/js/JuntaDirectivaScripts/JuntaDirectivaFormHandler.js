@@ -29,8 +29,6 @@
     }
 
     const miembrosCargados = JSON.parse($('#MiembrosJuntaJson').val() || '[]');
-
-    // Obtener nombres reales desde el servidor
     if (miembrosCargados.length > 0) {
         $.ajax({
             url: '/TbJuntaDirectivas/ObtenerNombresMiembros',
@@ -102,16 +100,22 @@
 
     function prepararModalMiembro(asociacionId) {
         limpiarErrores();
-
         const asociadosYaAgregados = $('#detailsTableMiembros tbody tr').map(function () {
             return $(this).data('id-asociado').toString();
         }).get();
-
         const puestosYaAgregados = $('#detailsTableMiembros tbody tr').map(function () {
             return $(this).data('id-puesto').toString();
         }).get();
 
         fetchDropdownData(rutasJuntaDirectiva.obtenerAsociados, { idAsociacion: asociacionId }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
+            if (!data || data.length === 0) {
+                cerrarModalConMensaje('#detailModalMiembrosJunta', {
+                    titulo: 'Sin asociados',
+                    texto: 'No hay asociados disponibles para esta asociación.'
+                });
+                return;
+            }
+
             let agregados = 0;
             data.forEach(item => {
                 const id = item.idAsociado.toString();
@@ -123,30 +127,22 @@
                     agregados++;
                 }
             });
+
             if (agregados === data.length) {
                 cerrarModalConMensaje('#detailModalMiembrosJunta', {
                     titulo: 'Todos agregados',
                     texto: 'Todos los asociados ya han sido agregados a la lista.'
                 });
             }
-        });
 
-        $('#modalIdPuesto option').each(function () {
-            const val = $(this).val();
-            const text = $(this).text();
-            if (val !== '0') {
-                puestosMap.set(val, text);
-            }
-            if (puestosYaAgregados.includes(val)) {
-                $(this).hide();
-            } else {
-                $(this).show();
-            }
-        });
-
-        setTimeout(() => {
+            $('#modalIdPuesto option').each(function () {
+                const val = $(this).val();
+                const text = $(this).text();
+                if (val !== '0') puestosMap.set(val, text);
+                $(this).toggle(!puestosYaAgregados.includes(val));
+            });
             $('#modalIdPuesto').val('0');
-        }, 10);
+        });
     }
 
     function reconstruirMiembrosUI(miembros) {
@@ -154,10 +150,7 @@
         miembros.forEach(m => {
             const nombreAsociado = asociadosMap.get(m.IdAsociado?.toString()) || `(Asociado ${m.IdAsociado})`;
             const nombrePuesto = puestosMap.get(m.IdPuesto?.toString()) || `(Puesto ${m.IdPuesto})`;
-
-            const botones = (modoVista === 'Create') ? `
-                <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
-            ` : '';
+            const botones = (modoVista === 'Create') ? `<td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>` : '';
             $('#detailsTableMiembros tbody').append(`
                 <tr data-id-asociado="${m.IdAsociado}" data-id-puesto="${m.IdPuesto}">
                     <td>${nombreAsociado}</td>
@@ -167,19 +160,35 @@
         });
     }
 
-    if (idAsociacion && parseInt(idAsociacion) > 0) {
+    function manejarCargaModal(asociacionId) {
         $('#detailModalMiembrosJunta').off('show.bs.modal').on('show.bs.modal', function () {
-            prepararModalMiembro(idAsociacion);
+            prepararModalMiembro(asociacionId);
         });
+    }
+
+    if (idAsociacion && parseInt(idAsociacion) > 0) {
+        manejarCargaModal(idAsociacion);
     } else {
         $('#IdAsociacion').change(function () {
             const nuevaAsociacion = $(this).val();
             $('#detailsTableMiembros tbody').empty();
+
             if (!nuevaAsociacion) return;
-            $('#detailModalMiembrosJunta').off('show.bs.modal').on('show.bs.modal', function () {
-                prepararModalMiembro(nuevaAsociacion);
+
+            // Validación inmediata al cambiar la asociación
+            fetchDropdownData(rutasJuntaDirectiva.obtenerAsociados, { idAsociacion: nuevaAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
+                if (!data || data.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin asociados',
+                        text: 'No hay asociados disponibles para esta asociación.'
+                    });
+                }
             });
+
+            manejarCargaModal(nuevaAsociacion); // esto prepara el modal para uso posterior
         });
+
     }
 
     $('#addMiembroBtn').on('click', function () {

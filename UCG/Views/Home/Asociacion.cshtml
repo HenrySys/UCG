@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <link rel="stylesheet" href="~/css/Asociacion.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- Espacio en blanco de 30rem -->
+    <div class="spacer"></div>
+
+    <div class="cards-container">
+        <!-- Clientes -->
+        <a class="card" asp-area="" asp-controller="TbClientes" asp-action="Index">
+            <i class='bx bx-user-pin'></i>
+            <h3>Clientes</h3>
+            <p>Gestión de información de clientes</p>
+        </a>
+
+        <!-- Junta directiva -->
+        <a class="card" asp-area="" asp-controller="TbJuntaDirectivas" asp-action="Index">
+            <i class='bx bx-user-pin'></i>
+            <h3>Junta Directiva</h3>
+            <p>Gestión de Junta Directiva</p>
+        </a>
+
+        <!-- Junta directiva -->
+        <a class="card" asp-area="" asp-controller="TbMiembroJuntaDirectivas" asp-action="Index">
+            <i class='bx bx-user-pin'></i>
+            <h3>Miembros de Junta Directiva</h3>
+            <p>Gestión de Miembros de Junta Directiva</p>
+        </a>
+
+        <!-- Categoría Movimiento -->
+        @* <a class="card" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">
+            <i class='bx bx-category'></i>
+            <h3>Categoría Movimiento</h3>
+            <p>Administración de categorías</p>
+        </a> *@
+
+        <!-- Concepto Movimiento -->
+        <a class="card" asp-area="" asp-controller="TbConceptoMovimientoes" asp-action="Index">
+            <i class='bx bx-list-check'></i>
+            <h3>Concepto Movimiento</h3>
+            <p>Control de conceptos</p>
+        </a>
+
+        <!-- Proveedor -->
+        <a class="card" asp-area="" asp-controller="TbProveedors" asp-action="Index">
+            <i class='bx bx-store'></i>
+            <h3>Proveedor</h3>
+            <p>Gestión de proveedores</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbActividads" asp-action="Index">
+            <i class='bx bx-category'></i>
+            <h3>Actividad</h3>
+            <p>Administración de Actividades</p>
+        </a>
+
+        <!-- Asociado -->
+        <a class="card" asp-area="" asp-controller="TbAsociadoes" asp-action="Index">
+            <i class='bx bx-group'></i>
+            <h3>Asociado</h3>
+            <p>Administración de asociados</p>
+        </a>
+
+        <!-- Concepto Asociacion -->
+        <a class="card" asp-area="" asp-controller="TbConceptoAsociacions" asp-action="Index">
+            <i class='bx bx-group'></i>
+            <h3>Concepto Asociacion</h3>
+            <p>Administración de concepto de Asociacion</p>
+        </a>
+
+
+
+        <!-- Cuenta -->
+        <a class="card" asp-area="" asp-controller="TbCuentums" asp-action="Index">
+            <i class='bx bx-wallet'></i>
+            <h3>Cuenta</h3>
+            <p>Gestión de cuentas</p>
+        </a>
+
+        <!-- Proyecto -->
+        @* <a class="card" asp-area="" asp-controller="TbProyectoes" asp-action="Index">
+            <i class='bx bx-briefcase'></i>
+            <h3>Proyecto</h3>
+            <p>Administración de proyectos</p>
+        </a> *@
+
+        <!-- Detalle Movimiento -->
+       @*  <a class="card" asp-area="" asp-controller="TbDetalleMovimientoes" asp-action="Index">
+            <i class='bx bx-detail'></i>
+            <h3>Detalle Movimiento</h3>
+            <p>Control de detalles</p>
+        </a> *@
+
+        <!-- Acta -->
+        
+        <a class="card" asp-area="" asp-controller="TbFolios" asp-action="Index">
+            <i class='bx bx-file'></i>
+            <h3>Folio</h3>
+            <p>Gestión de Folios</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbActums" asp-action="Index">
+            <i class='bx bx-file'></i>
+            <h3>Acta</h3>
+            <p>Gestión de actas</p>
+        </a>
+
+        <!-- Acta Asistencia -->
+        <a class="card" asp-area="" asp-controller="TbActaAsistenciums" asp-action="Index">
+            <i class='bx bx-calendar-check'></i>
+            <h3>Acta Asistencia</h3>
+            <p>Control de asistencias</p>
+        </a>
+
+        <!-- Acuerdo -->
+        <a class="card" asp-area="" asp-controller="TbAcuerdoes" asp-action="Index">
+            <i class='bx bx-check-shield'></i>
+            <h3>Acuerdo</h3>
+            <p>Administración de acuerdos</p>
+        </a>
+
+        <!-- Movimientos -->
+        <a class="card" asp-area="" asp-controller="TbMovimientoEgresos" asp-action="Index">
+            <i class='bx bx-transfer'></i>
+            <h3>Movimientos Egresos</h3>
+            <p>Control de Egresos</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbMovimientoIngresos" asp-action="Index">
+            <i class='bx bx-transfer'></i>
+            <h3>Movimientos Ingresos</h3>
+            <p>Control de Ingresos</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbFacturas" asp-action="Index">
+            <i class='bx bx-file'></i>
+            <h3>Factura</h3>
+            <p>Gestión de Facturas</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbCheques" asp-action="Index">
+            <i class='bx bx-wallet'></i>
+            <h3>Cheque</h3>
+            <p>Gestión de Cheques</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbDetalleChequeFacturas" asp-action="Index">
+            <i class='bx bx-wallet'></i>
+            <h3>Cheque-Facturas</h3>
+            <p>Gestión de Detalle Cheques-Facturas</p>
+        </a>
+
+        <a class="card" asp-area="" asp-controller="TbDocumentoIngresoes" asp-action="Index">
+            <i class='bx bx-file'></i>
+            <h3>Documento Ingresos</h3>
+            <p>Gestión de Documentos de Ingresos</p>
+        </a>
+
+        <!-- Puestos -->
+        <a class="card" asp-area="" asp-controller="TbPuestoes" asp-action="Index">
+            <i class='bx bx-transfer'></i>
+            <h3>Puestos</h3>
+            <p>Control de Puestos</p>
+        </a>
+
+        
+		<a class="card" asp-area="" asp-controller="TbColaboradors" asp-action="Index">
+            <i class='bx bx-group'></i>
+            <h3>Colaboradores</h3>
+            <p>Control de Colaboradores</p>
+		</a>
+
+        <a class="card" asp-area="" asp-controller="TbFinancistums" asp-action="Index">
+            <i class='bx bx-group'></i>
+            <h3>Financistas</h3>
+            <p>Control de Financistas</p>
+        </a>
+		
+
+        <!-- PDF -->
+       
+
+        <a class="card btn-download" asp-area="" asp-controller="AsociadoPdf" asp-action="Index">
+            <i class='bx bxs-cloud-download'></i>
+            <h3>Generar Asociados PDF</h3>
+            <p>Exportar información</p>
+        </a>
+        <a class="card btn-download" asp-area="" asp-controller="InformeEconomicoPdf" asp-action="Index">
+            <i class='bx bxs-cloud-download'></i>
+            <h3>Generar Informe Economico PDF</h3>
+            <p>Exportar información</p>
+        </a>
+    </div>
+    <div class="spacer"></div>
+</body>
+</html>

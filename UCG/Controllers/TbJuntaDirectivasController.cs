@@ -275,7 +275,6 @@ namespace UCG.Controllers
         }
 
         [HttpGet]
-
         public JsonResult ObtenerActaPorAsociacion(int idAsociacion)
         {
             try
@@ -297,43 +296,74 @@ namespace UCG.Controllers
             }
         }
 
-		[HttpGet]
-		public async Task<IActionResult> Edit(int id)
-		{
-			var junta = await _context.TbJuntaDirectivas
-				.Include(j => j.TbMiembroJuntaDirectivas)
-				.FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
 
-			if (junta is null)
-				return NotFound();
+        private async Task<bool> ParseFechasPeriodoAsync(JuntaDirectivaViewModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.FechaPeriodoInicioTexto))
+            {
+                if (!DateOnly.TryParseExact(model.FechaPeriodoInicioTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var inicio))
+                    return false;
 
-			var model = new JuntaDirectivaViewModel
-			{
-				IdJuntaDirectiva = junta.IdJuntaDirectiva,
-				IdAsociacion = junta.IdAsociacion,
-				IdActa = junta.IdActa,
-				Nombre = junta.Nombre,
-				Estado = junta.Estado,
-				PeriodoInicio = junta.PeriodoInicio ?? default,
-				PeriodoFin = junta.PeriodoFin ?? default,
-				FechaPeriodoInicioTexto = (junta.PeriodoInicio ?? default).ToString("yyyy-MM-dd"),
-				FechaPeriodoFinTexto = (junta.PeriodoFin ?? default).ToString("yyyy-MM-dd"),
-				MiembroJunta = junta.TbMiembroJuntaDirectivas.Select(m => new MiembroJuntaDirectivaViewModel
-				{
-					IdAsociado = m.IdAsociado,
-					IdPuesto = m.IdPuesto,
-                    Estado = m.Estado,
-				}).ToList()
-			};
+                model.PeriodoInicio = inicio;
+            }
 
-			model.MiembrosJuntaJson = JsonConvert.SerializeObject(model.MiembroJunta ?? new());
-			await PrepararViewDataAsync(model);
-			return View("Create", model);
-		}
+            if (!string.IsNullOrWhiteSpace(model.FechaPeriodoFinTexto))
+            {
+                if (!DateOnly.TryParseExact(model.FechaPeriodoFinTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fin))
+                    return false;
+
+                model.PeriodoFin = fin;
+            }
+
+            return true;
+        }
+
+        private JuntaDirectivaViewModel MapearJuntaDirectivaViewModel(TbJuntaDirectiva junta)
+        {
+            return new JuntaDirectivaViewModel
+            {
+                IdJuntaDirectiva = junta.IdJuntaDirectiva,
+                IdAsociacion = junta.IdAsociacion,
+                IdActa = junta.IdActa,
+                Nombre = junta.Nombre,
+                Estado = junta.Estado,
+                PeriodoInicio = junta.PeriodoInicio ?? default,
+                PeriodoFin = junta.PeriodoFin ?? default,
+                FechaPeriodoInicioTexto = (junta.PeriodoInicio ?? default).ToString("yyyy-MM-dd"),
+                FechaPeriodoFinTexto = (junta.PeriodoFin ?? default).ToString("yyyy-MM-dd"),
+                MiembroJunta = junta.TbMiembroJuntaDirectivas.Select(m => new MiembroJuntaDirectivaViewModel
+                {
+                    IdAsociado = m.IdAsociado,
+                    IdPuesto = m.IdPuesto,
+                    Estado = m.Estado
+                }).ToList()
+            };
+        }
 
 
 
-		[HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var junta = await _context.TbJuntaDirectivas
+                .Include(j => j.TbMiembroJuntaDirectivas)
+                .FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
+
+            if (junta is null)
+                return NotFound();
+
+            var model = MapearJuntaDirectivaViewModel(junta);
+
+            model.MiembrosJuntaJson = JsonConvert.SerializeObject(model.MiembroJunta ?? new());
+
+            await PrepararViewDataAsync(model);
+            return View(model);
+        }
+
+
+
+
+        [HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(int id, JuntaDirectivaViewModel model)
 		{
@@ -344,20 +374,17 @@ namespace UCG.Controllers
 			{
 				TempData["ErrorMessage"] = "Error en los datos de miembros.";
 				await PrepararViewDataAsync(model);
-				return View("Create", model);
+				return View(model);
 			}
 
-			try
-			{
-				if (DateOnly.TryParseExact(model.FechaPeriodoInicioTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var inicio))
-					model.PeriodoInicio = inicio;
+            if (!await ParseFechasPeriodoAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en el formato de fechas. Debe ser yyyy-MM-dd.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
 
-				if (DateOnly.TryParseExact(model.FechaPeriodoFinTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fin))
-					model.PeriodoFin = fin;
-			}
-			catch { }
-
-			var validator = new JuntaDirectivaViewModelValidator(_context);
+            var validator = new JuntaDirectivaViewModelValidator(_context);
 			var validationResult = await validator.ValidateAsync(model);
 
 			foreach (var error in validationResult.Errors)
@@ -367,7 +394,7 @@ namespace UCG.Controllers
 			{
 				TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
 				await PrepararViewDataAsync(model);
-				return View("Create", model);
+				return View(model);
 			}
 
 			using var transaction = await _context.Database.BeginTransactionAsync();
@@ -403,7 +430,7 @@ namespace UCG.Controllers
 				await transaction.RollbackAsync();
 				TempData["ErrorMessage"] = "Error al actualizar la junta directiva: " + ex.Message;
 				await PrepararViewDataAsync(model);
-				return View("Create", model);
+				return View(model);
 			}
 		}
 

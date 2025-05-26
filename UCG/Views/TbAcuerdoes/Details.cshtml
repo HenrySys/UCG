@@ -14,24 +14,25 @@
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-4 mb-3">Número del Acuerdo</dt>
-                    <dd class="col-sm-8 mb-3">@Model.NumeroAcuerdo</dd>
-
-                    <dt class="col-sm-4 mb-3">Nombre</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
-
-                    <dt class="col-sm-4 mb-3">Descripción</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
-
-                    <dt class="col-sm-4 mb-3">Monto del Acuerdo</dt>
-                    <dd class="col-sm-8 mb-3">@Model.MontoAcuerdo</dd>
-
                     <dt class="col-sm-4 mb-3">Número de Acta</dt>
                     <dd class="col-sm-8 mb-3">
                         <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation?.IdActa">
                             @Model.IdActaNavigation?.NumeroActa
                         </a>
                     </dd>
+
+                    <dt class="col-sm-4 mb-3">Número del Acuerdo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.NumeroAcuerdo</dd>
+
+                    <dt class="col-sm-4 mb-3">Tipo de Acuerdo</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Tipo</dd>
+
+                    <dt class="col-sm-4 mb-3">Nombre</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4 mb-3">Descripción</dt>
+                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
+ 
                 </dl>
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Edit" asp-route-id="@Model?.IdAcuerdo" class="btn btn-warning">Editar</a>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,6 +16,8 @@ namespace UCG.Controllers
    {
        private readonly UcgdbContext _context;
        private readonly HashingService _hashingService;
+       private string rol => User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
 
        public TbUsuariosController(UcgdbContext context, HashingService hashingService )
        {
@@ -25,7 +28,17 @@ namespace UCG.Controllers
        // GET: TbUsuarios
        public async Task<IActionResult> Index()
        {
+        IQueryable<TbUsuario> filtroAsociacion = _context.TbUsuarios.Include(t => t.IdAsociacionNavigation);
         try{
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                    if (int.TryParse(idAsociacionClaim, out int idAsociacion))
+                    {
+                        filtroAsociacion = filtroAsociacion.Where(c => c.IdAsociacion == idAsociacion);
+                        return View(await filtroAsociacion.ToListAsync());
+                    }
+            }
              return _context.TbUsuarios != null ? 
                         View(await _context.TbUsuarios.ToListAsync()) :
                         Problem("Entity set 'UcgdbContext.TbUsuarios'  is null.");
@@ -62,7 +75,34 @@ namespace UCG.Controllers
        // GET: TbUsuarios/Create
        public IActionResult Create()
        {
-           return View();
+        var model = new UsuarioViewModel();
+
+            if (rol == "Admin")
+            {
+                var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
+                bool tieneAsociacion = int.TryParse(idAsociacionClaim, out int idAsociacion);
+
+                // Obtener el nombre de la asociación desde la base de datos
+                var Nombre = _context.TbAsociacions
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.Nombre)
+                .FirstOrDefault();
+
+                // Se mantiene seleccionable el usuario
+                ViewBag.IdAsociacion = idAsociacion;
+                ViewBag.Nombre = Nombre;
+                ViewBag.EsAdmin = true;
+                model.IdAsociacion = idAsociacion;
+
+                return View(model);
+            }
+            else
+            {
+                ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
+
+                ViewBag.EsAdmin = false;
+                return View();
+            }
        }
 
        // POST: TbUsuarios/Create
