@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using UCG.Models;
 using UCG.Models.ValidationModels;
 using UCG.Models.ViewModels;
@@ -63,15 +64,22 @@ namespace UCG.Controllers
         public async Task<IActionResult> Create(MovimientoEgresoViewModel model)
         {
             // 1. Parsear y validar la fecha
-            var fechaValida = await ParseFechaEmisionAsync(model);
-
-            if (!fechaValida)
+            if (!await ParseFechaEmisionAsync(model))
             {
+                TempData["ErrorMessage"] = "Debe ingresar una fecha válida de egreso.";
                 await ConfigurarAsociacionMovimientoEgresoAsync(model);
                 return View(model);
             }
 
-            // 2. Validar con FluentValidation si lo estás usando
+            // 2. Deserializar JSON de detalles
+            if (!await DeserializarJsonAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en los detalles de cheques y facturas.";
+                await ConfigurarAsociacionMovimientoEgresoAsync(model);
+                return View(model);
+            }
+
+            // 3. Validar con FluentValidation
             var validator = new MovimientoEgresoViewModelValidator(_context);
             var validationResult = await validator.ValidateAsync(model);
 
@@ -85,27 +93,33 @@ namespace UCG.Controllers
                 return View(model);
             }
 
-            // 3. Guardar en transacción
+            // 4. Crear la transacción
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // 5. Mapear y guardar el movimiento
                 var egreso = MapearMovimientoEgreso(model);
                 _context.TbMovimientoEgresos.Add(egreso);
                 await _context.SaveChangesAsync();
 
-                await transaction.CommitAsync();
+                // 6. Guardar los detalles de cheque/factura
+                await GuardarDetallesChequeFacturasAsync(model.DetalleChequeFacturaEgreso, egreso.IdMovimientoEgreso);
+                await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "El movimiento de egreso fue registrado correctamente.";
+                // 7. Confirmar
+                await transaction.CommitAsync();
+                TempData["SuccessMessage"] = "El movimiento de egreso fue creado exitosamente.";
                 return RedirectToAction(nameof(Create));
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Error al guardar el movimiento: " + ex.Message;
+                TempData["ErrorMessage"] = "Error al guardar el movimiento de egreso: " + ex.Message;
                 await ConfigurarAsociacionMovimientoEgresoAsync(model);
                 return View(model);
             }
         }
+
 
 
         private async Task<bool> ParseFechaEmisionAsync(MovimientoEgresoViewModel model)
@@ -143,6 +157,42 @@ namespace UCG.Controllers
                 Descripcion = viewModel.Descripcion,
                 Fecha = viewModel.Fecha
             };
+        }
+
+        private async Task<bool> DeserializarJsonAsync(MovimientoEgresoViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.DetalleChequeFacturaEgresoJason))
+                    model.DetalleChequeFacturaEgreso = JsonConvert.DeserializeObject<List<DetalleChequeFacturaViewModel>>(model.DetalleChequeFacturaEgresoJason);
+
+               
+                model.DetalleChequeFacturaEgreso ??= new();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al deserializar los datos: " + ex.Message;
+                return false;
+            }
+        }
+
+        private async Task GuardarDetallesChequeFacturasAsync(List<DetalleChequeFacturaViewModel> chequeFacturas, int IdMovimientoEgreso)
+        {
+            foreach (var chequeFactura in chequeFacturas)
+            {
+                _context.TbDetalleChequeFacturas.Add(new TbDetalleChequeFactura
+                {
+                    IdMovimientoEgreso = IdMovimientoEgreso,
+                    IdAcuerdo = chequeFactura.IdAcuerdo,
+                    IdCheque = chequeFactura.IdCheque,
+                    IdFactura = chequeFactura.IdFactura,
+                    Monto = chequeFactura.Monto,
+                    Observacion = chequeFactura.Observacion
+
+                });
+                
+            }
         }
 
 
@@ -215,22 +265,66 @@ namespace UCG.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult ObtenerFacturasPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var facturas = _context.TbFacturas
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!facturas.Any())
+                {
+                    return Json(new { success = false, message = "No hay facturas disponibles." });
+                }
+
+                return Json(new { success = true, data = facturas });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los facturas: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerChequesPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var cheques = _context.TbCheques
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!cheques.Any())
+                {
+                    return Json(new { success = false, message = "No hay cheques disponibles." });
+                }
+
+                return Json(new { success = true, data = cheques });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los cheques: " + ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public JsonResult ObtenerActasPorAsociacion(int idAsociacion)
         {
             try
             {
-                var asociados = _context.TbActa
+                var actas = _context.TbActa
                     .Where(c => c.IdAsociacion == idAsociacion)
                     .ToList();
 
-                if (!asociados.Any())
+                if (!actas.Any())
                 {
                     return Json(new { success = false, message = "No hay actas disponibles." });
                 }
 
-                return Json(new { success = true, data = asociados });
+                return Json(new { success = true, data = actas });
             }
             catch (Exception ex)
             {
@@ -244,16 +338,16 @@ namespace UCG.Controllers
         {
             try
             {
-                var asociados = _context.TbAcuerdos
+                var acuerdos = _context.TbAcuerdos
                     .Where(c => c.IdActa == idActa)
                     .ToList();
 
-                if (!asociados.Any())
+                if (!acuerdos.Any())
                 {
                     return Json(new { success = false, message = "No hay acuerdos disponibles." });
                 }
 
-                return Json(new { success = true, data = asociados });
+                return Json(new { success = true, data = acuerdos });
             }
             catch (Exception ex)
             {

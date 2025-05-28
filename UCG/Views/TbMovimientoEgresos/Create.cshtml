@@ -173,7 +173,7 @@
 
 
             <div class="modal-footer">
-                <button type="button" id="addDetailAsistenciaBtn" class="btn btn-success">Agregar</button>
+                <button type="button" id="addDetailEgresoBtn" class="btn btn-success">Agregar</button>
             </div>
         </div>
     </div>
@@ -192,6 +192,9 @@
             obtenerActas: '@Url.Action("ObtenerActasPorAsociacion", "TbMovimientoEgresos")',
             obtenerAcuerdos: '@Url.Action("ObtenerAcuerdosPorActas", "TbMovimientoEgresos")',
             obtenerCheques: '@Url.Action("ObtenerChequesPorAsociacion", "TbMovimientoEgresos")',
+            obtenerFacturas: '@Url.Action("ObtenerFacturasPorAsociacion", "TbMovimientoEgresos")',
+
+
         };
     </script>
 
@@ -199,5 +202,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="~/js/FacturaScripts/FacturaFormHandler.js"></script>
-}}
 }
+

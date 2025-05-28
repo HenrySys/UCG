@@ -1,81 +1,110 @@
-﻿@model IEnumerable<UCG.Models.TbMovimientoEgreso>
+﻿
+@model IEnumerable<UCG.Models.TbMovimientoEgreso>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Movimientos de Egreso";
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<div class="table-responsive">
-    <table id="miTabla" class="table table-striped table-hover display ">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Monto)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Fecha)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Descripcion)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdActaNavigation)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-                </th>
+<head>
+    <!-- DataTables CSS con Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- Box Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Tu CSS personalizado -->
+    <link rel="stylesheet" href="~/css/Tables.css">
+</head>
+
+
+<div class="table-container">
+    <!-- Encabezado y botón Create -->
+    <div class="table-header center-header">
+        <div style="width: 100%; text-align: center;">
+            <h1 class="table-title" style="margin-bottom: 15px;">Movimientos de Egreso</h1>
+            <div class="table-actions">
+
+                <a asp-controller="Home" asp-action="Asociacion" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </a>
+
+                <a asp-action="Create" class="btn btn-create">
+                    <i class='bx bx-plus'></i> Crear Movimiento Egreso
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="miTabla" class="universal-table display compact">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Monto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fecha)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdActaNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
+            </th>
            
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Monto)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Fecha)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Descripcion)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
-                </td>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Monto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fecha)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+            </td>
 
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.IdMovimientoEgreso">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.IdMovimientoEgreso">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.IdMovimientoEgreso">Delete</a>
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
+                    <td class="action-links text-end">
+                        <a asp-action="Edit" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+
+                        <a asp-action="Details" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Detalles">
+                            <i class='bx bxs-detail'></i>
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-create" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
 </div>
-
-<!-- DataTables CSS con Bootstrap -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 @section Scripts {
     @{
         <!-- Tu script separado -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>

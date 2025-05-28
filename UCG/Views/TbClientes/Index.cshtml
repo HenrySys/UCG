@@ -1,16 +1,40 @@
-﻿@model IEnumerable<UCG.Models.TbCliente>
+﻿
+
+@model IEnumerable<UCG.Models.TbCliente>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Clientes";
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<div clss="table-responsive"></div>
-<table id="miTabla" class="table table-striped table-hover display ">
+<head>
+    <!-- DataTables CSS con Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- Box Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Tu CSS personalizado -->
+    <link rel="stylesheet" href="~/css/Tables.css">
+</head>
+
+<div class="table-container">
+    <!-- Encabezado y botón Create -->
+    <div class="table-header center-header">
+        <div style="width: 100%; text-align: center;">
+            <h1 class="table-title" style="margin-bottom: 15px;">Clientes</h1>
+            <div class="table-actions">
+
+                <a asp-controller="Home" asp-action="Asociacion" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </a>
+
+                <a asp-action="Create" class="btn btn-create">
+                    <i class='bx bx-plus'></i> Crear Nuevo Cliente
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="miTabla" class="universal-table display compact">
     <thead>
         <tr>
             <th>
@@ -73,26 +97,33 @@
             <td>
                 @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.IdAsociacion)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdCliente">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdCliente">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdCliente">Delete</a>
+                    <td class="action-links text-end">
+                        <a asp-action="Edit" asp-route-id="@item.IdCliente" class="btn btn-secondary" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+
+                        <a asp-action="Details" asp-route-id="@item.IdCliente" class="btn btn-secondary" title="Detalles">
+                            <i class='bx bxs-detail'></i>
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@item.IdCliente" class="btn btn-create" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
             </td>
         </tr>
 }
     </tbody>
 </table>
-<!-- DataTables CSS con Bootstrap -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+</div>
 
 @section Scripts {
     @{
         <!-- Tu script separado -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
         <script src="~/js/ClienteScripts/ClienteIndex.js"></script>
     }
 }

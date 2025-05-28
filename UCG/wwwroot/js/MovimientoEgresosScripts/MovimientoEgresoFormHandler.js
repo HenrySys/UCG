@@ -41,6 +41,11 @@
         });
     }
 
+    function limpiarErrores() {
+        $('.text-danger.mt-1').remove();
+        $('.is-invalid').removeClass('is-invalid');
+    }
+
     function cerrarModalConMensaje(modalSelector, mensaje, icono = 'info') {
         Swal.fire({
             icon: icono,
@@ -85,6 +90,79 @@
             data.forEach(item => {
                 dropdown.append(`<option value="${item.idFolio}">${item.numeroFolio}</option>`);
             });
+        });
+    }
+
+    function cargarAcuerdos(idAsociacion) {
+        fetchDropdownData(rutasMovimiento.obtenerAcuerdos, { idAsociacion }, '#modalIdAcuerdo', 'Seleccione un acuerdo', function (data, dropdown) {
+            data.forEach(item => {
+                dropdown.append(`<option value="${item.idAcuerdo}">${item.descripcion}</option>`);
+            });
+        });
+    }
+
+    function cargarFacturas(idAsociacion) {
+        const facturasYaAgregadas = $('#detailsTableEgreso tbody tr').map(function () {
+            return $(this).find('td:eq(1)').text().trim(); 
+        }).get();
+        fetchDropdownData(rutasMovimiento.obtenerFacturas, { idAsociacion }, '#modalIdFactura', 'Seleccione una factura', function (data, dropdown) {
+            let disponibles = 0;
+            data.forEach(item => {
+                if (!facturasYaAgregadas.includes(item.numeroFactura)) {
+                    dropdown.append(`<option value="${item.idFactura}">${item.numeroFactura}</option>`);
+                    disponibles++;
+                }
+            });
+
+            if (disponibles === 0) {
+                cerrarModalConMensaje('#detailModalEgreso', {
+                    titulo: 'Facturas agotadas',
+                    texto: 'Todas las facturas ya han sido agregadas.'
+                });
+            }
+        });
+    }
+
+    function cargarCheques(idAsociacion) {
+        fetchDropdownData(rutasMovimiento.obtenerCheques, { idAsociacion }, '#modalIdCheque', 'Seleccione un cheque', function (data, dropdown) {
+            data.forEach(item => {
+                dropdown.append(`<option value="${item.idCheque}">${item.numeroCheque}</option>`);
+            });
+        });
+    }
+
+    function recolectarDetalleChequeFactura() {
+        const detalles = [];
+        const filas = $('#detailsTableEgreso tbody tr');
+
+        filas.each(function () {
+            const idCheque = parseInt($(this).find('td:eq(0)').attr('data-id'), 10); 
+            const idFactura = parseInt($(this).find('td:eq(1)').attr('data-id'), 10); 
+            const monto = parseFloat($(this).find('td:eq(2)').text().trim());
+
+            detalles.push({
+                IdCheque: idCheque,
+                IdFactura: idFactura,
+                Monto: monto
+            });
+        });
+
+        return detalles;
+    }
+
+    function configurarModalEgresos(idAsociacion) {
+        $('#detailModalEgreso').off('show.bs.modal').on('show.bs.modal', function () {
+            limpiarErrores(); 
+
+            // Cargar acuerdos (sin cambios)
+            cargarAcuerdos(idAsociacion);
+
+            // Cargar cheques (sin cambios)
+            cargarCheques(idAsociacion);
+
+            // Cargar facturas evitando duplicadas
+            cargarFacturas(idAsociacion);
+            
         });
     }
 

@@ -276,7 +276,6 @@
         const nombre = $('#nombreAcuerdo').val().trim();
         const tipo = $('#tipoAcuerdo').val();
         const tipoTexto = $('#tipoAcuerdo option:selected').text();
-        const descripcionHtml = $('#summernoteAcuerdo').summernote('code');
         const descripcionTextoPlano = $('<div>').html($('#summernoteAcuerdo').summernote('code')).text().trim();
 
         let hayError = false;
