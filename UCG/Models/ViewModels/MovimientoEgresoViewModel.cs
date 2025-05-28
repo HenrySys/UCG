@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models.ViewModels
 {
@@ -24,6 +25,9 @@ namespace UCG.Models.ViewModels
 
         [Display(Name = "Descripcion")]
         public string? Descripcion { get; set; }
+
+        [BindNever]
+        public DateOnly Fecha { get; set; }
 
         public string DetalleChequeFacturaEgresoJason { get; set; } = null!;
 
