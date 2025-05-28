@@ -9,6 +9,11 @@
 <h1 class="text-center mb-4">Crear Concepto de Movimiento</h1>
 <hr />
 
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <div class="card shadow">
@@ -29,6 +34,27 @@
                             </select>
                             <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
                         </dd>
+
+                        
+                        <dt class="col-sm-4 mb-3" id="labelGrupoIngreso">
+                            <label asp-for="TipoOrigenIngreso" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3" id="grupoIngreso">
+                            <select asp-for="TipoOrigenIngreso" asp-items="Html.GetEnumSelectList<TipoDeOrigenIngreso>()" class="form-select">
+                            </select>
+                            <span asp-validation-for="TipoOrigenIngreso" class="text-danger"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 mb-3" id="labelGrupoEgreso">
+                            <label asp-for="TipoEmisorEgreso" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3" id="grupoEgreso">
+                            <select asp-for="TipoEmisorEgreso" asp-items="Html.GetEnumSelectList<TipoDeOrigenEgreso>()" class="form-select">
+                            </select>
+                            <span asp-validation-for="TipoEmisorEgreso" class="text-danger"></span>
+                        </dd>
+
+
 
                         <dt class="col-sm-4 mb-3">
                             <label asp-for="Concepto" class="form-label"></label>
@@ -53,4 +79,9 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+    <script src="~/js/ConceptoMovimientoScripts/ConceptoMovimientoFormHandler.js"></script>
 }

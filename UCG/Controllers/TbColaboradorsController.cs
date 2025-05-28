@@ -58,6 +58,7 @@ namespace UCG.Controllers
 
             var tbColaborador = await _context.TbColaboradors
                 .Include(t => t.IdAsociacionNavigation)
+                .Include(c => c.TbFacturas)
                 .FirstOrDefaultAsync(m => m.IdColaborador == id);
             if (tbColaborador == null)
             {

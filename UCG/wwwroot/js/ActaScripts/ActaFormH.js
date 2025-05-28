@@ -18,8 +18,28 @@
         Swal.fire({ icon: 'error', title: 'Error', text: errorMessage, confirmButtonText: 'Aceptar' });
     }
 
+    let colaErroresSwal = [];
+    let swalMostrandose = false;
+
     function mostrarErrorSwal(titulo, mensaje) {
-        Swal.fire({ icon: 'warning', title: titulo, text: mensaje });
+        colaErroresSwal.push({ titulo, mensaje });
+        procesarColaSwal();
+    }
+
+    function procesarColaSwal() {
+        if (swalMostrandose || colaErroresSwal.length === 0) return;
+
+        swalMostrandose = true;
+        const { titulo, mensaje } = colaErroresSwal.shift();
+
+        Swal.fire({
+            icon: 'warning',
+            title: titulo,
+            text: mensaje
+        }).then(() => {
+            swalMostrandose = false;
+            procesarColaSwal(); // Mostrar el siguiente si existe
+        });
     }
 
     function cerrarModalConMensaje(modalSelector, mensaje, icono = 'info') {
@@ -183,12 +203,28 @@
         return acuerdos;
     }
 
+    // Actualizar el número de acta al cambiar el folio o la fecha de sesión
+    function actualizarNumeroActa() {
+        var folioId = $('#IdFolio').val();
+        var fechaSesion = $('#FechaSesionTexto').val();
+
+        if (folioId && fechaSesion) {
+            $.get('/TbActums/ObtenerNumeroActa', { idFolio: folioId, fecha: fechaSesion }, function (data) {
+                if (data.numeroActa) {
+                    $('#NumeroActa').val(data.numeroActa);
+                }
+            });
+        }
+    }
+
     if (modoVista === 'Create' && idAsociacion && parseInt(idAsociacion) > 0) {
         cargarAsociados(idAsociacion);
         configurarModalAsistencia(idAsociacion);
         cargarFolios(idAsociacion);
     }
 
+    // Actualizar el número de acta al cargar la página
+    $('#IdFolio, #FechaSesionTexto').change(actualizarNumeroActa);
 
     $('#IdAsociacion').change(function () {
         const nuevaAsociacion = $(this).val();
@@ -362,4 +398,8 @@
             $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
         }
     });
+
+    
+        
+    
 });

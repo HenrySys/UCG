@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
-
+using UCG.Models.ValidationModels;
 
 namespace UCG.Controllers
 {
@@ -20,159 +18,171 @@ namespace UCG.Controllers
             _context = context;
         }
 
-        // GET: TbConceptoMovimientoes
-
         public async Task<IActionResult> Index()
         {
-            return _context.TbConceptoMovimientos != null ?
-                        View(await _context.TbConceptoMovimientos.ToListAsync()) :
-                        Problem("Entity set 'UcgdbContext.TbConceptoMovimientos'  is null.");
+            var conceptos = await _context.TbConceptoMovimientos.ToListAsync();
+            return View(conceptos);
         }
 
-        // GET: TbConceptoMovimientoes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TbConceptoMovimientos == null)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
-            var tbConceptoMovimiento = await _context.TbConceptoMovimientos
-                .FirstOrDefaultAsync(m => m.IdConceptoMovimiento == id);
-            if (tbConceptoMovimiento == null)
-            {
+            var concepto = await _context.TbConceptoMovimientos
+                .FirstOrDefaultAsync(c => c.IdConceptoMovimiento == id);
+
+            if (concepto == null)
                 return NotFound();
-            }
 
-            return View(tbConceptoMovimiento);
+            return View(concepto);
         }
 
-        // GET: TbConceptoMovimientoes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TbConceptoMovimientoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdConceptoMovimiento,TipoMovimiento,Concepto")] ConceptoMovimientoViewModel model)
+        public async Task<IActionResult> Create(ConceptoMovimientoViewModel model)
         {
-            if (ModelState.IsValid)
+            var validator = new ConceptoViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                var concepto = new TbConceptoMovimiento()
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var entidad = new TbConceptoMovimiento
                 {
                     TipoMovimiento = model.TipoMovimiento,
-                    Concepto = model.Concepto
-
+                    Concepto = model.Concepto,
+                    TipoOrigenIngreso = model.TipoMovimiento == TbConceptoMovimiento.TiposDeConceptoMovimientos.Ingreso ? model.TipoOrigenIngreso : null,
+                    TipoEmisorEgreso = model.TipoMovimiento == TbConceptoMovimiento.TiposDeConceptoMovimientos.Egreso ? model.TipoEmisorEgreso : null
                 };
 
-                _context.Add(concepto);
+                _context.Add(entidad);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Concepto creado correctamente.";
+                return RedirectToAction(nameof(Create));
             }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al guardar el concepto.";
+                return View(model);
+            }
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var entidad = await _context.TbConceptoMovimientos.FindAsync(id);
+            if (entidad == null)
+                return NotFound();
+
+            var model = new ConceptoMovimientoViewModel
+            {
+                IdConceptoMovimiento = entidad.IdConceptoMovimiento,
+                TipoMovimiento = entidad.TipoMovimiento,
+                Concepto = entidad.Concepto,
+                TipoOrigenIngreso = entidad.TipoOrigenIngreso,
+                TipoEmisorEgreso = entidad.TipoEmisorEgreso
+            };
+
             return View(model);
         }
 
-
-        // GET: TbConceptoMovimientoes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.TbConceptoMovimientos == null)
-            {
-                return NotFound();
-            }
-
-            var tbConceptoMovimiento = await _context.TbConceptoMovimientos.FindAsync(id);
-            if (tbConceptoMovimiento == null)
-            {
-                return NotFound();
-            }
-            return View(tbConceptoMovimiento);
-        }
-
-        // POST: TbConceptoMovimientoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdConceptoMovimiento,TipoMovimiento,Concepto")] TbConceptoMovimiento tbConceptoMovimiento)
+        public async Task<IActionResult> Edit(int id, ConceptoMovimientoViewModel model)
         {
-            if (id != tbConceptoMovimiento.IdConceptoMovimiento)
-            {
+            if (id != model.IdConceptoMovimiento)
                 return NotFound();
+
+            var validator = new ConceptoViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    _context.Update(tbConceptoMovimiento);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbConceptoMovimientoExists(tbConceptoMovimiento.IdConceptoMovimiento))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var entidad = await _context.TbConceptoMovimientos.FindAsync(id);
+                if (entidad == null)
+                    return NotFound();
+
+                entidad.TipoMovimiento = model.TipoMovimiento;
+                entidad.Concepto = model.Concepto;
+                entidad.TipoOrigenIngreso = model.TipoMovimiento == TbConceptoMovimiento.TiposDeConceptoMovimientos.Ingreso ? model.TipoOrigenIngreso : null;
+                entidad.TipoEmisorEgreso = model.TipoMovimiento == TbConceptoMovimiento.TiposDeConceptoMovimientos.Egreso ? model.TipoEmisorEgreso : null;
+
+                _context.Update(entidad);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Concepto actualizado correctamente.";
+                return RedirectToAction(nameof(Edit));
             }
-            return View(tbConceptoMovimiento);
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el concepto.";
+                return View(model);
+            }
         }
 
-        // GET: TbConceptoMovimientoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.TbConceptoMovimientos == null)
-            {
+            if (id == null)
                 return NotFound();
-            }
 
-            var tbConceptoMovimiento = await _context.TbConceptoMovimientos
-                .FirstOrDefaultAsync(m => m.IdConceptoMovimiento == id);
-            if (tbConceptoMovimiento == null)
-            {
+            var entidad = await _context.TbConceptoMovimientos
+                .FirstOrDefaultAsync(c => c.IdConceptoMovimiento == id);
+
+            if (entidad == null)
                 return NotFound();
-            }
 
-            return View(tbConceptoMovimiento);
+            return View(entidad);
         }
 
-        // POST: TbConceptoMovimientoes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.TbConceptoMovimientos == null)
+            var entidad = await _context.TbConceptoMovimientos.FindAsync(id);
+            if (entidad != null)
             {
-                return Problem("Entity set 'UcgdbContext.TbConceptoMovimientos'  is null.");
+                _context.TbConceptoMovimientos.Remove(entidad);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Concepto eliminado correctamente.";
             }
-            var tbConceptoMovimiento = await _context.TbConceptoMovimientos.FindAsync(id);
-            if (tbConceptoMovimiento != null)
-            {
-                _context.TbConceptoMovimientos.Remove(tbConceptoMovimiento);
-            }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TbConceptoMovimientoExists(int id)
         {
-            return (_context.TbConceptoMovimientos?.Any(e => e.IdConceptoMovimiento == id)).GetValueOrDefault();
-        }
-
-        public IActionResult Error()
-        {
-            return View("Error");
+            return _context.TbConceptoMovimientos.Any(e => e.IdConceptoMovimiento == id);
         }
     }
 }

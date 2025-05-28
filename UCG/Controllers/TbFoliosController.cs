@@ -57,6 +57,7 @@ namespace UCG.Controllers
             var tbFolio = await _context.TbFolios
                 .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdAsociadoNavigation)
+                .Include(t => t.TbActa)
                 .FirstOrDefaultAsync(m => m.IdFolio == id);
             if (tbFolio == null)
             {

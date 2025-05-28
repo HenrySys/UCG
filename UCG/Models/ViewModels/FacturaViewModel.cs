@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models.ViewModels
 {
@@ -41,6 +42,13 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Fecha Subida")]
         public string? FechaTextoSubida { get; set; }
 
-        
+        [BindNever]
+        public DateOnly FechaEmision { get; set; }
+        [BindNever]
+        public DateTime? FechaSubida { get; set; }
+
+        public string TipoEmisor { get; set; } 
+
+
     }
 }

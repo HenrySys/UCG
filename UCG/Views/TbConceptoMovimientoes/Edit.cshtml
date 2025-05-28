@@ -1,4 +1,6 @@
-﻿@model UCG.Models.TbConceptoMovimiento
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbConceptoMovimiento
+@model ConceptoMovimientoViewModel
 
 @{
     ViewData["Title"] = "Editar Concepto de Movimiento";
@@ -7,12 +9,15 @@
 <h1 class="text-center mb-4">Editar Concepto de Movimiento</h1>
 <hr />
 
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <div class="card shadow">
-            <div class="card-header">
-                Formulario de Edición
-            </div>
+            <div class="card-header">Formulario de Edición</div>
             <div class="card-body">
                 <form asp-action="Edit" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -20,8 +25,26 @@
 
                     <div class="mb-3">
                         <label asp-for="TipoMovimiento" class="form-label"></label>
-                        <input asp-for="TipoMovimiento" class="form-control" />
+                        <select asp-for="TipoMovimiento" asp-items="Html.GetEnumSelectList<TiposDeConceptoMovimientos>()" class="form-select">
+                            <option disabled selected>Seleccione un tipo de movimiento</option>
+                        </select>
                         <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3" id="grupoIngreso">
+                        <label asp-for="TipoOrigenIngreso" class="form-label"></label>
+                        <select asp-for="TipoOrigenIngreso" asp-items="Html.GetEnumSelectList<TipoDeOrigenIngreso>()" class="form-select">
+                            <option value="">Seleccione un tipo de origen</option>
+                        </select>
+                        <span asp-validation-for="TipoOrigenIngreso" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3" id="grupoEgreso">
+                        <label asp-for="TipoEmisorEgreso" class="form-label"></label>
+                        <select asp-for="TipoEmisorEgreso" asp-items="Html.GetEnumSelectList<TipoDeOrigenEgreso>()" class="form-select">
+                            <option value="">Seleccione un tipo de emisor</option>
+                        </select>
+                        <span asp-validation-for="TipoEmisorEgreso" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -31,8 +54,8 @@
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-warning">Editar</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                        <button type="submit" class="btn btn-warning">Actualizar</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </form>
             </div>
@@ -44,4 +67,9 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/ConceptoMovimientoScripts/ConceptoMovimientoFormHandler.js"></script>
 }

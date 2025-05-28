@@ -38,6 +38,7 @@ namespace UCG.Controllers
 
             var tbProveedor = await _context.TbProveedors
                 .Include(t => t.IdAsociacionNavigation)
+                .Include(p => p.TbFacturas)
                 .FirstOrDefaultAsync(m => m.IdProveedor == id);
             if (tbProveedor == null)
             {

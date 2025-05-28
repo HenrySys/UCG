@@ -17,6 +17,17 @@
                     <dt class="col-sm-4 mb-3">Tipo de Movimiento</dt>
                     <dd class="col-sm-8 mb-3">@Model.TipoMovimiento</dd>
 
+                    @if (Model.TipoMovimiento == UCG.Models.TbConceptoMovimiento.TiposDeConceptoMovimientos.Ingreso)
+                    {
+                        <dt class="col-sm-4 mb-3">Origen Ingreso</dt>
+                        <dd class="col-sm-8 mb-3">@Model.TipoOrigenIngreso</dd>
+                    }
+                    else if (Model.TipoMovimiento == UCG.Models.TbConceptoMovimiento.TiposDeConceptoMovimientos.Egreso)
+                    {
+                        <dt class="col-sm-4 mb-3">Emisor Egreso</dt>
+                        <dd class="col-sm-8 mb-3">@Model.TipoEmisorEgreso</dd>
+                    }
+
                     <dt class="col-sm-4 mb-3">Concepto</dt>
                     <dd class="col-sm-8 mb-3">@Model.Concepto</dd>
                 </dl>

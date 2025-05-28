@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -102,6 +103,10 @@ namespace UCG.Controllers
             {
                 // 5. Mapear el modelo a la entidad
                 var acta = MapearActa(model);
+
+                
+                // 5.1 Generar número automáticamente
+                acta.NumeroActa = await GenerarNumeroActaPorFolioAsync(acta.IdFolio, acta.FechaSesion);
 
                 // 6. Insertar acta
                 _context.TbActa.Add(acta);
@@ -378,6 +383,54 @@ namespace UCG.Controllers
             };
         }
 
+        // Método para generar el número de acta basado en el folio y la fecha de sesión
+        private async Task<string> GenerarNumeroActaPorFolioAsync(int? idFolio, DateOnly fechaSesion)
+        {
+            if (idFolio == null)
+                return "Folio-N/D No. 001-" + fechaSesion.Year;
+
+            // Buscar la última acta registrada con ese folio
+            var ultimaActa = await _context.TbActa
+                .Where(a => a.IdFolio == idFolio)
+                .OrderByDescending(a => a.IdActa) // Puede cambiarse por FechaSesion si es mejor
+                .FirstOrDefaultAsync();
+
+            // Inicializar número en 1
+            int siguienteNumero = 1;
+
+            if (ultimaActa != null)
+            {
+                // Extraer número con regex si el formato anterior era "Folio-xxx No. 001-2025"
+                var match = Regex.Match(ultimaActa.NumeroActa ?? "", @"No\.\s*(\d{3})");
+
+                if (match.Success && int.TryParse(match.Groups[1].Value, out int ultimoNumero))
+                {
+                    siguienteNumero = ultimoNumero + 1;
+                }
+            }
+
+            // Obtener el numeroFolio real
+            var folio = await _context.TbFolios.FirstOrDefaultAsync(f => f.IdFolio == idFolio);
+            var numeroFolio = folio?.NumeroFolio ?? "N/D";
+            var year = fechaSesion.Year;
+
+            return $"Folio-{numeroFolio} No. {siguienteNumero.ToString("D3")}-{year}";
+        }
+
+        // Método para obtener el número de acta basado en el folio y la fecha de sesión
+        [HttpGet]
+        public async Task<JsonResult> ObtenerNumeroActa(int idFolio, string fecha)
+        {
+            if (!DateOnly.TryParse(fecha, out var fechaSesion))
+            {
+                return Json(new { error = "Fecha inválida" });
+            }
+
+            var numero = await GenerarNumeroActaPorFolioAsync(idFolio, fechaSesion);
+            return Json(new { numeroActa = numero });
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int idActa, ActaViewModel model)
@@ -391,10 +444,6 @@ namespace UCG.Controllers
                 TempData["ErrorMessage"] = "Debe ingresar una fecha de sesión válida.";
                 await ConfigurarAsociacionActaAsync(model);
                 return View(model);
-            }
-            else
-            {
-
             }
 
             // Deserializar listas de asistencia y acuerdos

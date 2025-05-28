@@ -1,84 +1,127 @@
-﻿@model UCG.Models.TbFactura
+﻿@model UCG.Models.ViewModels.FacturaViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Factura";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var colaboradores = ViewData["IdColaborador"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var proveedores = ViewData["IdProveedor"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var conceptos = ViewData["IdConceptoAsociacion"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
-<h1>Edit</h1>
-
-<h4>TbFactura</h4>
+<h1 class="text-center mb-4">Editar Factura</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdFactura" />
-            <div class="form-group">
-                <label asp-for="NumeroFactura" class="control-label"></label>
-                <input asp-for="NumeroFactura" class="form-control" />
-                <span asp-validation-for="NumeroFactura" class="text-danger"></span>
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Actualizar Información de la Factura
             </div>
-            <div class="form-group">
-                <label asp-for="FechaEmision" class="control-label"></label>
-                <input asp-for="FechaEmision" class="form-control" />
-                <span asp-validation-for="FechaEmision" class="text-danger"></span>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="IdFactura" />
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoEmision" class="form-label"></label>
+                        <input asp-for="FechaTextoEmision" class="form-control" type="date" />
+                        <span asp-validation-for="FechaTextoEmision" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdConceptoAsociacion" class="form-label"></label>
+                        <select asp-for="IdConceptoAsociacion" class="form-select" asp-items="conceptos" id="IdConceptoAsociacion">
+                            <option disabled selected>Seleccione un concepto</option>
+                        </select>
+                        <span asp-validation-for="IdConceptoAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div id="grupoProveedor" class="mb-3" style="display: none;">
+                        <label asp-for="IdProveedor" class="form-label"></label>
+                        <select asp-for="IdProveedor" class="form-control" data-selected="@Model.IdProveedor"></select>
+                        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                    </div>
+
+                    <div id="grupoAsociado" class="mb-3" style="display: none;">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-control" data-selected="@Model.IdAsociado"></select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div id="grupoColaborador" class="mb-3" style="display: none;">
+                        <label asp-for="IdColaborador" class="form-label"></label>
+                        <select asp-for="IdColaborador" class="form-control" data-selected="@Model.IdColaborador"></select>
+                        <span asp-validation-for="IdColaborador" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumeroFactura" class="form-label"></label>
+                        <input asp-for="NumeroFactura" class="form-control" />
+                        <span asp-validation-for="NumeroFactura" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MontoTotal" class="form-label"></label>
+                        <input asp-for="MontoTotal" class="form-control" />
+                        <span asp-validation-for="MontoTotal" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" value="Actualizar Factura" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    </div>
+
+                    <input type="hidden" asp-for="TipoEmisor" id="TipoEmisor" />
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MontoTotal" class="control-label"></label>
-                <input asp-for="MontoTotal" class="form-control" />
-                <span asp-validation-for="MontoTotal" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdColaborador" class="control-label"></label>
-                <select asp-for="IdColaborador" class="form-control" asp-items="ViewBag.IdColaborador"></select>
-                <span asp-validation-for="IdColaborador" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdProveedor" class="control-label"></label>
-                <select asp-for="IdProveedor" class="form-control" asp-items="ViewBag.IdProveedor"></select>
-                <span asp-validation-for="IdProveedor" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class="form-control" asp-items="ViewBag.IdAsociado"></select>
-                <span asp-validation-for="IdAsociado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ArchivoUrl" class="control-label"></label>
-                <input asp-for="ArchivoUrl" class="form-control" />
-                <span asp-validation-for="ArchivoUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NombreArchivo" class="control-label"></label>
-                <input asp-for="NombreArchivo" class="form-control" />
-                <span asp-validation-for="NombreArchivo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaSubida" class="control-label"></label>
-                <input asp-for="FechaSubida" class="form-control" />
-                <span asp-validation-for="FechaSubida" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const rutasFactura = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbFacturas")',
+            obtenerConceptos: '@Url.Action("ObtenerConceptosPorAsociacion", "TbFacturas")',
+            obtenerProveedores: '@Url.Action("ObtenerProveedoresPorAsociacion", "TbFacturas")',
+            obtenerColaboradores: '@Url.Action("ObtenerColaboradoresPorAsociacion", "TbFacturas")',
+        };
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/FacturaScripts/FacturaFormHandler.js"></script>
 }

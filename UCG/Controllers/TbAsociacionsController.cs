@@ -36,6 +36,7 @@ namespace UCG.Controllers
             }
 
             var tbAsociacion = await _context.TbAsociacions
+                 .Include(a => a.TbAsociados)
                 .FirstOrDefaultAsync(m => m.IdAsociacion == id);
             if (tbAsociacion == null)
             {

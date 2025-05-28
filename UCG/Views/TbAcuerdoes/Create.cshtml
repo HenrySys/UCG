@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = "Agregar Acuerdo";
+    var acta = ViewData["IdActa"] as SelectList;
 }
 
 <h1 class="text-center mb-4">Agregar Acuerdo</h1>
@@ -33,7 +34,7 @@
                     {
                         <div class="mb-3">
                             <label asp-for="IdActa" class="form-label"></label>
-                            <select asp-for="IdActa" id="IdActa" class="form-select" asp-items="@(ViewData["IdActa"] as SelectList)">
+                            <select asp-for="IdActa" id="IdActa" class="form-select" asp-items="acta">
                                 <option disabled selected>Seleccione un acta</option>
                             </select>
                             <span asp-validation-for="IdActa" class="text-danger"></span>

@@ -17,10 +17,8 @@ $(document).ready(function () {
     });
     $('#miTabla tbody').on('click', 'tr', function () {
         var idFactura = $(this).data("id"); // Obtener ID de la fila seleccionada
-        console.log("ID Factura:", idFactura);
-
         if (idFactura) {
-            window.location.href = "/TbFinancistums/Details/" + idFactura;
+            window.location.href = "/TbFacturas/Details/" + idFactura;
         }
     });
 

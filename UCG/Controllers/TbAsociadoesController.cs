@@ -40,6 +40,7 @@ namespace UCG.Controllers
             var tbAsociado = await _context.TbAsociados
                 .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdUsuarioNavigation)
+                .Include(c => c.TbFacturas)
                 .FirstOrDefaultAsync(m => m.IdAsociado == id);
             if (tbAsociado == null)
             {

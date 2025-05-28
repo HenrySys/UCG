@@ -30,6 +30,7 @@ public partial class TbFactura
     [Display(Name = "Fecha Subida")]
     public DateTime? FechaSubida { get; set; }
 
+    [Display(Name = "Concepto Asociacion")]
     public int? IdConceptoAsociacion { get; set; }
     [Display(Name = "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
