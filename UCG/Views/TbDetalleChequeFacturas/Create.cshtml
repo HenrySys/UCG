@@ -1,54 +1,92 @@
 ﻿@model UCG.Models.TbDetalleChequeFactura
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Agregar Detalle de Cheque y Factura";
 }
 
-<h1>Create</h1>
-
-<h4>TbDetalleChequeFactura</h4>
+<h1 class="text-center mb-4">Agregar Detalle de Egreso</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdMovimientoEgreso" class="control-label"></label>
-                <select asp-for="IdMovimientoEgreso" class ="form-control" asp-items="ViewBag.IdMovimientoEgreso"></select>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-movimiento="@ViewData["IdMovimientoEgreso"]">
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header">
+                Detalles del Egreso
             </div>
-            <div class="form-group">
-                <label asp-for="IdAcuerdo" class="control-label"></label>
-                <select asp-for="IdAcuerdo" class ="form-control" asp-items="ViewBag.IdAcuerdo"></select>
+            <div class="card-body">
+                <form asp-action="Create" data-mode="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Movimiento Egreso -->
+                    <div class="mb-3">
+                        <label asp-for="IdMovimientoEgreso" class="form-label"></label>
+                        <select asp-for="IdMovimientoEgreso" class="form-select" asp-items="ViewBag.IdMovimientoEgreso">
+                            <option disabled selected>Seleccione un movimiento</option>
+                        </select>
+                        <span asp-validation-for="IdMovimientoEgreso" class="text-danger"></span>
+                    </div>
+
+                    <!-- Acuerdo -->
+                    <div class="mb-3">
+                        <label asp-for="IdAcuerdo" class="form-label"></label>
+                        <select asp-for="IdAcuerdo" class="form-select" asp-items="ViewBag.IdAcuerdo">
+                            <option disabled selected>Seleccione un acuerdo</option>
+                        </select>
+                        <span asp-validation-for="IdAcuerdo" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cheque -->
+                    <div class="mb-3">
+                        <label asp-for="IdCheque" class="form-label"></label>
+                        <select asp-for="IdCheque" class="form-select" asp-items="ViewBag.IdCheque">
+                            <option disabled selected>Seleccione un cheque</option>
+                        </select>
+                        <span asp-validation-for="IdCheque" class="text-danger"></span>
+                    </div>
+
+                    <!-- Factura -->
+                    <div class="mb-3">
+                        <label asp-for="IdFactura" class="form-label"></label>
+                        <select asp-for="IdFactura" class="form-select" asp-items="ViewBag.IdFactura">
+                            <option disabled selected>Seleccione una factura</option>
+                        </select>
+                        <span asp-validation-for="IdFactura" class="text-danger"></span>
+                    </div>
+
+                    <!-- Monto -->
+                    <div class="mb-3">
+                        <label asp-for="Monto" class="form-label"></label>
+                        <input asp-for="Monto" class="form-control" type="number" min="0" step="0.01" />
+                        <span asp-validation-for="Monto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Observación -->
+                    <div class="mb-3">
+                        <label asp-for="Observacion" class="form-label"></label>
+                        <input asp-for="Observacion" class="form-control" />
+                        <span asp-validation-for="Observacion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between">
+                        <input type="submit" value="Guardar" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="IdCheque" class="control-label"></label>
-                <select asp-for="IdCheque" class ="form-control" asp-items="ViewBag.IdCheque"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdFactura" class="control-label"></label>
-                <select asp-for="IdFactura" class ="form-control" asp-items="ViewBag.IdFactura"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Monto" class="control-label"></label>
-                <input asp-for="Monto" class="form-control" />
-                <span asp-validation-for="Monto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observacion" class="control-label"></label>
-                <input asp-for="Observacion" class="form-control" />
-                <span asp-validation-for="Observacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/DetalleChequeFacturaScripts/Create.js"></script>
 }

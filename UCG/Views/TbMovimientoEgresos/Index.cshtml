@@ -36,8 +36,8 @@
 
     <table id="miTabla" class="universal-table display compact">
     <thead>
-        <tr>
-            <th>
+            <tr >
+                <th>
                 @Html.DisplayNameFor(model => model.Monto)
             </th>
             <th>
@@ -61,38 +61,38 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+                <tr data-id="@item.IdMovimientoEgreso">
             <td>
                 @Html.DisplayFor(modelItem => item.Monto)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Fecha)
+                        @item.Fecha.ToString("yyyy-MM-dd")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Descripcion)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdActaNavigation.IdActa)
+                @Html.DisplayFor(modelItem => item.IdActaNavigation!.NumeroActa)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.Nombre)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+                @Html.DisplayFor(modelItem => item.IdAsociadoNavigation!.Nombre)
             </td>
 
-                    <td class="action-links text-end">
-                        <a asp-action="Edit" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Editar">
-                            <i class="fa-solid fa-pen"></i>
-                        </a>
+                <td class="action-links text-end">
+                    <a asp-action="Edit" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Editar">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
 
-                        <a asp-action="Details" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Detalles">
-                            <i class='bx bxs-detail'></i>
-                        </a>
+                    <a asp-action="Details" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-secondary" title="Detalles">
+                        <i class='bx bxs-detail'></i>
+                    </a>
 
-                        <a asp-action="Delete" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-create" title="Eliminar">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </a>
+                    <a asp-action="Delete" asp-route-id="@item.IdMovimientoEgreso" class="btn btn-create" title="Eliminar">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </a>
             </td>
         </tr>
 }

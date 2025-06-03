@@ -58,7 +58,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+                <tr data-id="@item.IdDetalleChequeFactura">
             <td>
                 @Html.DisplayFor(modelItem => item.Monto)
             </td>
@@ -66,13 +66,13 @@
                 @Html.DisplayFor(modelItem => item.Observacion)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAcuerdoNavigation.IdAcuerdo)
+                @Html.DisplayFor(modelItem => item.IdAcuerdoNavigation!.NumeroAcuerdo)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdChequeNavigation.IdCheque)
+                @Html.DisplayFor(modelItem => item.IdChequeNavigation!.NumeroCheque)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdFacturaNavigation.IdFactura)
+                @Html.DisplayFor(modelItem => item.IdFacturaNavigation!.NumeroFactura)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IdMovimientoEgresoNavigation.IdMovimientoEgreso)

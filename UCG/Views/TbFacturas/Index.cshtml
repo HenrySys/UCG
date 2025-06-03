@@ -34,54 +34,29 @@
     </div>
 
     <table id="miTabla" class="universal-table display compact">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroFactura)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaEmision)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MontoTotal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ArchivoUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NombreArchivo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaSubida)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdColaboradorNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdProveedorNavigation)
-            </th>
-            <td>Emisor</td>
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.NumeroFactura)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaEmision)</th>
+                <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+                <th>@Html.DisplayNameFor(model => model.MontoTotal)</th>
+                <th>@Html.DisplayNameFor(model => model.ArchivoUrl)</th>
+                <th>@Html.DisplayNameFor(model => model.NombreArchivo)</th>
+                <th>@Html.DisplayNameFor(model => model.FechaSubida)</th>
+                <th>@Html.DisplayNameFor(model => model.IdAsociacionNavigation)</th>  
+                <th>Emisor</th> 
+                <th>ACCIONES</th> <!-- Acciones -->
+            </tr>
+        </thead>
 
-            <th></th>
-        </tr>
-    </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr  data-id="@item.IdFactura">
             <td>
                 @Html.DisplayFor(modelItem => item.NumeroFactura)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaEmision)
+                        @item.FechaEmision.ToString("yyyy-MM-dd")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Descripcion)
@@ -99,7 +74,7 @@
                 @Html.DisplayFor(modelItem => item.FechaSubida)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.IdAsociacion)
+                @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.Nombre)
             </td>
             <td>
                     @if (item.IdAsociadoNavigation != null)

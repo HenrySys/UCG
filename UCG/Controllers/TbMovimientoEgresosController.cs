@@ -42,6 +42,10 @@ namespace UCG.Controllers
                 .Include(t => t.IdActaNavigation)
                 .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdAsociadoNavigation)
+                .Include(m => m.TbDetalleChequeFacturas)
+                .ThenInclude(d => d.IdChequeNavigation)
+                .Include(m => m.TbDetalleChequeFacturas)
+                .ThenInclude(d => d.IdFacturaNavigation)
                 .FirstOrDefaultAsync(m => m.IdMovimientoEgreso == id);
             if (tbMovimientoEgreso == null)
             {

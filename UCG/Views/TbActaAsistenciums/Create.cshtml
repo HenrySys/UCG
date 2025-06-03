@@ -11,7 +11,7 @@
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
      data-error="@TempData["ErrorMessage"]"
-     data-acta="@ViewData["IdActa"]">
+     data-acta="@TempData["IdActa"]">
 </div>
 
 <div class="row justify-content-center">
@@ -24,7 +24,7 @@
                 <form asp-action="Create" data-mode="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    @if (Model.IdActa != null && Model.IdActa > 0)
+                    @if (Model!.IdActa != null && Model.IdActa > 0)
                     {
                         <input type="hidden" asp-for="IdActa" />
                     }

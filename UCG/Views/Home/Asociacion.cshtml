@@ -31,12 +31,6 @@
             <p>Gestión de Miembros de Junta Directiva</p>
         </a>
 
-        <!-- Categoría Movimiento -->
-        @* <a class="card" asp-area="" asp-controller="TbCategoriaMovimientoes" asp-action="Index">
-            <i class='bx bx-category'></i>
-            <h3>Categoría Movimiento</h3>
-            <p>Administración de categorías</p>
-        </a> *@
 
         <!-- Concepto Movimiento -->
         <a class="card" asp-area="" asp-controller="TbConceptoMovimientoes" asp-action="Index">
@@ -81,24 +75,9 @@
             <p>Gestión de cuentas</p>
         </a>
 
-        <!-- Proyecto -->
-        @* <a class="card" asp-area="" asp-controller="TbProyectoes" asp-action="Index">
-            <i class='bx bx-briefcase'></i>
-            <h3>Proyecto</h3>
-            <p>Administración de proyectos</p>
-        </a> *@
-
-        <!-- Detalle Movimiento -->
-       @*  <a class="card" asp-area="" asp-controller="TbDetalleMovimientoes" asp-action="Index">
-            <i class='bx bx-detail'></i>
-            <h3>Detalle Movimiento</h3>
-            <p>Control de detalles</p>
-        </a> *@
-
         <!-- Acta -->
-        
         <a class="card" asp-area="" asp-controller="TbFolios" asp-action="Index">
-            <i class='bx bx-file'></i>
+            <i class="fa-regular fa-folder"></i>
             <h3>Folio</h3>
             <p>Gestión de Folios</p>
         </a>
@@ -198,3 +177,13 @@
     <div class="spacer"></div>
 </body>
 </html>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/AdminAsociaciones.js"></script>
+}

@@ -48,20 +48,51 @@ namespace UCG.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create(int? id)
+        public async Task<IActionResult> Create(int? id)
         {
-            if (id == null)
+            var model = new ActaAsistenciaViewModel();
+
+            if (id.HasValue)
             {
-                ViewData["IdActa"] = new SelectList(_context.TbActa.ToList(), "IdActa", "NumeroActa");
-                return View(new ActaAsistenciaViewModel());
+                var acta = await _context.TbActa.FindAsync(id.Value);
+                if (acta == null)
+                {
+                    TempData["ErrorMessage"] = "El acta no fue encontrada.";
+                    return RedirectToAction("Index", "TbActums");
+                }
+
+                var idAsociacion = acta.IdAsociacion;
+                var todosAsociados = await _context.TbAsociados
+                    .Where(a => a.IdAsociacion == idAsociacion)
+                    .Select(a => a.IdAsociado)
+                    .ToListAsync();
+
+                var yaRegistrados = await _context.TbActaAsistencia
+                    .Where(a => a.IdActa == id.Value)
+                    .Select(a => a.IdAsociado)
+                    .ToListAsync();
+
+                var restantes = todosAsociados.Except(yaRegistrados).ToList();
+
+              
+                if (!restantes.Any())
+                {
+                    TempData["IdActa"] = id.Value;
+                }
+
+                model.IdActa = id.Value;
+                ViewData["IdActa"] = id;
+                ViewData["IdAsociacion"] = idAsociacion;
+            }
+            else
+            {
+                ViewData["IdActa"] = new SelectList(await _context.TbActa.ToListAsync(), "IdActa", "NumeroActa");
             }
 
-            var acta = _context.TbActa.FirstOrDefault(a => a.IdActa == id);
-            var model = new ActaAsistenciaViewModel { IdActa = id.Value };
-            ViewData["IdActa"] = id;
-            ViewData["IdAsociacion"] = acta?.IdAsociacion;
+            await PrepararViewDataAsync(model);
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -85,39 +116,42 @@ namespace UCG.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var asistencia = MapearActa(model);
-
+                var asistencia = new TbActaAsistencium
+                {
+                    IdActa = model.IdActa,
+                    IdAsociado = model.IdAsociado,
+                    Fecha = model.Fecha
+                };
 
                 _context.TbActaAsistencia.Add(asistencia);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                // Verificación de asociados restantes
                 var idAsociacion = await _context.TbActa
                     .Where(a => a.IdActa == model.IdActa)
                     .Select(a => a.IdAsociacion)
                     .FirstOrDefaultAsync();
 
-                var asociadosAsociacion = await _context.TbAsociados
+                var todosAsociados = await _context.TbAsociados
                     .Where(a => a.IdAsociacion == idAsociacion)
                     .Select(a => a.IdAsociado)
                     .ToListAsync();
 
-                var asociadosRegistrados = await _context.TbActaAsistencia
+                var yaRegistrados = await _context.TbActaAsistencia
                     .Where(a => a.IdActa == model.IdActa)
                     .Select(a => a.IdAsociado)
                     .ToListAsync();
 
-                var asociadosRestantes = asociadosAsociacion.Except(asociadosRegistrados).ToList();
+                var restantes = todosAsociados.Except(yaRegistrados).ToList();
 
-                TempData["SuccessMessage"] = asociadosRestantes.Any()
+                TempData["SuccessMessage"] = restantes.Any()
                     ? "La asistencia fue creada exitosamente."
                     : "Todos los asociados ya han sido registrados.";
 
                 TempData["IdActa"] = model.IdActa;
 
-                return asociadosRestantes.Any()
-                    ? RedirectToAction(nameof(Create), new { id = model.IdActa })
-                    : RedirectToAction("Details", "TbActums", new { id = model.IdActa });
+                return RedirectToAction(nameof(Create), new { id = model.IdActa });
             }
             catch (Exception ex)
             {
@@ -127,6 +161,7 @@ namespace UCG.Controllers
                 return View(model);
             }
         }
+
 
         private TbActaAsistencium MapearActa(ActaAsistenciaViewModel model)
         {
@@ -141,26 +176,22 @@ namespace UCG.Controllers
         private async Task PrepararViewDataAsync(ActaAsistenciaViewModel model)
         {
             ViewData["IdActa"] = new SelectList(
-                await _context.TbActa.ToListAsync(),
-                "IdActa", "NumeroActa", model.IdActa);
+                await _context.TbActa.ToListAsync(), "IdActa", "NumeroActa", model.IdActa);
 
             List<SelectListItem> asociadosDisponibles;
 
             if (model.IdActa > 0)
             {
-                // Obtener la asociación del acta
                 var idAsociacion = await _context.TbActa
                     .Where(a => a.IdActa == model.IdActa)
                     .Select(a => a.IdAsociacion)
                     .FirstOrDefaultAsync();
 
-                // Asociados que ya tienen asistencia en ese acta
                 var idsYaRegistrados = await _context.TbActaAsistencia
                     .Where(a => a.IdActa == model.IdActa)
                     .Select(a => a.IdAsociado)
                     .ToListAsync();
 
-                // Asociados disponibles = no registrados aún
                 asociadosDisponibles = await _context.TbAsociados
                     .Where(a => a.IdAsociacion == idAsociacion && !idsYaRegistrados.Contains(a.IdAsociado))
                     .Select(a => new SelectListItem
@@ -172,7 +203,6 @@ namespace UCG.Controllers
             }
             else
             {
-                // Carga general (caso raro pero por si acaso)
                 asociadosDisponibles = await _context.TbAsociados
                     .Select(a => new SelectListItem
                     {
@@ -184,6 +214,7 @@ namespace UCG.Controllers
 
             ViewData["IdAsociado"] = asociadosDisponibles;
         }
+
 
 
         [HttpGet]

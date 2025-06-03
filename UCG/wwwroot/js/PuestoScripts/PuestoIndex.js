@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#miTabla').DataTable({
+    var tabla = $('#miTabla').DataTable({
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -15,11 +15,12 @@
             }
         }
     });
-    $("#miTabla tbody tr").click(function () {
-        var idActaAsistencia = $(this).data("id"); // Obtener ID de la fila seleccionada
-    
-        if (idActaAsistencia) {
-            window.location.href = "/TbActaAsistenciums/Details/" + idActaAsistencia;
+    $('#miTabla tbody').on('click', 'tr', function () {
+        var idPuesto = $(this).data("id"); 
+        console.log("ID Puesto:", idPuesto);
+
+        if (idPuesto) {
+            window.location.href = "/TbPuestoes/Details/" + idPuesto;
         }
     });
 });

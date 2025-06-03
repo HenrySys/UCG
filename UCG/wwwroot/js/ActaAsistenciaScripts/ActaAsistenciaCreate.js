@@ -1,125 +1,109 @@
 ﻿$(document).ready(function () {
-    const container = $('#tempDataSwal');
-    const successMessage = container.data('success');
-    const errorMessage = container.data('error');
-    const idAsociacion = container.data('asociacion');
-    const idActa = container.data('acta');
+    const tempData = $('#tempDataSwal');
+    const successMessage = tempData.data('success');
+    const errorMessage = tempData.data('error');
+    const actaId = tempData.data('acta');
 
-    function fetchDropdownData(url, data, dropdownSelector, placeholder, callback) {
-        $.ajax({
-            url,
-            data,
-            success: function (response) {
-                const dropdown = $(dropdownSelector).empty();
-                dropdown.append(`<option disabled selected>${placeholder}</option>`);
+    const selectActa = $('#IdActa');
+    const selectAsociado = $('#IdAsociado');
 
-                if (response.success) {
-                    if (response.data.length === 0) {
-                        dropdown.append(`<option disabled selected>No hay asociados disponibles</option>`);
-                        $('#btnSubmit').prop('disabled', true);
-                        return;
-                    }
+    let swalMostrado = false;
 
-                    callback(response.data, dropdown);
-                    $('#btnSubmit').prop('disabled', false);
-                } else {
-                    dropdown.append(`<option disabled selected>No hay asociados disponibles</option>`);
+    if (successMessage) {
+        swalMostrado = true; 
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: successMessage,
+            timer: 2500,
+            showConfirmButton: false
+        });
 
-                    $('#btnSubmit').prop('disabled', true);
-                }
-            },
-            error: function (_, __, error) {
-                mostrarErrorSwal('Error', 'Error al cargar los datos: ' + error);
-                $('#btnSubmit').prop('disabled', true);
-            }
+        if (actaId) {
+            setTimeout(() => {
+                window.location.href = `/TbActums/Details/${actaId}`;
+            }, 2500);
+        }
+    } else if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage
         });
     }
 
     function mostrarErrorSwal(titulo, mensaje) {
         Swal.fire({
-            icon: 'error',
+            icon: 'warning',
             title: titulo,
-            text: mensaje,
-            confirmButtonText: 'Aceptar'
+            text: mensaje
         });
     }
 
-    // Si viene desde el detalle del acta (con ID en la ruta)
-    if (idAsociacion && idActa) {
-        fetchDropdownData(
-            '/TbActaAsistenciums/ObtenerAsociadosPorAsociacion',
-            { idAsociacion, idActa },
-            '#IdAsociado',
-            'Seleccione un asociado',
-            function (data, dropdown) {
-                data.forEach(item => {
-                    dropdown.append(`<option value="${item.idAsociado}">${item.nombre} ${item.apellido1}</option>`);
-                });
+    function cargarAsociados(idActa, idAsociacion) {
+        $.ajax({
+            url: '/TbActaAsistenciums/ObtenerAsociadosPorAsociacion',
+            method: 'GET',
+            data: { idAsociacion, idActa },
+            success: function (res) {
+                selectAsociado.empty();
+
+                if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+                    selectAsociado.append('<option disabled selected>Seleccione un asociado</option>');
+                    res.data.forEach(a => {
+                        selectAsociado.append(`<option value="${a.idAsociado}">${a.nombre} ${a.apellido1}</option>`);
+                    });
+                } else {
+                    selectAsociado.append('<option disabled selected>No hay asociados disponibles</option>');
+
+                    // ✅ Si ya se mostró un Swal (por TempData), no repetir
+                    if (!swalMostrado) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Todos registrados',
+                            text: res.message || 'Todos los asociados ya han sido registrados.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        if (actaId) {
+                            setTimeout(() => {
+                                window.location.href = `/TbActums/Details/${actaId}`;
+                            }, 2000);
+                        }
+                    }
+                }
+            },
+            error: function () {
+                selectAsociado.empty();
+                selectAsociado.append('<option disabled selected>Error al cargar asociados</option>');
+                mostrarErrorSwal('Error', 'No se pudieron cargar los asociados.');
             }
-        );
+        });
     }
 
-    // Si el acta se elige manualmente en el dropdown
-    $('#IdActa').change(function () {
+    selectActa.on('change', function () {
         const idActa = $(this).val();
-        console.log('Acta seleccionada:', idActa);
-
         if (!idActa) return;
 
         $.ajax({
             url: '/TbActaAsistenciums/ObtenerAsociacionPorActa',
+            method: 'GET',
             data: { idActa },
-            success: function (response) {
-                if (response.success) {
-                    const idAsociacion = response.idAsociacion;
-
-                    fetchDropdownData(
-                        '/TbActaAsistenciums/ObtenerAsociadosPorAsociacion',
-                        { idAsociacion, idActa },
-                        '#IdAsociado',
-                        'Seleccione un asociado',
-                        function (data, dropdown) {
-                            data.forEach(item => {
-                                dropdown.append(`<option value="${item.idAsociado}">${item.nombre} ${item.apellido1}</option>`);
-                            });
-                        }
-                    );
+            success: function (res) {
+                if (res.success) {
+                    cargarAsociados(idActa, res.idAsociacion);
                 } else {
-                    mostrarErrorSwal('Error', response.message);
-                    $('#btnSubmit').prop('disabled', true);
+                    mostrarErrorSwal('Error', res.message);
                 }
             },
             error: function () {
                 mostrarErrorSwal('Error', 'Error al obtener la asociación.');
-                $('#btnSubmit').prop('disabled', true);
             }
         });
     });
 
-    $('#IdAsociado').change(function () {
-        const idAsociado = $(this).val();
-        console.log('Asociado seleccionado:', idAsociado);
-    });
-
-    if (successMessage && idActa) {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: successMessage,
-            confirmButtonText: 'Ir al Acta'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/TbActums/Details/' + idActa;
-            }
-        });
+    if (actaId) {
+        selectActa.val(actaId).trigger('change');
     }
-
-    if (errorMessage) {
-        mostrarErrorSwal('Error', errorMessage);
-    }
-
-    
 });
-
-
-

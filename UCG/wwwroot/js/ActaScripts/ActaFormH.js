@@ -18,6 +18,8 @@
         Swal.fire({ icon: 'error', title: 'Error', text: errorMessage, confirmButtonText: 'Aceptar' });
     }
 
+   
+
     let colaErroresSwal = [];
     let swalMostrandose = false;
 
@@ -65,7 +67,6 @@
         $('#summernoteAcuerdo').val('');
     }
 
-
     function fetchDropdownData(url, data, selector, placeholder, renderFn) {
         $.ajax({
             url,
@@ -102,9 +103,23 @@
         });
     }
 
-    function configurarModalAsistencia(idAsociacion) {
-        $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function () {
+    function configurarModalAsistencia() {
+        $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function (e) {
+            const idAsociacion = $('#IdAsociacion').val();
+            if (!idAsociacion || parseInt(idAsociacion) === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Debe seleccionar una asociación',
+                    text: 'Por favor, seleccione una asociación antes de agregar asistencias.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
             limpiarErrores();
+
             const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
                 return $(this).find('td:eq(1)').text();
             }).get();
@@ -115,8 +130,11 @@
                     if (!asociadosYaAgregados.includes(item.idAsociado.toString())) {
                         const nombreCompleto = `${item.nombre} ${item.apellido1}`;
                         dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
-                    } else agregados++;
+                    } else {
+                        agregados++;
+                    }
                 });
+
                 if (agregados === data.length) {
                     cerrarModalConMensaje('#detailModalAsistencia', {
                         titulo: 'Todos agregados',
@@ -126,6 +144,25 @@
             });
         });
     }
+
+
+    $('#detailModalAcuerdo').on('shown.bs.modal', function () {
+        limpiarErrores();
+        $('#summernoteAcuerdo').summernote({
+            height: 125,
+            placeholder: 'Escriba el acuerdo aquí...',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['view', ['codeview']]
+            ]
+        });
+    }).on('hidden.bs.modal', function () {
+        $('#summernoteAcuerdo').summernote('destroy');
+        limpiarErrores();
+        limpiarCamposModalAcuerdo();
+        filaAcuerdoEditando = null;
+    });
     function reconstruirAsistenciasUI() {
         $('#detailsTableAsistencia tbody').empty();
         asistenciasCargadas.forEach((a, index) => {
@@ -145,7 +182,6 @@
             );
         });
     }
-
 
     function reconstruirAcuerdosUI() {
         $('#detailsTableAcuerdo tbody').empty();
@@ -183,10 +219,10 @@
 
         return asistencias;
     }
+
     function recolectarAcuerdos() {
         const acuerdos = [];
         const filas = $('#detailsTableAcuerdo tbody tr');
-
         filas.each(function () {
             const fila = $(this);
 
@@ -199,7 +235,6 @@
                 Tipo: tipo
             });
         });
-
         return acuerdos;
     }
 
@@ -216,15 +251,15 @@
             });
         }
     }
-
-    if (modoVista === 'Create' && idAsociacion && parseInt(idAsociacion) > 0) {
-        cargarAsociados(idAsociacion);
-        configurarModalAsistencia(idAsociacion);
-        cargarFolios(idAsociacion);
+    
+    if (modoVista === 'Create') {
+        const idAsociacion = $('#IdAsociacion').val();
+        if (idAsociacion && parseInt(idAsociacion) > 0) {
+            cargarAsociados(idAsociacion);
+            cargarFolios(idAsociacion);
+        }
+        configurarModalAsistencia(); // Solo se configura una vez
     }
-
-    // Actualizar el número de acta al cargar la página
-    $('#IdFolio, #FechaSesionTexto').change(actualizarNumeroActa);
 
     $('#IdAsociacion').change(function () {
         const nuevaAsociacion = $(this).val();
@@ -232,13 +267,50 @@
 
         $('#detailsTableAsistencia tbody').empty();
         cargarAsociados(nuevaAsociacion);
-        configurarModalAsistencia(nuevaAsociacion);
         cargarFolios(nuevaAsociacion);
+        configurarModalAsistencia();
     });
 
-    $('#detailsTableAsistencia, #detailsTableAcuerdo').on('click', '.removeRow', function () {
-        $(this).closest('tr').remove();
-        actualizarMontoTotalAcordado();
+
+
+    // Actualizar el número de acta al cargar la página
+    $('#IdFolio, #FechaSesionTexto').change(actualizarNumeroActa);
+
+   
+
+    $('#detailsTableAcuerdo').on('click', '.removeRow', function () {
+        const fila = $(this).closest('tr');
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: '¿Desea eliminar este acuerdo?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fila.remove();
+                Swal.fire('Eliminado', 'El acuerdo ha sido eliminado.', 'success');
+            }
+        });
+    });
+
+
+    $('#detailsTableAsistencia').on('click', '.removeRow', function () {
+        const fila = $(this).closest('tr');
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: '¿Desea eliminar esta asistencia?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fila.remove();
+                Swal.fire('Eliminado', 'La asistencia ha sido eliminada.', 'success');
+            }
+        });
     });
 
     $('#addDetailAsistenciaBtn').on('click', function () {
@@ -332,51 +404,6 @@
         $('#detailModalAcuerdo').modal('hide');
     });
 
-
-
-    $('#detailModalAcuerdo').on('shown.bs.modal', function () {
-        limpiarErrores();
-        $('#summernoteAcuerdo').summernote({
-            height: 125,
-            placeholder: 'Escriba el acuerdo aquí...',
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['view', ['codeview']]
-            ]
-        });
-    }).on('hidden.bs.modal', function () {
-        $('#summernoteAcuerdo').summernote('destroy');
-        limpiarErrores();
-        limpiarCamposModalAcuerdo();
-        filaAcuerdoEditando = null;
-    });
-
-    $('#detailsTableAcuerdo').on('click', '.btn-edit-acuerdo', function () {
-        limpiarErrores();
-        filaAcuerdoEditando = $(this).closest('tr');
-
-        const nombre = filaAcuerdoEditando.data('nombre');
-        const descripcion = filaAcuerdoEditando.data('descripcion');
-        const tipo = filaAcuerdoEditando.data('tipo'); // <-- Añadido
-
-        $('#nombreAcuerdo').val(nombre);
-        $('#tipoAcuerdo').val(tipo); // <-- Añadido
-        $('#summernoteAcuerdo').summernote({
-            height: 125,
-            placeholder: 'Escriba el acuerdo aquí...',
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['view', ['codeview']]
-            ]
-        });
-        $('#summernoteAcuerdo').summernote('code', descripcion);
-        $('#detailModalAcuerdo').modal('show');
-    });
-
-
-
     $('form').on('submit', function (e) {
         limpiarErrores();
 
@@ -397,8 +424,4 @@
             $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
         }
     });
-
-    
-        
-    
 });

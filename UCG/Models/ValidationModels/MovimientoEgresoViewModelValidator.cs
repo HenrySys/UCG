@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using UCG.Models.ViewModels;
 
 namespace UCG.Models.ValidationModels
@@ -52,12 +53,12 @@ namespace UCG.Models.ValidationModels
             //     .NotEmpty().WithMessage("Debe agregar al menos un detalle de cheque o factura.");
         }
 
-        private bool EsFechaValida(string? fecha)
+
+        private bool EsFechaValida(string? FechaTexto)
         {
-            return !string.IsNullOrWhiteSpace(fecha) &&
-                DateTime.TryParseExact(fecha, "dd/MM/yyyy",
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None, out _);
+            return DateTime.TryParseExact(FechaTexto, "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var fecha);
         }
     }
 }
