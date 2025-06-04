@@ -18,7 +18,7 @@ public partial class TbMiembroJuntaDirectiva
 
     public int? IdJuntaDirectiva { get; set; }
 
-    public int? IdAsociado { get; set; }
+    public int IdAsociado { get; set; } 
 
     public int? IdPuesto { get; set; }
     [Display(Name = "Estado")]

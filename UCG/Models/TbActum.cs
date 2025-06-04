@@ -15,7 +15,7 @@ public partial class TbActum
         Inactivo = 2,
 
         [Display(Name = "En Proceso")]
-        EnProceso = 0,
+        EnProceso = 3
         
     }
 

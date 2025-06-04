@@ -6,6 +6,18 @@ namespace UCG.Models;
 
 public partial class TbFactura
 {
+
+    public enum EstadoDeFactura
+    {
+        [Display(Name = "Pendiente")]
+        Pendiente = 1,
+
+        [Display(Name = "Pagada")]
+        Pagada = 2,
+
+        [Display(Name = "Rechazada")]
+        Rechazada = 3
+    }
     public int IdFactura { get; set; }
     [Display(Name = "Numero Factura")]
     public string NumeroFactura { get; set; } = null!;
@@ -21,6 +33,8 @@ public partial class TbFactura
     public int? IdProveedor { get; set; }
 
     public int? IdAsociacion { get; set; }
+
+    public EstadoDeFactura Estado { get; set; }
 
     public int? IdAsociado { get; set; }
     [Display(Name = "RutaURL")]

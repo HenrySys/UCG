@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using static UCG.Models.TbFactura;
 
 namespace UCG.Models.ViewModels
 {
@@ -33,6 +34,7 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Monto Total")]
         public decimal MontoTotal { get; set; }
 
+        public EstadoDeFactura Estado { get; set; }
 
         [Display(Name = "RutaURL")]
         public string? ArchivoUrl { get; set; }
@@ -47,7 +49,7 @@ namespace UCG.Models.ViewModels
         [BindNever]
         public DateTime? FechaSubida { get; set; }
 
-        public string TipoEmisor { get; set; } 
+        public string? TipoEmisor { get; set; } 
 
 
     }

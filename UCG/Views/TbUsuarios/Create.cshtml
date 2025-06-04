@@ -20,6 +20,29 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <dl class="row">
+
+                        <dt class="col-sm-4 mb-3">
+                            <label asp-for="IdAsociacion" class="form-label"></label>
+                        </dt>
+                        <dd class="col-sm-8 mb-3">
+                            @if (ViewBag.EsAdmin == true)
+                            {
+                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                            }
+                            else
+                            {
+                                <select asp-for="IdAsociacion" class="form-select">
+                                    <option disabled selected>Seleccione una asociacion</option>
+                                    @foreach (var item in (SelectList)ViewBag.IdAsociacion)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            }
+                            <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                        </dd>
+
                         <dt class="col-sm-4 mb-3"><label asp-for="NombreUsuario" class="form-label"></label></dt>
                         <dd class="col-sm-8 mb-3">
                             <input asp-for="NombreUsuario" class="form-control" />

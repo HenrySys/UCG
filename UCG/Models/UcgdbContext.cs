@@ -162,7 +162,7 @@ public partial class UcgdbContext : DbContext
                 .HasMaxLength(320)
                 .HasColumnName("descripcion");
             entity.Property(e => e.Estado)
-                .HasColumnType("enum('Cerrado','Inactivo','En Proceso')")
+                .HasColumnType("enum('Cerrado','Inactivo','EnProceso')")
                 .HasColumnName("estado");
             entity.Property(e => e.FechaSesion).HasColumnName("fecha_sesion");
             entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
@@ -716,6 +716,10 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.NumeroFactura)
                 .HasMaxLength(50)
                 .HasColumnName("numero_factura");
+
+            entity.Property(e => e.Estado)
+               .HasColumnType("enum('Pendiente','Pagada','Rechazada')")
+               .HasColumnName("estado");
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbFacturas)
                 .HasForeignKey(d => d.IdAsociacion)

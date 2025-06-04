@@ -17,6 +17,20 @@
                     <dt class="col-sm-4 mb-3">Nombre de Usuario</dt>
                     <dd class="col-sm-8 mb-3">@Model.NombreUsuario</dd>
 
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdAsociacionNavigation != null)
+                        {
+                            <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
+                                @Model.IdAsociacionNavigation.Nombre
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin asociación</span>
+                        }
+                    </dd>
+
                     <dt class="col-sm-4 mb-3">Contraseña</dt>
                     <dd class="col-sm-8 mb-3">@Model.Contraseña</dd>
 

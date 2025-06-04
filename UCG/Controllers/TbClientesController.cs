@@ -15,6 +15,7 @@ namespace UCG.Controllers
     public class TbClientesController : Controller
     {
         private readonly UcgdbContext _context;
+        private string rol => User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
         public TbClientesController(UcgdbContext context)
         {

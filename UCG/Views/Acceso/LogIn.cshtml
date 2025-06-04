@@ -1,5 +1,7 @@
 ﻿@{
+
     ViewData["Title"] = "LogIn";
+
     Layout = null;
 }
 
@@ -11,46 +13,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
-   
+    <link rel="stylesheet" href="~/css/LogIn.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="card-container">
-        <div class="col-md-4">
-            <div class="card">
-
-                <!-- Botón de volver -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="card-header">
+                <!-- Flecha centrada arriba -->
                 <a asp-controller="Home" asp-action="Index" class="back-button">
                     <svg viewBox="0 0 384 512">
                         <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"></path>
                     </svg>
                 </a>
 
-                <div class="card-header">
-                    Iniciar Sesion
-                </div>
-                <div class="card-body">
-                    <form asp-controller="Acceso" asp-action="LogIn" method="post">
-                        <input type="email" class="form-control mb-3" placeholder="Correo electrónico" required asp-for="Correo" />
-                        <input type="password" class="form-control mb-3" placeholder="Contraseña" required asp-for="Contraseña" />
+                <h2 style="margin-top:6rem;">Iniciar Sesión</h2>
+                <p>Ingresa tus credenciales para continuar</p>
+            </div>
 
-                        <div class="d-grid gap-2">
-                            <button class="btn b-btn" type="submit">Iniciar Sesion</button>
+            <div class="card-body">
+                <form asp-controller="Acceso" asp-action="LogIn" method="post">
+                    <div class="mb-3">
+                        <input type="email" class="form-control" placeholder="Correo electrónico" required asp-for="Correo" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="password" class="form-control" placeholder="Contraseña" required asp-for="Contraseña" />
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                        <button class="btn btn-primary" type="submit">Iniciar Sesión</button>
+                    </div>
+
+                    @if (ViewData["Mensaje"] != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @ViewData["Mensaje"]
                         </div>
-
-                        @if (ViewData["Mensaje"] != null)
-                        {
-                            <div class="alert alert-danger mt-3" role="alert">
-                                @ViewData["Mensaje"]
-                            </div>
-                        }
-
-                        <p class="text-center mt-3">No tienes una cuenta? <a asp-controller="Acceso" asp-action="Registrarse" class="register-link">Registrarse Ya!</a></p>
-                    </form>
-                </div>
+                    }
+                </form>
             </div>
         </div>
     </div>

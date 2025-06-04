@@ -6,11 +6,14 @@
 
 <h1 class="text-center mb-4">Detalle de Junta Directiva</h1>
 <hr />
-<div class="row justify-content-center">
-    <div class="col-lg-7">
+
+<div class="row g-3 mb-4">
+
+    <!-- Información general -->
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header">
-                Información de la Junta Directiva
+                Información General
             </div>
             <div class="card-body">
                 <dl class="row">
@@ -26,13 +29,6 @@
                     <dt class="col-sm-4 mb-3">Estado</dt>
                     <dd class="col-sm-8 mb-3">@Model.Estado</dd>
 
-            
-                    @* <dd class="col-sm-8 mb-3">
-                        <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation.IdActa">
-                            @Model.IdActaNavigation.NumeroActa
-                        </a>
-                    </dd> *@
-
                     <dt class="col-sm-4 mb-3">Asociación</dt>
                     <dd class="col-sm-8 mb-3">
                         <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
@@ -40,12 +36,59 @@
                         </a>
                     </dd>
                 </dl>
-
-                <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="Edit" asp-route-id="@Model?.IdJuntaDirectiva" class="btn btn-warning">Editar</a>
-                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
-                </div>
             </div>
         </div>
     </div>
+
+    <!-- Miembros de Junta -->
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Miembros de Junta
+                <button id="btnAgregarMiembros" class="btn btn-primary" data-id="@Model.IdJuntaDirectiva">Agregar</button>
+            </div>
+            <div class="card-body">
+                <table id="tablaMiembros" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Puesto</th>
+                            <th>Asociado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var miembro in Model.TbMiembroJuntaDirectivas)
+                        {
+                            <tr data-id="@miembro.IdMiembrosJuntaDirectiva">
+                                <td>@miembro.IdPuestoNavigation?.Nombre</td>
+                                <td>@miembro.IdAsociadoNavigation?.Nombre</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<!-- Botones -->
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model?.IdJuntaDirectiva" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+</div>
+
+
+<!-- DataTables CSS con Bootstrap -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+@section Scripts {
+    @{
+        <!-- Tu script separado -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="~/js/JuntaDirectivaScripts/JuntaDirectivaDetail.js"></script>
+    }
+}

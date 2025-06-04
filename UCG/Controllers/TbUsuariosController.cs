@@ -59,6 +59,7 @@ namespace UCG.Controllers
            try{
 
            var tbUsuario = await _context.TbUsuarios
+                .Include(u => u.IdAsociacionNavigation)
                .FirstOrDefaultAsync(m => m.IdUsuario == id);
            if (tbUsuario == null)
            {
@@ -127,6 +128,7 @@ namespace UCG.Controllers
             
                 var usuario = new TbUsuario
                {
+                   IdAsociacion = model.IdAsociacion,
                    NombreUsuario = model.NombreUsuario,
                    Contraseña = _hashingService.GenerateHash(model.Contraseña),
                    Rol = model.Rol,
@@ -187,6 +189,7 @@ namespace UCG.Controllers
            
                try
                {
+                   tbUsuario.Contraseña = _hashingService.GenerateHash(tbUsuario.Contraseña);
                    _context.Update(tbUsuario);
                    await _context.SaveChangesAsync();
                    return RedirectToAction(nameof(Index));

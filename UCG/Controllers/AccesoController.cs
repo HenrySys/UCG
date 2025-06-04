@@ -86,89 +86,62 @@ namespace UCG.Controllers
 
        [HttpPost]
        [ValidateAntiForgeryToken]
-       public async Task<IActionResult> Login(LoginViewModel modelo)
-       {
-           // Verifica si el modelo es válido
-           if (ModelState.IsValid)
-           {
-               // Busca al usuario por correo
-               TbUsuario? usuario_encontrado = await _context.TbUsuarios
-                    .Include(u => u.TbAsociados)
-                        .ThenInclude(a => a.IdAsociacionNavigation)
-                   .FirstOrDefaultAsync(u => u.Correo == modelo.Correo);
+        public async Task<IActionResult> Login(LoginViewModel modelo)
+        {
+            // Verifica si el modelo es válido
+            if (ModelState.IsValid)
+            {
+                // Busca al usuario por correo
+                TbUsuario? usuario_encontrado = await _context.TbUsuarios
+                    .Include(u => u.IdAsociacionNavigation)
+                    .FirstOrDefaultAsync(u => u.Correo == modelo.Correo);
 
-                var asociado = usuario_encontrado?.TbAsociados.FirstOrDefault();
-
-               // Verifica si se encontró el usuario
-               if (usuario_encontrado != null)
-               {
-                   // Compara la contraseña ingresada con la almacenada
-                   if (_hashingService.VeryfyHash(modelo.Contraseña, usuario_encontrado.Contraseña))
-                   {
-                       // Si la contraseña es correcta, crea los claims
+                // Verifica si se encontró el usuario
+                if (usuario_encontrado != null)
+                {
+                    // Compara la contraseña ingresada con la almacenada
+                    if (_hashingService.VeryfyHash(modelo.Contraseña, usuario_encontrado.Contraseña))
+                    {
+                        // Si la contraseña es correcta, crea los claims
                         List<Claim> claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, usuario_encontrado.NombreUsuario),
-                            new Claim(ClaimTypes.Role, usuario_encontrado.Rol.ToString())
-                        };
+                {
+                    new Claim(ClaimTypes.Name, usuario_encontrado.NombreUsuario),
+                    new Claim(ClaimTypes.Email,usuario_encontrado.Correo),
+                    new Claim(ClaimTypes.Role, usuario_encontrado.Rol.ToString())
+                };
+
                         if (usuario_encontrado.Rol == TbUsuario.RolUsuario.Admin)
                         {
-                            if (asociado != null)
+                            if (usuario_encontrado.IdAsociacion.HasValue)
                             {
-                                claims.Add(new Claim("IdAsociado", asociado.IdAsociado.ToString()));
-                                if (asociado.IdAsociacion.HasValue)
-                                {
-                                    claims.Add(new Claim("IdAsociacion", asociado.IdAsociacion.ToString()));
-                                }
+                                claims.Add(new Claim("IdAsociacion", usuario_encontrado.IdAsociacion.Value.ToString()));
                             }
                         }
-                       ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                       AuthenticationProperties properties = new AuthenticationProperties()
-                       {
-                           AllowRefresh = true,
-                       };
 
-                       // Inicia sesión
-                       await HttpContext.SignInAsync(
-                           CookieAuthenticationDefaults.AuthenticationScheme,
-                           new ClaimsPrincipal(claimsIdentity),
-                           properties
-                       );
+                        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProps = new AuthenticationProperties
+                        {
+                            AllowRefresh = true,
+                        };
 
-                       // Restablece los intentos
-                       if (_intentosPorUsuario.ContainsKey(modelo.Correo))
-                       {
-                           _intentosPorUsuario[modelo.Correo] = 0; // Resetea los intentos
-                       }
+                        // Inicia sesión
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            new ClaimsPrincipal(identity),
+                            authProps
+                        );
 
-                       return RedirectToAction("Index", "Home");
-                   }
-               }
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
 
-               // Si la autenticación falla, aumenta los intentos
-               if (!_intentosPorUsuario.ContainsKey(modelo.Correo))
-               {
-                   _intentosPorUsuario[modelo.Correo] = 0;
-               }
-               _intentosPorUsuario[modelo.Correo]++;
+                ViewData["Mensaje"] = "Correo o contraseña incorrectos.";
+            }
 
-               // Verifica si se superaron los 3 intentos
-               if (_intentosPorUsuario[modelo.Correo] >= 3)
-               {
-                   ViewData["Mensaje"] = "Has superado el número de intentos permitidos. Intenta más tarde.";
-                   // Aquí deberías retornar la vista "Bloqueado".
-                   return View("Bloqueado");
-               }
-               else
-               {
-                   ViewData["Mensaje"] = "Correo o contraseña incorrectos.";
-               }
-           }
+            return View(modelo);
+        }
 
-           return View(modelo);
-       }
-
-       public IActionResult Error()
+        public IActionResult Error()
         {
             return View("Error");
         }

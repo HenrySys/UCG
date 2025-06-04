@@ -39,9 +39,13 @@ namespace UCG.Controllers
             }
 
             var tbJuntaDirectiva = await _context.TbJuntaDirectivas
-                .Include(t => t.IdActaNavigation)
-                .Include(t => t.IdAsociacionNavigation)
-                .FirstOrDefaultAsync(m => m.IdJuntaDirectiva == id);
+                .Include(j => j.IdAsociacionNavigation) // Asociación
+                .Include(j => j.TbMiembroJuntaDirectivas) // Miembros
+                    .ThenInclude(m => m.IdAsociadoNavigation) // Asociación del miembro
+                .Include(j => j.TbMiembroJuntaDirectivas)
+                    .ThenInclude(m => m.IdPuestoNavigation) // Puesto del miembro
+                .FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
+
             if (tbJuntaDirectiva == null)
             {
                 return NotFound();
@@ -49,6 +53,7 @@ namespace UCG.Controllers
 
             return View(tbJuntaDirectiva);
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -225,7 +230,7 @@ namespace UCG.Controllers
                 _context.TbMiembroJuntaDirectivas.Add(new TbMiembroJuntaDirectiva
                 {
                     IdJuntaDirectiva = idJuntaDirectiva,
-                    IdAsociado = miembro.IdAsociado,
+                    IdAsociado = (int)miembro.IdAsociado,
                     IdPuesto = miembro.IdPuesto,
                     Estado = TbMiembroJuntaDirectiva.EstadoDeMiembroJD.Activo
                 });
