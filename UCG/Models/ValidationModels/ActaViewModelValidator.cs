@@ -41,8 +41,9 @@ namespace UCG.Models.ValidationModels
                 })
                 .WithMessage("La asociación seleccionada no existe.");
 
-            RuleFor(x => x.FechaSesion)
-                .NotNull().WithMessage("Debe ingresar una fecha de sesión.");
+            RuleFor(x => x.FechaSesionTexto)
+                .NotNull().WithMessage("Debe ingresar una fecha de sesión.")
+                .Must(SerFechaValida).WithMessage("La fecha debe tener el formato válido yyyy-MM-dd y estar entre el año 2000 y hoy.");
 
 
             RuleFor(x => x.NumeroActa)
@@ -71,6 +72,12 @@ namespace UCG.Models.ValidationModels
                 .NotEmpty().WithMessage("Debe seleccionar un tipo.");
 
 
+        }
+        private bool SerFechaValida(string? fecha)
+        {
+            return DateTime.TryParseExact(fecha, "dd/MM/yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out _);
         }
     }
 }

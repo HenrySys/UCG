@@ -1,4 +1,6 @@
-﻿@model UCG.Models.TbCheque
+﻿@using System.Reflection;
+@using System.ComponentModel.DataAnnotations;
+@model UCG.Models.TbCheque
 
 @{
     ViewData["Title"] = "Detalle del Cheque";
@@ -7,7 +9,7 @@
 <h1 class="text-center mb-4">Detalle del Cheque</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header">
                 Información del Cheque
@@ -45,7 +47,22 @@
                     </dd>
 
                     <dt class="col-sm-4 mb-3">Estado</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @{
+                            var nombreEstado = Model.Estado.HasValue
+                            ? Model.Estado.GetType()
+                            .GetMember(Model.Estado.Value.ToString())
+                            .First()
+                            .GetCustomAttributes(typeof(DisplayAttribute), false)
+                            .Cast<DisplayAttribute>()
+                            .FirstOrDefault()?.Name ?? Model.Estado.ToString()
+                            : null;
+                        }
+
+                        @Html.Raw(!string.IsNullOrWhiteSpace(nombreEstado)
+                        ? nombreEstado
+                        : "<h5><span class='badge bg-warning text-dark'>No especificado</span></h5>")
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Observaciones</dt>
                     <dd class="col-sm-8 mb-3">@Model.Observaciones</dd>

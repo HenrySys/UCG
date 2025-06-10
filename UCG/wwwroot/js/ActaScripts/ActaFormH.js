@@ -18,7 +18,7 @@
         Swal.fire({ icon: 'error', title: 'Error', text: errorMessage, confirmButtonText: 'Aceptar' });
     }
 
-   
+
 
     let colaErroresSwal = [];
     let swalMostrandose = false;
@@ -165,60 +165,67 @@
     });
     function reconstruirAsistenciasUI() {
         $('#detailsTableAsistencia tbody').empty();
+
         asistenciasCargadas.forEach((a, index) => {
             const nombreCompleto = `${a.Nombre} ${a.Apellido1 || ''}`.trim();
-            const botones = (modoVista === 'Create') ? `
-            <td>
-              <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
-            </td>
-        ` : '';
 
             $('#detailsTableAsistencia tbody').append(`
-            <tr>
+            <tr data-id-asociado="${a.IdAsociado}" data-nombre="${a.Nombre}" data-apellido1="${a.Apellido1}">
                 <td>${a.Fecha}</td>
                 <td>${nombreCompleto}</td>
-                ${botones}
-            </tr>`
-            );
+                <td><button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button></td>
+            </tr>
+        `);
         });
     }
+
 
     function reconstruirAcuerdosUI() {
         $('#detailsTableAcuerdo tbody').empty();
 
         acuerdosCargados.forEach((a, index) => {
+            const tipoTexto = $('#tipoAcuerdo option[value="' + a.Tipo + '"]').text();
 
-            console.log(`Acuerdo ${index}:`, a);
             $('#detailsTableAcuerdo tbody').append(`
-            <tr data-index="${index}" data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}">
+            <tr data-nombre="${a.Nombre}" data-descripcion="${a.Descripcion}" data-tipo="${a.Tipo}">
+                <td><span class="badge bg-info text-dark">${tipoTexto}</span></td>
                 <td>${a.Nombre}</td>
                 <td>
-                    <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo" data-index="${index}">Editar</button>
-                    <button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button>
+                    <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo">Editar</button>
+                    <button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button>
                 </td>
             </tr>`);
         });
     }
 
+
     reconstruirAsistenciasUI();
     reconstruirAcuerdosUI();
+
+
+  
+
 
     function recolectarAsistencias() {
         const asistencias = [];
         const filas = $('#detailsTableAsistencia tbody tr');
 
         filas.each(function () {
-            const fecha = $(this).find('td:eq(0)').text().trim();
-            const idAsociado = parseInt($(this).find('td:eq(1)').text().trim());
+            const fila = $(this);
+            const fecha = fila.find('td:eq(0)').text().trim();
 
             asistencias.push({
                 Fecha: fecha,
-                IdAsociado: idAsociado
+                IdAsociado: parseInt(fila.attr('data-id-asociado')),
+                Nombre: fila.attr('data-nombre') || '',
+                Apellido1: fila.attr('data-apellido1') || ''
             });
         });
 
         return asistencias;
     }
+
+
 
     function recolectarAcuerdos() {
         const acuerdos = [];
@@ -251,96 +258,111 @@
             });
         }
     }
-    
+
     if (modoVista === 'Create') {
         const idAsociacion = $('#IdAsociacion').val();
-        if (idAsociacion && parseInt(idAsociacion) > 0) {
+        const asociadoTieneOpciones = $('#IdAsociado option').length > 1;
+        const folioTieneOpciones = $('#IdFolio option').length > 1;
+
+        if (idAsociacion && parseInt(idAsociacion) > 0 && (!asociadoTieneOpciones || !folioTieneOpciones)) {
             cargarAsociados(idAsociacion);
             cargarFolios(idAsociacion);
         }
-        configurarModalAsistencia(); // Solo se configura una vez
-    }
 
-    $('#IdAsociacion').change(function () {
-        const nuevaAsociacion = $(this).val();
-        if (!nuevaAsociacion) return;
-
-        $('#detailsTableAsistencia tbody').empty();
-        cargarAsociados(nuevaAsociacion);
-        cargarFolios(nuevaAsociacion);
         configurarModalAsistencia();
-    });
 
+    }
+        $('#IdAsociacion').change(function () {
+            const nuevaAsociacion = $(this).val();
+            if (!nuevaAsociacion) return;
 
-
-    // Actualizar el número de acta al cargar la página
-    $('#IdFolio, #FechaSesionTexto').change(actualizarNumeroActa);
-
-   
-
-    $('#detailsTableAcuerdo').on('click', '.removeRow', function () {
-        const fila = $(this).closest('tr');
-        Swal.fire({
-            title: '¿Está seguro?',
-            text: '¿Desea eliminar este acuerdo?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fila.remove();
-                Swal.fire('Eliminado', 'El acuerdo ha sido eliminado.', 'success');
-            }
+            $('#detailsTableAsistencia tbody').empty();
+            cargarAsociados(nuevaAsociacion);
+            cargarFolios(nuevaAsociacion);
+            configurarModalAsistencia();
         });
-    });
 
 
-    $('#detailsTableAsistencia').on('click', '.removeRow', function () {
-        const fila = $(this).closest('tr');
-        Swal.fire({
-            title: '¿Está seguro?',
-            text: '¿Desea eliminar esta asistencia?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fila.remove();
-                Swal.fire('Eliminado', 'La asistencia ha sido eliminada.', 'success');
-            }
+
+        // Actualizar el número de acta al cargar la página
+        $('#IdFolio, #FechaSesionTexto').change(actualizarNumeroActa);
+
+
+
+        $('#detailsTableAcuerdo').on('click', '.removeRow', function () {
+            const fila = $(this).closest('tr');
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Desea eliminar este acuerdo?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fila.remove();
+                    Swal.fire('Eliminado', 'El acuerdo ha sido eliminado.', 'success');
+                }
+            });
         });
-    });
 
-    $('#addDetailAsistenciaBtn').on('click', function () {
-        limpiarErrores();
-        const idAsociado = $('#modalIdAsociado').val();
-        const fecha = new Date().toISOString().split('T')[0];
 
-        if (!idAsociado || idAsociado === "0") {
-            $('#modalIdAsociado').addClass('is-invalid')
-                .after('<div id="errorMensaje" class="text-danger mt-1">Debe seleccionar un asociado.</div>');
-            return;
-        }
+        $('#detailsTableAsistencia').on('click', '.removeRow', function () {
+            const fila = $(this).closest('tr');
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Desea eliminar esta asistencia?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fila.remove();
+                    Swal.fire('Eliminado', 'La asistencia ha sido eliminada.', 'success');
+                }
+            });
+        });
 
-        const existe = $('#detailsTableAsistencia tbody tr').toArray().some(tr => $(tr).find('td:eq(1)').text() === idAsociado);
-        if (existe) {
-            $('#modalIdAsociado').addClass('is-invalid')
-                .after('<div id="errorMensaje" class="text-danger mt-1">Este asociado ya fue agregado.</div>');
-            return;
-        }
+        $('#addDetailAsistenciaBtn').on('click', function () {
+            limpiarErrores();
 
-        $('#detailsTableAsistencia tbody').append(`
-            <tr>
-                <td>${fecha}</td>
-                <td>${idAsociado}</td>
-                <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
-            </tr>`);
+            const idAsociado = $('#modalIdAsociado').val();
+            const nombreCompleto = $('#modalIdAsociado option:selected').text();
+            const fecha = new Date().toISOString().split('T')[0];
 
-        $('#modalIdAsociado').val('0');
-        $('#detailModalAsistencia').modal('hide');
-    });
+            if (!idAsociado || idAsociado === "0") {
+                $('#modalIdAsociado').addClass('is-invalid')
+                    .after('<div id="errorMensaje" class="text-danger mt-1">Debe seleccionar un asociado.</div>');
+                return;
+            }
+
+            const yaExiste = $('#detailsTableAsistencia tbody tr').toArray().some(tr =>
+                $(tr).attr('data-id-asociado') === idAsociado
+            );
+
+            if (yaExiste) {
+                $('#modalIdAsociado').addClass('is-invalid')
+                    .after('<div id="errorMensaje" class="text-danger mt-1">Este asociado ya fue agregado.</div>');
+                return;
+            }
+
+            // Descomponer nombre en Nombre y Apellido1
+            const [nombre, apellido1] = nombreCompleto.split(' ');
+
+            $('#detailsTableAsistencia tbody').append(`
+                <tr data-id-asociado="${idAsociado}" data-nombre="${nombre}" data-apellido1="${apellido1}">
+                    <td>${fecha}</td>
+                    <td>${nombreCompleto}</td>
+                    <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
+                </tr>
+            `);
+
+            $('#modalIdAsociado').val('0');
+            $('#detailModalAsistencia').modal('hide');
+        });
+
+
 
     $('#addDetailAcuerdoBtn').on('click', function () {
         limpiarErrores();
@@ -381,17 +403,20 @@
         if (hayError) return;
 
         if (filaAcuerdoEditando !== null) {
+            // Actualizar fila existente
             filaAcuerdoEditando.attr('data-nombre', nombre);
             filaAcuerdoEditando.attr('data-descripcion', descripcionTextoPlano);
             filaAcuerdoEditando.attr('data-tipo', tipo);
-            filaAcuerdoEditando.find('td:eq(0)').text(nombre);
+
+            filaAcuerdoEditando.find('td:eq(0)').html(`<span class="badge bg-info text-dark">${tipoTexto}</span>`);
+            filaAcuerdoEditando.find('td:eq(1)').text(nombre);
+
             filaAcuerdoEditando = null;
         } else {
+            // Agregar nueva fila
             $('#detailsTableAcuerdo tbody').append(`
             <tr data-nombre="${nombre}" data-descripcion="${descripcionTextoPlano}" data-tipo="${tipo}">
-                <td>
-                    <span class="badge bg-info text-dark">${tipoTexto}</span>
-                </td>
+                <td><span class="badge bg-info text-dark">${tipoTexto}</span></td>
                 <td>${nombre}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-warning btn-edit-acuerdo">Editar</button>
@@ -404,24 +429,64 @@
         $('#detailModalAcuerdo').modal('hide');
     });
 
-    $('form').on('submit', function (e) {
-        limpiarErrores();
 
-        const asistencias = recolectarAsistencias();
-        const acuerdos = recolectarAcuerdos();
+    $('#detailModalAsistenciaEdit').click(function () {
+        var idActa = $(this).data("id"); // <-- aquí sí se obtiene correctamente el ID del botón
+        console.log("ID Acta:", idActa);
 
-        if (asistencias.length === 0) {
-            $('#detailsTableAsistencia').after('<div id="errorTablaAsistencia" class="text-danger mt-1">Debe agregar al menos una asistencia.</div>');
-            e.preventDefault();
-        } else {
-            $('#ActaAsistenciaJason').val(JSON.stringify(asistencias));
-        }
-
-        if (acuerdos.length === 0) {
-            $('#detailsTableAcuerdo').after('<div id="errorTablaAcuerdo" class="text-danger mt-1">Debe agregar al menos un acuerdo.</div>');
-            e.preventDefault();
-        } else {
-            $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
+        if (idActa) {
+            window.location.href = "/TbActaAsistenciums/Create/" + idActa;
         }
     });
+
+    $('#detailsTableAcuerdo').on('click', '.btn-edit-acuerdo', function () {
+        limpiarErrores(); // Borra errores anteriores
+
+        const fila = $(this).closest('tr');
+        filaAcuerdoEditando = fila; // Guarda referencia global para saber que se está editando
+
+        const nombre = fila.data('nombre');
+        const tipo = fila.data('tipo');
+        const descripcion = fila.data('descripcion');
+
+        // Carga los valores en el modal
+        $('#nombreAcuerdo').val(nombre);
+        $('#tipoAcuerdo').val(tipo);
+
+        // Inicializa summernote y le carga el contenido
+        $('#summernoteAcuerdo').summernote({
+            height: 125,
+            placeholder: 'Escriba el acuerdo aquí...',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['view', ['codeview']]
+            ]
+        }).summernote('code', descripcion);
+
+        // Abre el modal
+        $('#detailModalAcuerdo').modal('show');
+    });
+
+        $('form').on('submit', function (e) {
+            limpiarErrores();
+
+            const asistencias = recolectarAsistencias();
+            const acuerdos = recolectarAcuerdos();
+
+            if (asistencias.length === 0) {
+                $('#detailsTableAsistencia').after('<div id="errorTablaAsistencia" class="text-danger mt-1">Debe agregar al menos una asistencia.</div>');
+                e.preventDefault();
+            } else {
+                $('#ActaAsistenciaJason').val(JSON.stringify(asistencias));
+            }
+
+            if (acuerdos.length === 0) {
+                $('#detailsTableAcuerdo').after('<div id="errorTablaAcuerdo" class="text-danger mt-1">Debe agregar al menos un acuerdo.</div>');
+                e.preventDefault();
+            } else {
+                $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
+            }
+        });
+    
 });

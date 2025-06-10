@@ -359,6 +359,38 @@ namespace UCG.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetMontoCheque(int id)
+        {
+            var cheque = _context.TbCheques
+                .Where(c => c.IdCheque == id)
+                .Select(c => new {
+                    c.Monto,
+                    c.MontoRestante
+                })
+                .FirstOrDefault();
+
+            if (cheque == null)
+                return NotFound();
+
+            return Json(cheque);
+        }
+
+        [HttpGet]
+        public IActionResult GetMontoFactura(int id)
+        {
+            var factura = _context.TbFacturas
+                .Where(c => c.IdFactura == id)
+                .Select(c => new {
+                    c.MontoTotal,
+                })
+                .FirstOrDefault();
+
+            if (factura == null)
+                return NotFound();
+
+            return Json(factura);
+        }
 
 
         // GET: TbMovimientoEgresos/Edit/5

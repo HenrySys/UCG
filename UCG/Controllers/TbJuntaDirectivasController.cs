@@ -106,15 +106,13 @@ namespace UCG.Controllers
                 return View(model);
             }
 
-            try
-            {
+         
                 if (DateOnly.TryParseExact(model.FechaPeriodoInicioTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var inicio))
                     model.PeriodoInicio = inicio;
 
                 if (DateOnly.TryParseExact(model.FechaPeriodoFinTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fin))
                     model.PeriodoFin = fin;
-            }
-            catch { }
+ 
 
         
 
@@ -172,37 +170,6 @@ namespace UCG.Controllers
             };
         }
 
-        [HttpPost]
-        public IActionResult ObtenerNombresMiembros([FromBody] List<MiembroJuntaDirectivaViewModel> miembros)
-        {
-            try
-            {
-                var idAsociados = miembros.Select(m => m.IdAsociado).Where(id => id.HasValue).Distinct().ToList();
-                var idPuestos = miembros.Select(m => m.IdPuesto).Where(id => id.HasValue).Distinct().ToList();
-
-                var asociados = _context.TbAsociados
-                    .Where(a => idAsociados.Contains(a.IdAsociado))
-                    .ToDictionary(a => a.IdAsociado, a => $"{a.Nombre} {a.Apellido1}");
-
-                var puestos = _context.TbPuestos
-                    .Where(p => idPuestos.Contains(p.IdPuesto))
-                    .ToDictionary(p => p.IdPuesto, p => p.Nombre);
-
-                var resultado = miembros.Select(m => new
-                {
-                    idAsociado = m.IdAsociado,
-                    nombreAsociado = m.IdAsociado.HasValue && asociados.ContainsKey(m.IdAsociado.Value) ? asociados[m.IdAsociado.Value] : null,
-                    idPuesto = m.IdPuesto,
-                    nombrePuesto = m.IdPuesto.HasValue && puestos.ContainsKey(m.IdPuesto.Value) ? puestos[m.IdPuesto.Value] : null
-                });
-
-                return Json(resultado);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = "Error al obtener nombres: " + ex.Message });
-            }
-        }
 
 
         private async Task<bool> DeserializarJsonAsync(JuntaDirectivaViewModel model)
@@ -230,7 +197,7 @@ namespace UCG.Controllers
                 _context.TbMiembroJuntaDirectivas.Add(new TbMiembroJuntaDirectiva
                 {
                     IdJuntaDirectiva = idJuntaDirectiva,
-                    IdAsociado = (int)miembro.IdAsociado,
+                    IdAsociado = miembro.IdAsociado,
                     IdPuesto = miembro.IdPuesto,
                     Estado = TbMiembroJuntaDirectiva.EstadoDeMiembroJD.Activo
                 });
@@ -279,28 +246,6 @@ namespace UCG.Controllers
             }
         }
 
-        [HttpGet]
-        public JsonResult ObtenerActaPorAsociacion(int idAsociacion)
-        {
-            try
-            {
-                var actas = _context.TbActa
-                    .Where(c => c.IdAsociacion == idAsociacion)
-                    .ToList();
-
-                if (!actas.Any())
-                {
-                    return Json(new { success = false, message = "No hay actas disponibles." });
-                }
-
-                return Json(new { success = true, data = actas });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Error al obtener los actas: " + ex.Message });
-            }
-        }
-
 
         private async Task<bool> ParseFechasPeriodoAsync(JuntaDirectivaViewModel model)
         {
@@ -340,7 +285,9 @@ namespace UCG.Controllers
                 {
                     IdAsociado = m.IdAsociado,
                     IdPuesto = m.IdPuesto,
-                    Estado = m.Estado
+                    Estado = m.Estado,
+                    Nombre = m.IdAsociadoNavigation!.Nombre + " " + m.IdAsociadoNavigation.Apellido1,
+                    Puesto = m.IdPuestoNavigation!.Nombre
                 }).ToList()
             };
         }
@@ -351,8 +298,12 @@ namespace UCG.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var junta = await _context.TbJuntaDirectivas
-                .Include(j => j.TbMiembroJuntaDirectivas)
-                .FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
+                 .Include(j => j.TbMiembroJuntaDirectivas)
+                     .ThenInclude(m => m.IdAsociadoNavigation)
+                 .Include(j => j.TbMiembroJuntaDirectivas)
+                     .ThenInclude(m => m.IdPuestoNavigation)
+                 .FirstOrDefaultAsync(j => j.IdJuntaDirectiva == id);
+
 
             if (junta is null)
                 return NotFound();

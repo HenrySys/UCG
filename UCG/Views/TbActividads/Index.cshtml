@@ -18,7 +18,7 @@
     <!-- Encabezado y botón Create -->
     <div class="table-header center-header">
         <div style="width: 100%; text-align: center;">
-            <h1 class="table-title" style="margin-bottom: 15px;">Actas</h1>
+            <h1 class="table-title" style="margin-bottom: 15px;">Actividades</h1>
             <div class="table-actions">
 
                 <a asp-controller="Home" asp-action="Asociacion" class="btn btn-secondary">
@@ -51,26 +51,23 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Observaciones)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdActaNavigation)
-                </th>
+    
                 <th>
                     @Html.DisplayNameFor(model => model.IdAsociacionNavigation)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdAsociadoNavigation)
-                </th>
+              
                 <th></th>
             </tr>
         </thead>
         <tbody>
     @foreach (var item in Model) {
-            <tr>
+                <tr data-id="@item.IdActividad">
                 <td>
                     @Html.DisplayFor(modelItem => item.Nombre)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Fecha)
+                    @(item.Fecha.HasValue ? item.Fecha.Value.ToString("yyyy/MM/dd") : "")
+
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Razon)
@@ -81,15 +78,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Observaciones)
                 </td>
+            
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdActaNavigation!.IdActa)
+                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.Nombre)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.IdAsociacion)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociadoNavigation!.IdAsociado)
-                </td>
+           
                 <td>
                         <a asp-action="Edit" asp-route-id="@item.IdActividad" class="btn btn-secondary" title="Editar">
                             <i class="fa-solid fa-pen"></i>
@@ -116,6 +109,6 @@
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-        <script src="~/js/ActaScripts/ActaIndex.js"></script>
+        <script src="~/js/ActividadScripts/ActividadIndex.js"></script>
     }
 }

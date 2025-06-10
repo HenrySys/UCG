@@ -1,4 +1,5 @@
-﻿@model UCG.Models.TbAcuerdo
+﻿@using System.ComponentModel.DataAnnotations;
+@model UCG.Models.TbAcuerdo
 
 @{
     ViewData["Title"] = "Detalle del Acuerdo";
@@ -7,7 +8,7 @@
 <h1 class="text-center mb-4">Detalle del Acuerdo</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header">
                 Información del Acuerdo
@@ -16,24 +17,59 @@
                 <dl class="row">
                     <dt class="col-sm-4 mb-3">Número de Acta</dt>
                     <dd class="col-sm-8 mb-3">
-                        <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation?.IdActa">
-                            @Model.IdActaNavigation?.NumeroActa
-                        </a>
+                        @if (Model.IdActaNavigation != null)
+                        {
+                            <a asp-controller="TbActums" asp-action="Details" asp-route-id="@Model.IdActaNavigation.IdActa">
+                                @Model.IdActaNavigation.NumeroActa
+                            </a>
+                        }
+                        else
+                        {
+                            @Html.Raw("<h5><span class='badge bg-warning text-dark'>Sin acta asociada</span></h5>")
+                        }
                     </dd>
 
                     <dt class="col-sm-4 mb-3">Número del Acuerdo</dt>
-                    <dd class="col-sm-8 mb-3">@Model.NumeroAcuerdo</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @Html.Raw(Model.NumeroAcuerdo?.ToString() ?? "<h5><span class='badge bg-warning text-dark'>No especificado</span></h5>")
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Tipo de Acuerdo</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Tipo</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @{
+                            var nombreTipo = Model.Tipo.HasValue
+                            ? Model.Tipo.Value.GetType()
+                            .GetMember(Model.Tipo.Value.ToString())
+                            .First()
+                            .GetCustomAttributes(typeof(DisplayAttribute), false)
+                            .Cast<DisplayAttribute>()
+                            .FirstOrDefault()?.Name ?? Model.Tipo.Value.ToString()
+                            : null;
+                        }
+
+                        @Html.Raw(!string.IsNullOrWhiteSpace(nombreTipo)
+                        ? nombreTipo
+                        : "<h5><span class='badge bg-warning text-dark'>No especificado</span></h5>")
+                    </dd>
+
+
+
 
                     <dt class="col-sm-4 mb-3">Nombre</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @Html.Raw(string.IsNullOrWhiteSpace(Model.Nombre)
+                        ? "<h5><span class='badge bg-warning text-dark'>Sin nombre</span></h5>"
+                        : Model.Nombre)
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Descripción</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Descripcion</dd>
- 
+                    <dd class="col-sm-8 mb-3">
+                        @Html.Raw(string.IsNullOrWhiteSpace(Model.Descripcion)
+                        ? "<h5><span class='badge bg-warning text-dark'>Sin descripción</span></h5>"
+                        : Model.Descripcion)
+                    </dd>
                 </dl>
+
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Edit" asp-route-id="@Model?.IdAcuerdo" class="btn btn-warning">Editar</a>
                     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>

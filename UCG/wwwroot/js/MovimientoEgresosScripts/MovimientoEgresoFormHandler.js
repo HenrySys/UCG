@@ -15,18 +15,21 @@
 
     if (successMessage) {
         Swal.fire({ icon: 'success', title: '¡Éxito!', text: successMessage, confirmButtonText: 'Ir al listado' })
-            .then(result => { if (result.isConfirmed) window.location.href = '/TbActums/Index'; });
+            .then(result => { if (result.isConfirmed) window.location.href = '/TbMovimientoEgresos/Index'; });
     } else if (errorMessage) {
         Swal.fire({ icon: 'error', title: 'Error', text: errorMessage, confirmButtonText: 'Aceptar' });
     }
 
     $('#summernoteAcuerdo').summernote({
-        placeholder: 'Ingrese la descripción...',
-        tabsize: 2,
-        height: 120
+        height: 125,
+        placeholder: 'Escriba el acuerdo aquí...',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['view', ['codeview']]
+        ],
+
     });
-
-
 
     let colaErroresSwal = [];
     let swalMostrandose = false;
@@ -126,15 +129,13 @@
                 }
             });
 
-            $('#modalIdFactura').trigger('change.select2');
-
-
             if (disponibles === 0) {
                 cerrarModalConMensaje('#detailModalEgreso', {
                     titulo: 'Facturas agotadas',
                     texto: 'Todas las facturas ya han sido agregadas.'
                 });
             }
+
         });
     }
 
@@ -176,6 +177,8 @@
         });
     }
     reconstruirEgresosUI();
+    actualizarMontoTotal(); // después de reconstruir
+
 
     function recolectarDetalleChequeFactura() {
         const detalles = [];
@@ -207,6 +210,7 @@
         $('#modalIdFactura').val("0").removeClass('is-invalid');
         $('#modalIdCheque').val("0").removeClass('is-invalid');
         $('#modalMonto').val('').removeClass('is-invalid');
+        $('#montoChequeRestante').remove();
 
         $('#summernoteAcuerdo').summernote('code', '');
         $('#summernoteAcuerdo').removeClass('is-invalid');
@@ -216,14 +220,16 @@
 
 
     function configurarModalEgresos() {
-        $('#detailModalEgreso').off('show.bs.modal').on('show.bs.modal', function (e) {
-            if (esEdicionEgreso) return; // si es edición, permitir sin validar
+        $('#btnAbrirModalEgreso').off('click').on('click', function () {
+            if (esEdicionEgreso) {
+                $('#detailModalEgreso').modal('show');
+                return;
+            }
 
             const idAsociacion = $('#IdAsociacion').val();
             const idActa = $('#IdActa').val();
 
             if (!idAsociacion || parseInt(idAsociacion) === 0) {
-                e.preventDefault();
                 Swal.fire({
                     icon: 'info',
                     title: 'Debe seleccionar una asociación',
@@ -235,7 +241,6 @@
             }
 
             if (!idActa || parseInt(idActa) === 0) {
-                e.preventDefault();
                 Swal.fire({
                     icon: 'info',
                     title: 'Debe seleccionar un acta',
@@ -246,14 +251,37 @@
                 return;
             }
 
-            limpiarErrores();
-            limpiarCamposModalEgreso();
+            // Validar facturas antes de abrir el modal
+            $.get(rutasMovimientoEgreso.obtenerFacturas, { idAsociacion }, function (response) {
+                const facturasAgregadas = $('#detailsTableEgreso tbody tr').map(function () {
+                    return $(this).find('td:eq(1)').text().trim();
+                }).get();
 
-            cargarAcuerdos(idActa);
-            cargarCheques(idAsociacion);
-            cargarFacturas(idAsociacion);
+                const disponibles = response.data.filter(f => !facturasAgregadas.includes(f.numeroFactura));
+
+                if (disponibles.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Facturas agotadas',
+                        text: 'No hay facturas disponibles para agregar.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                // Si hay facturas disponibles, entonces sí abrís el modal
+                cargarAcuerdos(idActa);
+                cargarCheques(idAsociacion);
+                cargarFacturas(idAsociacion);
+                limpiarErrores();
+                limpiarCamposModalEgreso();
+
+                $('#detailModalEgreso').modal('show');
+            });
         });
     }
+
 
 
 
@@ -357,6 +385,7 @@
             </tr>
         `);
         }
+        actualizarMontoTotal(); 
 
         limpiarErrores();
         $('#detailModalEgreso').modal('hide');
@@ -404,7 +433,6 @@
         esEdicionEgreso = false;
     });
 
-
     $('#detailsTableEgreso').on('click', '.btn-remove-egreso', function () {
         const fila = $(this).closest('tr');
         Swal.fire({
@@ -417,6 +445,8 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 fila.remove();
+                actualizarMontoTotal();
+
                 Swal.fire('Eliminado', 'El egreso ha sido eliminado.', 'success');
             }
         });
@@ -434,5 +464,84 @@
             $('#DetalleChequeFacturaEgresoJason').val(JSON.stringify(detallesChequFactura));
         }   
     });
+
+
+    $('#modalIdCheque').on('change', function () {
+        const idCheque = $(this).val();
+        if (!idCheque || idCheque === "0") return;
+
+        const detalles = $('#detailsTableEgreso tbody tr');
+        let montoUsado = 0;
+
+        detalles.each(function () {
+            const idChequeDetalle = $(this).data('idcheque');
+            const monto = parseFloat($(this).data('monto')) || 0;
+            if (parseInt(idChequeDetalle) === parseInt(idCheque)) {
+                montoUsado += monto;
+            }
+        });
+
+        // Llamar al backend para obtener el monto base del cheque
+        $.get(`/TbMovimientoEgresos/GetMontoCheque/${idCheque}`, function (data) {
+            const montoBase = parseFloat(data.montoRestante || data.monto || 0);
+            const montoDisponible = montoBase - montoUsado;
+
+            $('#montoChequeRestante').remove();
+            $('#modalIdCheque').after(`<div id="montoChequeRestante" class="mt-2 text-info">Monto restante disponible: ₡${montoDisponible.toLocaleString('es-CR')}</div>`);
+
+            // Obtener el monto automáticamente desde la factura seleccionada
+            $('#modalIdFactura').off('change').on('change', function () {
+                const facturaId = $(this).val();
+                if (!facturaId || facturaId === "0") return;
+
+                $.get(`/TbMovimientoEgresos/GetMontoFactura/${facturaId}`, function (facturaData) {
+                    const montoFactura = parseFloat(facturaData.montoTotal);
+                    if (!isNaN(montoFactura)) {
+                        const montoFormateado = montoFactura.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' });
+
+                        // Mostrar en campo visible con formato
+                        $('#modalMontoVisible')
+                            .val(montoFormateado)
+                            .attr('readonly', true)
+                            .addClass('bg-light');
+
+                        // Asignar valor decimal real al campo oculto que va al servidor
+                        $('#modalMonto').val(montoFactura);
+
+                        // Validar contra el monto restante
+                        if (montoFactura > montoDisponible) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Monto excedido',
+                                text: 'El monto de la factura supera el monto disponible del cheque.',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    });
+
+
+    function actualizarMontoTotal() {
+        let total = 0;
+        $('#detailsTableEgreso tbody tr').each(function () {
+            const monto = parseFloat($(this).data('monto')) || 0;
+            total += monto;
+        });
+
+        // Asignar el total al campo Monto del modelo
+        $('#Monto').val(total);
+
+        // También puedes formatearlo visualmente si quieres mostrarlo en un campo visible aparte
+        $('#Monto').closest('.mb-3').find('.text-info-monto-total').remove();
+        $('#Monto').after(`<div class="text-info text-info-monto-total mt-1">Total: ₡${total.toLocaleString('es-CR')}</div>`);
+    }
+
+
+
+
 
 });

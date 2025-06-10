@@ -1,4 +1,6 @@
-﻿@model UCG.Models.TbMiembroJuntaDirectiva
+﻿@using UCG.Models.ViewModels;
+@using static UCG.Models.TbMiembroJuntaDirectiva;
+@model MiembroJuntaDirectivaViewModel;
 
 @{
     ViewData["Title"] = "Crear Miembro de Junta Directiva";
@@ -6,6 +8,12 @@
 
 <h1 class="text-center mb-4">Crear Miembro de Junta Directiva</h1>
 <hr />
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-junta="@TempData["IdJuntaDirectiva"]">
+</div>
+
 
 <div class="row justify-content-center">
     <div class="col-lg-6">
@@ -18,19 +26,29 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <dl class="row">
-                        <dt class="col-sm-4 mb-3">
-                            <label asp-for="IdJuntaDirectiva" class="form-label"></label>
-                        </dt>
-                        <dd class="col-sm-8 mb-3">
-                            <select asp-for="IdJuntaDirectiva" class="form-select" asp-items="ViewBag.IdJuntaDirectiva"></select>
-                            <span asp-validation-for="IdJuntaDirectiva" class="text-danger"></span>
-                        </dd>
+                        @if (Model!.IdJuntaDirectiva != null && Model.IdJuntaDirectiva > 0)
+                        {
+                            <input type="hidden" asp-for="IdJuntaDirectiva" id="IdJuntaDirectiva" />
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label asp-for="IdJuntaDirectiva" class="form-label"></label>
+                                <select asp-for="IdJuntaDirectiva" id="IdJuntaDirectiva" class="form-select" asp-items="@(ViewBag.IdJuntaDirectiva as SelectList)">
+                                    <option disabled selected>Seleccione una junta directiva</option>
+                                </select>
+                                <span asp-validation-for="IdJuntaDirectiva" class="text-danger"></span>
+                            </div>
+                        }
+
 
                         <dt class="col-sm-4 mb-3">
                             <label asp-for="IdAsociado" class="form-label"></label>
                         </dt>
                         <dd class="col-sm-8 mb-3">
-                            <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado"></select>
+                            <select asp-for="IdAsociado" class="form-select" asp-items="ViewBag.IdAsociado" id="IdAsociado">
+                                <option disabled selected>Seleccione un asociado</option>
+                            </select>
                             <span asp-validation-for="IdAsociado" class="text-danger"></span>
                         </dd>
 
@@ -38,7 +56,9 @@
                             <label asp-for="IdPuesto" class="form-label"></label>
                         </dt>
                         <dd class="col-sm-8 mb-3">
-                            <select asp-for="IdPuesto" class="form-select" asp-items="ViewBag.IdPuesto"></select>
+                            <select asp-for="IdPuesto" class="form-select" asp-items="ViewBag.IdPuesto" id="IdPuesto">
+                                <option disabled selected>Seleccione un puesto</option>
+                            </select>
                             <span asp-validation-for="IdPuesto" class="text-danger"></span>
                         </dd>
                     </dl>
@@ -57,4 +77,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/MiembroJuntaDirectivaScripts/MiembroJuntaDirectivaCreate.js"></script>
 }

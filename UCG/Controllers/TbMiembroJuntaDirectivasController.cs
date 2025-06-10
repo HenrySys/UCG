@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ValidationModels;
 using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
@@ -54,16 +55,88 @@ namespace UCG.Controllers
         {
             var model = new MiembroJuntaDirectivaViewModel();
 
-            if (id.HasValue)
-            {
-                var junta = await _context.TbJuntaDirectivas.FindAsync(id.Value);
-                if (junta == null)
-                {
-                    TempData["ErrorMessage"] = "La Junta Directiva no fue encontrada.";
-                    return RedirectToAction("Index", "TbJuntaDirectivas");
-                }
+            if (!id.HasValue) return RedirectToAction("Index");
 
-                var idAsociacion = junta.IdAsociacion;
+            var junta = await _context.TbJuntaDirectivas.FindAsync(id.Value);
+            if (junta == null) return NotFound();
+
+            model.IdJuntaDirectiva = id.Value;
+
+            var idAsociacion = junta.IdAsociacion;
+            ViewData["IdJuntaDirectiva"] = id.Value;
+            ViewData["IdAsociacion"] = idAsociacion;
+
+            var asociadosExistentes = await _context.TbMiembroJuntaDirectivas
+                .Where(m => m.IdJuntaDirectiva == id.Value)
+                .Select(m => m.IdAsociado)
+                .ToListAsync();
+
+            var asociadosDisponibles = await _context.TbAsociados
+                .Where(a => a.IdAsociacion == idAsociacion && !asociadosExistentes.Contains(a.IdAsociado))
+                .Select(a => new SelectListItem
+                {
+                    Value = a.IdAsociado.ToString(),
+                    Text = a.Nombre + " " + a.Apellido1
+                }).ToListAsync();
+
+            var puestosOcupados = await _context.TbMiembroJuntaDirectivas
+                .Where(m => m.IdJuntaDirectiva == id.Value)
+                .Select(m => m.IdPuesto)
+                .ToListAsync();
+
+            var puestosDisponibles = await _context.TbPuestos
+                .Where(p => !puestosOcupados.Contains(p.IdPuesto))
+                .Select(p => new SelectListItem
+                {
+                    Value = p.IdPuesto.ToString(),
+                    Text = p.Nombre
+                }).ToListAsync();
+
+            ViewData["IdAsociado"] = asociadosDisponibles;
+            ViewData["IdPuesto"] = puestosDisponibles;
+
+            if (!asociadosDisponibles.Any())
+                TempData["IdJuntaDirectiva"] = id.Value;
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(MiembroJuntaDirectivaViewModel model)
+        {
+            var validator = new MiembroJuntaDirectivaViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await PrepararViewDataAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var entidad = new TbMiembroJuntaDirectiva
+                {
+                    IdJuntaDirectiva = model.IdJuntaDirectiva,
+                    IdAsociado = model.IdAsociado,
+                    IdPuesto = model.IdPuesto
+                };
+
+                _context.TbMiembroJuntaDirectivas.Add(entidad);
+                await _context.SaveChangesAsync();
+
+                // Verificación de asociados restantes
+                var idAsociacion = await _context.TbJuntaDirectivas
+                    .Where(j => j.IdJuntaDirectiva == model.IdJuntaDirectiva)
+                    .Select(j => j.IdAsociacion)
+                    .FirstOrDefaultAsync();
 
                 var todosAsociados = await _context.TbAsociados
                     .Where(a => a.IdAsociacion == idAsociacion)
@@ -71,49 +144,29 @@ namespace UCG.Controllers
                     .ToListAsync();
 
                 var yaRegistrados = await _context.TbMiembroJuntaDirectivas
-                    .Where(m => m.IdJuntaDirectiva == id.Value)
+                    .Where(m => m.IdJuntaDirectiva == model.IdJuntaDirectiva)
                     .Select(m => m.IdAsociado)
                     .ToListAsync();
 
                 var restantes = todosAsociados.Except(yaRegistrados).ToList();
 
-                var puestosAsignados = await _context.TbMiembroJuntaDirectivas
-                    .Where(m => m.IdJuntaDirectiva == id.Value)
-                    .Select(m => m.IdPuesto)
-                    .ToListAsync();
+                TempData["SuccessMessage"] = restantes.Any()
+                    ? "Miembro agregado correctamente."
+                    : "Todos los asociados ya han sido registrados.";
 
-                var puestosDisponibles = await _context.TbPuestos
-                    .Where(p => !puestosAsignados.Contains(p.IdPuesto))
-                    .ToListAsync();
+                TempData["IdJuntaDirectiva"] = model.IdJuntaDirectiva;
 
-                
-                if (!restantes.Any() || !puestosDisponibles.Any())
-                {
-                    TempData["IdJunta"] = id.Value;
-                }
-
-                // Seteo final
-                model.IdJuntaDirectiva = id.Value;
-                ViewData["IdJuntaDirectiva"] = id;
-                ViewData["IdAsociacion"] = idAsociacion;
-
-                ViewData["IdAsociado"] = new SelectList(
-                    await _context.TbAsociados
-                        .Where(a => restantes.Contains(a.IdAsociado))
-                        .ToListAsync(),
-                    "IdAsociado", "Nombre");
-
-                ViewData["IdPuesto"] = new SelectList(puestosDisponibles, "IdPuesto", "Nombre");
+                await transaction.CommitAsync();
+                return RedirectToAction(nameof(Create), new { id = model.IdJuntaDirectiva });
             }
-            else
+            catch (Exception ex)
             {
-                ViewData["IdJuntaDirectiva"] = new SelectList(await _context.TbJuntaDirectivas.ToListAsync(), "IdJuntaDirectiva", "Nombre");
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Error al guardar el miembro de junta: " + ex.Message;
+                await PrepararViewDataAsync(model);
+                return View(model);
             }
-
-            return View(model);
         }
-
-
 
 
         private async Task PrepararViewDataAsync(MiembroJuntaDirectivaViewModel model)
@@ -190,24 +243,31 @@ namespace UCG.Controllers
 
 
         [HttpGet]
-        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion, int? idActa)
+        public JsonResult ObtenerAsociadosDisponiblesPorJunta(int idJunta)
         {
             try
             {
-                var asociadosConAsistencia = idActa.HasValue
-                    ? _context.TbActaAsistencia
-                        .Where(a => a.IdActa == idActa.Value)
-                        .Select(a => a.IdAsociado)
-                        .ToHashSet()
-                    : new HashSet<int>();
+                // Obtener la junta
+                var junta = _context.TbJuntaDirectivas.FirstOrDefault(j => j.IdJuntaDirectiva == idJunta);
+                if (junta == null)
+                {
+                    return Json(new { success = false, message = "Junta directiva no encontrada." });
+                }
 
+                // Obtener asociados ya registrados en la junta
+                var asociadosEnJunta = _context.TbMiembroJuntaDirectivas
+                    .Where(m => m.IdJuntaDirectiva == idJunta)
+                    .Select(m => m.IdAsociado)
+                    .ToHashSet();
+
+                // Obtener asociados disponibles de la misma asociación de la junta
                 var asociadosDisponibles = _context.TbAsociados
-                    .Where(a => a.IdAsociacion == idAsociacion && !asociadosConAsistencia.Contains(a.IdAsociado))
+                    .Where(a => a.IdAsociacion == junta.IdAsociacion && !asociadosEnJunta.Contains(a.IdAsociado))
                     .Select(a => new { a.IdAsociado, a.Nombre, a.Apellido1 })
                     .ToList();
 
                 return !asociadosDisponibles.Any()
-                    ? Json(new { success = false, message = "Todos los asociados ya fueron registrados en esta acta." })
+                    ? Json(new { success = false, message = "Todos los asociados ya han sido registrados en esta junta directiva." })
                     : Json(new { success = true, data = asociadosDisponibles });
             }
             catch (Exception ex)
@@ -215,6 +275,8 @@ namespace UCG.Controllers
                 return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
             }
         }
+
+
 
         [HttpGet]
         public JsonResult ObtenerPuestosPorJunta(int idJunta)
@@ -242,10 +304,6 @@ namespace UCG.Controllers
                 return Json(new { success = false, message = "Error al obtener los puestos: " + ex.Message });
             }
         }
-
-
-
-
 
 
         // GET: TbMiembroJuntaDirectivas/Edit/5

@@ -9,6 +9,8 @@
 <h1>Crear Junta Directiva</h1>
 <hr />
 
+
+
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
      data-error="@TempData["ErrorMessage"]"
@@ -16,7 +18,7 @@
  </div>
 
 <form asp-action="Create" data-mode="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="row g-3 mb-4">
         <!-- CARD 1: Información de la Junta -->
@@ -42,21 +44,6 @@
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
-                    @* <div class="mb-3">
-                        <label asp-for="IdActa" class="form-label"></label>
-                        @if (ViewBag.EsAdmin == true || ViewBag.EsAdmin == false)
-						{
-                            <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
-                                <option disabled selected>Seleccione un acta</option>
-                            </select>
-						}
-						
-                        @* <select asp-for="IdActa" class="form-select" asp-items="ViewBag.IdActa" id="IdActa">
-                            <option disabled selected>Seleccione un acta</option>
-                        </select> 
-                        <span asp-validation-for="IdActa" class="text-danger"></span>
-                    </div> *@
-
                     <div class="mb-3">
                         <label asp-for="FechaPeriodoInicioTexto" class="form-label"></label>
                         <input asp-for="FechaPeriodoInicioTexto" class="form-control" type="date" />
@@ -71,7 +58,7 @@
 
                     <div class="mb-3">
                         <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Junta Directiva 2025-2028" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
 
@@ -89,26 +76,39 @@
         <!-- CARD 2: Miembros -->
         <div class="col-lg-6">
             <div class="card h-100 shadow">
-                <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
-                    <span>Miembros de la Junta</span>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalMiembrosJunta">
-                        Agregar
-                    </button>
+                <div class="card-header">
+                    Relacionados
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered table-sm" id="detailsTableMiembros">
-                        <thead>
-                            <tr>
-                                <th>Asociado</th>
-                                <th>Puesto</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="row g-3">
+                        <!-- Mini Card de Miembros -->
+                        <div class="col-12">
+                            <div class="card border-secondary-emphasis shadow">
+                                <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
+                                    <span>Miembros de la Junta</span>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalMiembrosJunta">
+                                        Agregar
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered table-sm" id="detailsTableMiembros">
+                                        <thead>
+                                            <tr>
+                                                <th>Asociado</th>
+                                                <th>Puesto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- End row -->
                 </div>
             </div>
         </div>
-    </div>
+</div> 
+
 
     <!-- Botones -->
     <div class="mt-4">
@@ -165,7 +165,6 @@
     <script>
         const rutasJuntaDirectiva = {
             obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbJuntaDirectivas")',
-            obtenerActas: '@Url.Action("ObtenerActasPorAsociacion", "TbJuntaDirectivas")',
         };
     </script>
 

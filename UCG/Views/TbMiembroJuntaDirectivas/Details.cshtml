@@ -1,4 +1,5 @@
-﻿@model UCG.Models.TbMiembroJuntaDirectiva
+﻿@using System.ComponentModel.DataAnnotations;
+@model UCG.Models.TbMiembroJuntaDirectiva
 
 @{
     ViewData["Title"] = "Detalle de Miembro de Junta Directiva";
@@ -7,7 +8,7 @@
 <h1 class="text-center mb-4">Detalle de Miembro de Junta Directiva</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-7">
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header">
                 Información del Miembro de la Junta Directiva
@@ -15,16 +16,64 @@
             <div class="card-body">
                 <dl class="row">
                     <dt class="col-sm-4 mb-3">Estado</dt>
-                    <dd class="col-sm-8 mb-3">@Model.Estado</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @{
+                            var nombreEstado = Model.Estado.HasValue
+                            ? Model.Estado.Value.GetType()
+                            .GetMember(Model.Estado.Value.ToString())
+                            .First()
+                            .GetCustomAttributes(typeof(DisplayAttribute), false)
+                            .Cast<DisplayAttribute>()
+                            .FirstOrDefault()?.Name ?? Model.Estado.Value.ToString()
+                            : null;
+                        }
+
+                        @Html.Raw(!string.IsNullOrWhiteSpace(nombreEstado)
+                        ? nombreEstado
+                        : "<h5><span class='badge bg-warning text-dark'>No especificado</span></h5>")
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Asociado</dt>
-                    <dd class="col-sm-8 mb-3">@Model.IdAsociadoNavigation.IdAsociado</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdAsociadoNavigation != null)
+                        {
+                            <a asp-controller="TbAsociados" asp-action="Details" asp-route-id="@Model.IdAsociadoNavigation.IdAsociado">
+                                @Model.IdAsociadoNavigation.Nombre
+                            </a>
+                        }
+                        else
+                        {
+                            @Html.Raw("<h5><span class='badge bg-warning text-dark'>Sin asociado</span></h5>")
+                        }
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Junta Directiva</dt>
-                    <dd class="col-sm-8 mb-3">@Model.IdJuntaDirectivaNavigation.IdJuntaDirectiva</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdJuntaDirectivaNavigation != null)
+                        {
+                            <a asp-controller="TbJuntaDirectivas" asp-action="Details" asp-route-id="@Model.IdJuntaDirectivaNavigation.IdJuntaDirectiva">
+                                @Model.IdJuntaDirectivaNavigation.Nombre
+                            </a>
+                        }
+                        else
+                        {
+                            @Html.Raw("<h5><span class='badge bg-warning text-dark'>Sin junta</span></h5>")
+                        }
+                    </dd>
 
                     <dt class="col-sm-4 mb-3">Puesto</dt>
-                    <dd class="col-sm-8 mb-3">@Model.IdPuestoNavigation.IdPuesto</dd>
+                    <dd class="col-sm-8 mb-3">
+                        @if (Model.IdPuestoNavigation != null)
+                        {
+                            <a asp-controller="TbPuestos" asp-action="Details" asp-route-id="@Model.IdPuestoNavigation.IdPuesto">
+                                @Model.IdPuestoNavigation.Nombre
+                            </a>
+                        }
+                        else
+                        {
+                            @Html.Raw("<h5><span class='badge bg-warning text-dark'>Sin puesto</span></h5>")
+                        }
+                    </dd>
                 </dl>
 
                 <div class="d-flex justify-content-between mt-4">

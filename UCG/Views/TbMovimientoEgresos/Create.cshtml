@@ -85,7 +85,7 @@
                             <div class="card border-secondary-emphasis shadow">
                                 <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
                                     <span>Detalle Egreso</span>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalEgreso">
+                                    <button type="button" class="btn btn-primary btn-sm"  id="btnAbrirModalEgreso">
                                         Agregar
                                     </button>
                                 </div>
@@ -141,20 +141,23 @@
                 </select>
             </div>
             <div class="modal-body">
-				<label class="form-label">Factura</label>
-                <select id="modalIdFactura" class="form-select">
-					<option value="0" disabled="" selected="">Seleccione un factura</option>
-				</select>
-            </div>
-            <div class="modal-body" >
                 <label class="form-label">Cheque</label>
                 <select id="modalIdCheque" class="form-select">
                     <option value="0" disabled="" selected="">Seleccione un cheque</option>
                 </select>
             </div>
+            <div class="modal-body">
+				<label class="form-label">Factura</label>
+                <select id="modalIdFactura" class="form-select">
+					<option value="0" disabled="" selected="">Seleccione un factura</option>
+				</select>
+            </div>
+            
             <div class="modal-body" id="Monto">
 				<label class="form-label">Monto</label>
-				<input type="number" id="modalMonto" class="form-control" placeholder="Ingrese el monto" />
+                <input id="modalMontoVisible" class="form-control" type="text" readonly placeholder="Monto de la factura" />
+                <input id="modalMonto" name="modalMonto" type="hidden" />
+
             </div>
 
             <div class="modal-body" id="descripcionAcuerdo">
@@ -164,8 +167,6 @@
                     <textarea id="summernoteAcuerdo" class="form-control" rows="5" required></textarea>
                 </div>
             </div>
-
-
 
             <div class="modal-footer">
                 <button type="button" id="addDetailEgresoBtn" class="btn btn-success">Agregar</button>
@@ -196,7 +197,6 @@
         };
     </script>
 
-    <!-- 🔻 ESTA LÍNEA SIEMPRE VA AL FINAL 🔻 -->
     <script src="~/js/MovimientoEgresosScripts/MovimientoEgresoFormHandler.js"></script>
 }
 

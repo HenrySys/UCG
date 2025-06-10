@@ -7,7 +7,7 @@
 <h1 class="text-center mb-4">Detalle de Asistencia</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="card shadow">
             <div class="card-header">
                 Información de la Asistencia
@@ -19,18 +19,27 @@
 
                     <dt class="col-sm-4 mb-3">Asociado</dt>
                     <dd class="col-sm-8 mb-3">
-                        <a asp-controller="TbAsociadoes"
-                           asp-action="Details"
-                           asp-route-id="@Model.IdAsociadoNavigation?.IdAsociado">
-                            @Model.IdAsociadoNavigation?.Nombre
-                        </a>
+
+                        @if (Model.IdAsociadoNavigation != null)
+                        {
+                            <a asp-controller="TbAsociadoes" asp-action="Details" asp-route-id="@Model.IdAsociadoNavigation.IdAsociado">
+                                @Model.IdAsociadoNavigation.Nombre
+                            </a>
+                        }
+                        else
+                        {
+                            @Html.Raw("<h5><span class='badge bg-warning text-dark'>Sin asociado relacionado</span></h5>")
+                        }
                     </dd>
                 </dl>
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Edit" asp-route-id="@Model?.IdActaAsistencia" class="btn btn-warning">Editar</a>
                     <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
                 </div>
+               
             </div>
         </div>
+        
     </div>
+    
 </div>

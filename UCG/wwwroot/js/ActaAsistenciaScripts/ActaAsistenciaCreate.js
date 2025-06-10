@@ -56,7 +56,6 @@
                 } else {
                     selectAsociado.append('<option disabled selected>No hay asociados disponibles</option>');
 
-                    // ✅ Si ya se mostró un Swal (por TempData), no repetir
                     if (!swalMostrado) {
                         Swal.fire({
                             icon: 'info',

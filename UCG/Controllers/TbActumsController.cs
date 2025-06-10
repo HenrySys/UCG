@@ -208,6 +208,7 @@ namespace UCG.Controllers
                         .Where(f => f.IdAsociacion == idAsociacion)
                         .ToListAsync();
 
+                    // Aquí asegurás que se mantengan seleccionados los valores
                     ViewData["IdAsociado"] = new SelectList(asociados, "IdAsociado", "Nombre", model.IdAsociado);
                     ViewData["IdFolio"] = new SelectList(folios, "IdFolio", "NumeroFolio", model.IdFolio);
                 }
@@ -220,6 +221,7 @@ namespace UCG.Controllers
                     await _context.TbAsociacions.ToListAsync(),
                     "IdAsociacion", "Nombre", model.IdAsociacion);
 
+                // Asegurar que los combos dependientes se carguen si ya hay asociación seleccionada
                 if (model.IdAsociacion > 0)
                 {
                     var asociados = await _context.TbAsociados
@@ -233,7 +235,11 @@ namespace UCG.Controllers
                     ViewData["IdAsociado"] = new SelectList(asociados, "IdAsociado", "Nombre", model.IdAsociado);
                     ViewData["IdFolio"] = new SelectList(folios, "IdFolio", "NumeroFolio", model.IdFolio);
                 }
-              
+                else
+                {
+                    ViewData["IdAsociado"] = new SelectList(Enumerable.Empty<SelectListItem>());
+                    ViewData["IdFolio"] = new SelectList(Enumerable.Empty<SelectListItem>());
+                }
             }
         }
 
@@ -376,8 +382,8 @@ namespace UCG.Controllers
                 ActaAcuerdo = acta.TbAcuerdos.Select(a => new AcuerdoViewModel
                 {
                     Nombre = a.Nombre,
+                    Tipo = a.Tipo,
                     Descripcion = a.Descripcion,
-                    MontoAcuerdo = a.MontoAcuerdo
                 }).ToList()
 
             };

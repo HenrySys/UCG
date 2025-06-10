@@ -15,7 +15,8 @@
 <hr />
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
-     data-error="@TempData["ErrorMessage"]">
+     data-error="@TempData["ErrorMessage"]"
+     >
     
 </div>
 <form asp-action="Edit" data-mode="Edit">
@@ -98,6 +99,9 @@
                             <div class="card borde-secondary-emphasis shadow">
                                 <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
                                     <span>Asistencias</span>
+                                    <button type="button" class="btn btn-primary btn-sm" id="detailModalAsistenciaEdit">
+                                        Agregar
+                                    </button>
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-bordered table-sm" id="detailsTableAsistencia">
@@ -126,6 +130,7 @@
                                     <table class="table table-bordered table-sm" id="detailsTableAcuerdo">
                                         <thead>
                                             <tr>
+                                                <th>Tipo</th>
                                                 <th>Nombre</th>
                                                 <th>Acciones</th>
                                             </tr>
@@ -148,9 +153,9 @@
         <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
     </div>
 
-    <!-- Inputs ocultos -->
-    <input type="hidden" id="ActaAsistenciaJason" name="ActaAsistenciaJason" value="@Model.ActaAsistenciaJason" />
-    <input type="hidden" id="ActaAcuerdoJason" name="ActaAcuerdoJason" value="@Model.ActaAcuerdoJason" />
+    <input type="hidden" id="ActaAsistenciaJason" name="ActaAsistenciaJason" value='@Html.Raw(Model.ActaAsistenciaJason)' />
+    <input type="hidden" id="ActaAcuerdoJason" name="ActaAcuerdoJason" value='@Html.Raw(Model.ActaAcuerdoJason)' />
+
 </form>
 
 <!-- Modal Acuerdo -->
@@ -162,10 +167,26 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
+                <!-- Campo para el nombre del acuerdo -->
                 <div class="mb-3">
                     <label for="nombreAcuerdo" class="form-label">Nombre del Acuerdo</label>
                     <input type="text" class="form-control" id="nombreAcuerdo" placeholder="Ingrese el nombre del acuerdo" required>
                 </div>
+
+                <!-- Tipo de Acuerdo -->
+                <div class="mb-3">
+                    <label for="tipoAcuerdo" class="form-label">Tipo de Acuerdo</label>
+                    <select class="form-select" id="tipoAcuerdo" required>
+                        <option disabled selected>Seleccione un tipo</option>
+                        <option value="1">Compra</option>
+                        <option value="2">Pago</option>
+                        <option value="3">Ordinario</option>
+                    </select>
+                </div>
+
+
+                <!-- Campo para la descripcion del acuerdo -->
+
                 <div class="mb-3 " id="descripcionAcuerdo">
                     <label for="summernoteAcuerdo" class="form-label">Descripción</label>
                     <div class="input-group">
@@ -173,7 +194,9 @@
                         <textarea id="summernoteAcuerdo" class="form-control" rows="5" required></textarea>
                     </div>
                 </div>
+
             </div>
+
             <div class="modal-footer">
                 <button type="button" id="addDetailAcuerdoBtn" class="btn btn-success">Agregar</button>
             </div>
