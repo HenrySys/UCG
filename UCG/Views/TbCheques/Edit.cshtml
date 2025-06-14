@@ -15,33 +15,51 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow">
-            <div class="card-header">Formulario de Edición</div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="IdCheque" />
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+    <div class="row g-3">
+        <!-- CARD 1: Información del Cheque -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información del Cheque</div>
+                <div class="card-body">
+                    <!-- Asociación -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones"></select>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
+                    <!-- Asociado que autoriza -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociadoAutoriza" class="form-label"></label>
+                        <select asp-for="IdAsociadoAutoriza" class="form-select" asp-items="asociados" id="IdAsociadoAutoriza">
+                            <option disabled selected>Seleccione un autorizado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociadoAutoriza" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cuenta -->
                     <div class="mb-3">
                         <label asp-for="IdCuenta" class="form-label"></label>
-                        <select asp-for="IdCuenta" class="form-select" asp-items="cuentas"></select>
+                        <select asp-for="IdCuenta" class="form-select" asp-items="cuentas" id="IdCuenta">
+                            <option disabled selected>Seleccione una cuenta</option>
+                        </select>
                         <span asp-validation-for="IdCuenta" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="NumeroCheque" class="form-label"></label>
-                        <input asp-for="NumeroCheque" class="form-control" />
-                        <span asp-validation-for="NumeroCheque" class="text-danger"></span>
-                    </div>
-
+                    <!-- Fechas -->
                     <div class="mb-3">
                         <label asp-for="FechaTextoEmision" class="form-label"></label>
                         <input asp-for="FechaTextoEmision" type="date" class="form-control" />
@@ -54,7 +72,7 @@
                         <span asp-validation-for="FechaTextoPago" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
+                    <!--  <div class="mb-3">
                         <label asp-for="FechaTextoCobro" class="form-label"></label>
                         <input asp-for="FechaTextoCobro" type="date" class="form-control" />
                         <span asp-validation-for="FechaTextoCobro" class="text-danger"></span>
@@ -64,20 +82,41 @@
                         <label asp-for="FechaTextoAnulacion" class="form-label"></label>
                         <input asp-for="FechaTextoAnulacion" type="date" class="form-control" />
                         <span asp-validation-for="FechaTextoAnulacion" class="text-danger"></span>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Detalle del Cheque -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Detalle del Cheque</div>
+                <div class="card-body">
+                    <!-- Número de cheque -->
+                    <div class="mb-3">
+                        <label asp-for="NumeroCheque" class="form-label"></label>
+                        <input asp-for="NumeroCheque" class="form-control" placeholder="Ingrese el número de cheque" />
+                        <span asp-validation-for="NumeroCheque" class="text-danger"></span>
                     </div>
 
+                    <!-- Beneficiario -->
                     <div class="mb-3">
                         <label asp-for="Beneficiario" class="form-label"></label>
-                        <input asp-for="Beneficiario" class="form-control" />
+                        <input asp-for="Beneficiario" class="form-control" placeholder="Nombre del beneficiario" />
                         <span asp-validation-for="Beneficiario" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Monto" class="form-label"></label>
-                        <input asp-for="Monto" class="form-control" />
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="Monto" class="form-control" placeholder="Ingrese el monto en colones" />
+                        </div>
                         <span asp-validation-for="Monto" class="text-danger"></span>
                     </div>
 
+                    <!-- Estado -->
                     <div class="mb-3">
                         <label asp-for="Estado" class="form-label"></label>
                         <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<UCG.Models.TbCheque.EstadoCheque>()">
@@ -86,33 +125,22 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="IdAsociadoAutoriza" class="form-label"></label>
-                        <select asp-for="IdAsociadoAutoriza" class="form-select" asp-items="asociados"></select>
-                        <span asp-validation-for="IdAsociadoAutoriza" class="text-danger"></span>
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="summernoteObservacion" class="form-label">Descripción</label>
+                        <textarea id="summernoteObservacion" name="Descripcion" class="form-control"></textarea>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
                     </div>
-
-                    <div class="mb-3">
-                        <label asp-for="MontoRestante" class="form-label"></label>
-                        <input asp-for="MontoRestante" class="form-control" />
-                        <span asp-validation-for="MontoRestante" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Observaciones" class="form-label"></label>
-                        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Observaciones" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES: como en la vista de Acta -->
+    <div class="mt-4">
+        <input type="submit" value="Editar" class="btn btn-warning" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
 
 @section Scripts {
     @{

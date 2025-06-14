@@ -1,0 +1,83 @@
+@model UCG.Models.TbFactura
+
+@{
+    Layout = null;
+    ViewData["Title"] = "FacturaIndividualPdf";
+
+    bool tieneProveedor = Model.IdProveedor != null;
+    bool tieneColaborador = Model.IdColaborador != null;
+    bool tieneAsociado = Model.IdAsociado != null;
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Factura @Model.NumeroFactura</title>
+    <link rel="stylesheet" href="~/css/FacturaPdf.css" />
+</head>
+<body>
+    <div class="header">
+        <h1>Factura</h1>
+        <h2>No. @Model.NumeroFactura</h2>
+    </div>
+
+    <div class="asociacion">
+        @Model.IdAsociacionNavigation?.Nombre
+    </div>
+
+    <div class="info">
+        <p><label>Fecha de Emisión:</label> @Model.FechaEmision.ToString("dd/MM/yyyy")</p>
+        <p><label>Estado:</label> @Model.Estado</p>
+        <p><label>Descripción:</label> @Model.Descripcion</p>
+    </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        @if (tieneProveedor)
+                        {
+                            <th>Proveedor</th>
+                        }
+                        @if (tieneColaborador)
+                        {
+                            <th>Colaborador</th>
+                        }
+                        @if (tieneAsociado)
+                        {
+                            <th>Asociado</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Model.IdConceptoAsociacionNavigation?.IdConceptoNavigation?.Concepto</td>
+                        @if (tieneProveedor)
+                        {
+                            <td>@Model.IdProveedorNavigation?.NombreEmpresa</td>
+                        }
+                        @if (tieneColaborador)
+                        {
+                            <td>@Model.IdColaboradorNavigation?.Nombre</td>
+                        }
+                        @if (tieneAsociado)
+                        {
+                            <td>@Model.IdAsociadoNavigation?.Nombre</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    <div class="total">
+        Total: ?@Model.MontoTotal.ToString("N2")
+    </div>
+
+    <div class="footer">
+        Generado automáticamente por el sistema UCG
+    </div>
+</body>
+</html>

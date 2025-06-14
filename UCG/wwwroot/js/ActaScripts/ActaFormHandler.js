@@ -51,9 +51,10 @@
         });
         $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function () {
             limpiarErrores();
-            const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
-                return $(this).find('td:eq(1)').text();
+            const asociadosYaAgregados = $('#detailsTableAsistencia tbody .asociado-id').map(function () {
+                return $(this).data('id').toString();
             }).get();
+
 
             fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
                 let agregados = 0;
@@ -87,9 +88,10 @@
 
             $('#detailModalAsistencia').off('show.bs.modal').on('show.bs.modal', function () {
                 limpiarErrores();
-                const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
-                    return $(this).find('td:eq(1)').text();
+                const asociadosYaAgregados = $('#detailsTableAsistencia tbody .asociado-id').map(function () {
+                    return $(this).data('id').toString();
                 }).get();
+
 
                 fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
                     let agregados = 0;
@@ -265,13 +267,15 @@
                 .after('<div id="errorMensaje" class="text-danger mt-1">Este asociado ya fue agregado.</div>');
             return;
         }
+        const nombreCompleto = $('#modalIdAsociado option:selected').text();
 
         $('#detailsTableAsistencia tbody').append(`
             <tr>
                 <td>${fecha}</td>
-                <td>${idAsociado}</td>
+                <td><span class="asociado-id" data-id="${idAsociado}">${nombreCompleto}</span></td>
                 <td><button type="button" class="btn btn-danger btn-sm removeRow">Eliminar</button></td>
             </tr>`);
+
 
         $('#modalIdAsociado').val('0');
         $('#detailModalAsistencia').modal('hide');

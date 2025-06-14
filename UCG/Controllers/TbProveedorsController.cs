@@ -234,15 +234,16 @@ namespace UCG.Controllers
                 return NotFound();
             }
 
-            var tbProveedor = await _context.TbProveedors
-                .Include(t => t.IdAsociacionNavigation)
-                .FirstOrDefaultAsync(m => m.IdProveedor == id);
-            if (tbProveedor == null)
+            var proveedor = await _context.TbProveedors
+                .Include(p => p.IdAsociacionNavigation)
+                .FirstOrDefaultAsync(p => p.IdProveedor == id);
+
+            if (proveedor == null)
             {
                 return NotFound();
             }
 
-            return View(tbProveedor);
+            return View(proveedor);
         }
 
         // POST: TbProveedors/Delete/5
@@ -250,19 +251,33 @@ namespace UCG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.TbProveedors == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                return Problem("Entity set 'UcgdbContext.TbProveedors'  is null.");
+                var proveedor = await _context.TbProveedors.FindAsync(id);
+
+                if (proveedor == null)
+                {
+                    TempData["ErrorMessage"] = "El proveedor no fue encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.TbProveedors.Remove(proveedor);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El proveedor fue eliminado correctamente.";
             }
-            var tbProveedor = await _context.TbProveedors.FindAsync(id);
-            if (tbProveedor != null)
+            catch (Exception ex)
             {
-                _context.TbProveedors.Remove(tbProveedor);
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Error al eliminar el proveedor: " + ex.Message;
             }
-            
-            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool TbProveedorExists(int id)
         {

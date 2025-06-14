@@ -40,8 +40,8 @@
                 <th>@Html.DisplayNameFor(model => model.FechaEmision)</th>
                 <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
                 <th>@Html.DisplayNameFor(model => model.MontoTotal)</th>
-                <th>@Html.DisplayNameFor(model => model.ArchivoUrl)</th>
-                <th>@Html.DisplayNameFor(model => model.NombreArchivo)</th>
+                <!-- <th>@Html.DisplayNameFor(model => model.ArchivoUrl)</th>
+                <th>@Html.DisplayNameFor(model => model.NombreArchivo)</th> -->
                 <th>@Html.DisplayNameFor(model => model.FechaSubida)</th>
                 <th>@Html.DisplayNameFor(model => model.IdAsociacionNavigation)</th>  
                 <th>Emisor</th> 
@@ -64,12 +64,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.MontoTotal)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ArchivoUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NombreArchivo)
-            </td>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.FechaSubida)
             </td>

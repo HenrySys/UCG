@@ -65,4 +65,21 @@ $(document).ready(function () {
         );
     });
 
+    $('#summernoteObservacion').summernote({
+        height: 125,
+        placeholder: 'Escriba el acuerdo aqui...',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['view']
+        ],
+
+    });
+
+    $('form').on('submit', function () {
+        const rawHtml = $('#summernoteObservacion').summernote('code');
+        const cleanText = $('<div>').html(rawHtml).text().trim(); // Extrae solo el texto plano
+        $('#summernoteObservacion').val(cleanText);
+    });
+
 });

@@ -90,22 +90,66 @@
         });
     }
 
-    function cargarAsociados(idAsociacion) {
-        fetchDropdownData(rutasMovimientoEgreso.obtenerAsociados, { idAsociacion }, '#IdAsociado', 'Seleccione un asociado', function (data, dropdown) {
-            data.forEach(item => {
-                const nombreCompleto = `${item.nombre} ${item.apellido1}`;
-                dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
+    function cargarAsociados(idAsociacion, valorSeleccionado = null) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: rutasMovimientoEgreso.obtenerAsociados,
+                data: { idAsociacion },
+                success: function (response) {
+                    const dropdown = $('#IdAsociado');
+                    dropdown.empty();
+                    dropdown.append(`<option value="" disabled selected>Seleccione un asociado</option>`);
+                    if (response.success) {
+                        response.data.forEach(item => {
+                            const nombreCompleto = `${item.nombre} ${item.apellido1}`;
+                            dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
+                        });
+
+                        if (valorSeleccionado) dropdown.val(valorSeleccionado); // Restaurar selección
+                        resolve();
+                    } else {
+                        mostrarErrorSwal('Atención', response.message);
+                        reject();
+                    }
+                },
+                error: function (_, __, error) {
+                    mostrarErrorSwal('Error', 'Error al cargar asociados: ' + error);
+                    reject();
+                }
             });
         });
     }
 
-    function cargarActas(idAsociacion) {
-        fetchDropdownData(rutasMovimientoEgreso.obtenerActas, { idAsociacion }, '#IdActa', 'Seleccione un acta', function (data, dropdown) {
-            data.forEach(item => {
-                dropdown.append(`<option value="${item.idActa}">${item.numeroActa}</option>`);
+
+    function cargarActas(idAsociacion, valorSeleccionado = null) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: rutasMovimientoEgreso.obtenerActas,
+                data: { idAsociacion },
+                success: function (response) {
+                    const dropdown = $('#IdActa');
+                    dropdown.empty();
+                    dropdown.append(`<option value="" disabled selected>Seleccione un acta</option>`);
+                    if (response.success) {
+                        response.data.forEach(item => {
+                            dropdown.append(`<option value="${item.idActa}">${item.numeroActa}</option>`);
+                        });
+
+                        if (valorSeleccionado) dropdown.val(valorSeleccionado); // Restaurar selección
+                        resolve();
+                    } else {
+                        mostrarErrorSwal('Atención', response.message);
+                        reject();
+                    }
+                },
+                error: function (_, __, error) {
+                    mostrarErrorSwal('Error', 'Error al cargar actas: ' + error);
+                    reject();
+                }
             });
         });
     }
+
 
     function cargarAcuerdos(idActa) {
         fetchDropdownData(rutasMovimientoEgreso.obtenerAcuerdos, { idActa }, '#modalIdAcuerdo', 'Seleccione un acuerdo', function (data, dropdown) {
@@ -155,55 +199,61 @@
         chequeFacturaCargadas.forEach((item, index) => {
             console.log(`Egreso ${index}:`, item);
 
+            const monto = parseFloat(item.Monto) || 0;
+            const descripcion = item.Descripcion ?? '';
+            const numeroCheque = item.NumeroCheque ?? `Cheque ${item.IdCheque}`;
+            const numeroFactura = item.NumeroFactura ?? `Factura ${item.IdFactura}`;
+            const numeroAcuerdo = item.NumeroAcuerdo ?? `Acuerdo ${item.IdAcuerdo}`;
+
             const fila = `
-                <tr data-index="${index}" 
-                    data-idacuerdo="${item.IdAcuerdo}" 
-                    data-idfactura="${item.IdFactura}" 
-                    data-idcheque="${item.IdCheque}" 
-                    data-monto="${item.Monto}" 
-                    data-descripcion="${item.Descripcion}">
-            
-                    <td>${item.NumeroCheque}</td>
-                    <td>${item.NumeroFactura}</td>
-                    <td>${item.Monto.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' })}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-warning btn-edit-egreso" data-index="${index}">Editar</button>
-                        <button type="button" class="btn btn-danger btn-sm btn-remove-egreso" data-index="${index}">Eliminar</button>
-                    </td>
-                </tr>
-            `;
+             <tr 
+                data-index="${index}" 
+                data-idacuerdo="${item.IdAcuerdo}" 
+                data-idfactura="${item.IdFactura}" 
+                data-idcheque="${item.IdCheque}" 
+                data-monto="${monto}" 
+                data-descripcion="${descripcion}"
+                data-numerocheque="${numeroCheque}" 
+                data-numerofactura="${numeroFactura}" 
+                data-numeroacuerdo="${numeroAcuerdo}">
+                <td>${numeroCheque}</td>
+                <td>${numeroFactura}</td>
+                <td>${monto.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' })}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning btn-edit-egreso">Editar</button>
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-egreso">Eliminar</button>
+                </td>
+            </tr>
+        `;
 
             $('#detailsTableEgreso tbody').append(fila);
         });
+        actualizarMontoTotal();
     }
+
+
     reconstruirEgresosUI();
     actualizarMontoTotal(); // después de reconstruir
 
 
     function recolectarDetalleChequeFactura() {
         const detalles = [];
-        const filas = $('#detailsTableEgreso tbody tr');
-
-        filas.each(function () {
+        $('#detailsTableEgreso tbody tr').each(function () {
             const fila = $(this);
-
-            const idCheque = parseInt(fila.data('idcheque'), 10);
-            const idFactura = parseInt(fila.data('idfactura'), 10);
-            const idAcuerdo = parseInt(fila.data('idacuerdo'), 10);
-            const monto = parseFloat(fila.data('monto'));
-            const descripcion = fila.data('descripcion');
-
             detalles.push({
-                IdCheque: idCheque,
-                IdFactura: idFactura,
-                IdAcuerdo: idAcuerdo,
-                Monto: monto,
-                Descripcion: descripcion
+                IdCheque: parseInt(fila.data('idcheque')),
+                IdFactura: parseInt(fila.data('idfactura')),
+                IdAcuerdo: parseInt(fila.data('idacuerdo')),
+                Monto: parseFloat(fila.data('monto')),
+                Descripcion: fila.data('descripcion'),
+                NumeroCheque: fila.data('numerocheque'),
+                NumeroFactura: fila.data('numerofactura'),
+                NumeroAcuerdo: fila.data('numeroacuerdo')
             });
         });
-
         return detalles;
     }
+
 
     function limpiarCamposModalEgreso() {
         $('#modalIdAcuerdo').val("0").removeClass('is-invalid');
@@ -286,22 +336,29 @@
 
 
 
-    if (modoVista === 'Create') {
+    if (modoVista === 'Create' || modoVista === 'Edit') {
         const idAsociacion = $('#IdAsociacion').val();
+        const idActaSeleccionada = $('#IdActa').val();
+        const idAsociadoSeleccionado = $('#IdAsociado').val();
+
         if (idAsociacion && parseInt(idAsociacion) > 0) {
-            cargarAsociados(idAsociacion);
-            cargarActas(idAsociacion);
+            cargarAsociados(idAsociacion, idAsociadoSeleccionado);
+            cargarActas(idAsociacion, idActaSeleccionada);
         }
-        configurarModalEgresos(); // Solo se configura una vez
+
+        configurarModalEgresos();
     }
 
-    $('#IdAsociacion').change(function () {
-        const nuevaAsociacion = $(this).val();
-        if (!nuevaAsociacion) return;
 
-        cargarAsociados(nuevaAsociacion);
-        cargarActas(nuevaAsociacion);
-    });
+        
+    //$('#IdAsociacion').change(function () {
+    //    const nuevaAsociacion = $(this).val();
+    //    if (!nuevaAsociacion) return;
+
+    //    cargarAsociados(nuevaAsociacion);
+    //    cargarActas(nuevaAsociacion);
+
+    //});
 
     
 
@@ -319,7 +376,8 @@
         const numeroCheque = $('#modalIdCheque option:selected').text().trim();
 
         const monto = parseFloat($('#modalMonto').val());
-        const descripcionTextoPlano = $('<div>').html($('#summernoteAcuerdo').summernote('code')).text().trim();
+        const descripcionHTML = $('#summernoteAcuerdo').summernote('code');
+        const descripcionTextoPlano = $('<div>').html(descripcionHTML).text().trim();
 
         let hayError = false;
 
@@ -351,30 +409,40 @@
             $('#summernoteAcuerdo').addClass('is-invalid')
                 .closest('.mb-3')
                 .append('<div class="text-danger mt-1">La descripción no puede estar vacía.</div>');
-
             hayError = true;
         }
 
         if (hayError) return;
 
-        // ✅ ACTUALIZAR correctamente los atributos
         if (filaEgresoEditando !== null) {
+            // Actualizar fila existente
             filaEgresoEditando
                 .attr('data-idacuerdo', idAcuerdo)
                 .attr('data-idfactura', idFactura)
                 .attr('data-idcheque', idCheque)
                 .attr('data-monto', monto)
-                .attr('data-descripcion', descripcionTextoPlano); // <== ESTA ES LA CLAVE
+                .attr('data-descripcion', descripcionTextoPlano)
+                .attr('data-numerocheque', numeroCheque)
+                .attr('data-numerofactura', nombreFactura)
+                .attr('data-numeroacuerdo', nombreAcuerdo);
 
             filaEgresoEditando.find('td:eq(0)').text(numeroCheque);
             filaEgresoEditando.find('td:eq(1)').text(nombreFactura);
             filaEgresoEditando.find('td:eq(2)').text(monto.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' }));
 
-            // Limpieza de referencia de edición
             filaEgresoEditando = null;
         } else {
+            // Agregar nueva fila
             $('#detailsTableEgreso tbody').append(`
-            <tr data-idacuerdo="${idAcuerdo}" data-idfactura="${idFactura}" data-idcheque="${idCheque}" data-monto="${monto}" data-descripcion="${descripcionTextoPlano}">
+            <tr 
+                data-idacuerdo="${idAcuerdo}" 
+                data-idfactura="${idFactura}" 
+                data-idcheque="${idCheque}" 
+                data-monto="${monto}" 
+                data-descripcion="${descripcionTextoPlano}"
+                data-numerocheque="${numeroCheque}" 
+                data-numerofactura="${nombreFactura}" 
+                data-numeroacuerdo="${nombreAcuerdo}">
                 <td>${numeroCheque}</td>
                 <td>${nombreFactura}</td>
                 <td>${monto.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' })}</td>
@@ -385,27 +453,95 @@
             </tr>
         `);
         }
-        actualizarMontoTotal(); 
 
+        actualizarMontoTotal();
         limpiarErrores();
         $('#detailModalEgreso').modal('hide');
     });
 
 
+    function verificarDisponibilidadDatosAsociacion() {
+        const idAsociacion = $('#IdAsociacion').val();
+        const modoVista = $('form').data('mode'); // 'Create' o 'Edit'
+
+        // Si no hay asociación seleccionada
+        if (!idAsociacion || parseInt(idAsociacion) === 0) {
+            // En modo Create, mantener habilitado
+            if (modoVista === 'Create') {
+                $('#btnAbrirModalEgreso').prop('disabled', false);
+            }
+            return;
+        }
+
+        $.get('/TbMovimientoEgresos/VerificarDatosAsociacion', { idAsociacion }, function (response) {
+            if (response.success) {
+                const tieneCheques = response.tieneCheques;
+                const tieneFacturas = response.tieneFacturas;
+
+                if (!tieneCheques || !tieneFacturas) {
+                    $('#btnAbrirModalEgreso').prop('disabled', true);
+
+                    let mensaje = 'La asociación no tiene ';
+                    if (!tieneCheques && !tieneFacturas) {
+                        mensaje += 'cheques ni facturas.';
+                    } else if (!tieneCheques) {
+                        mensaje += 'cheques.';
+                    } else {
+                        mensaje += 'facturas.';
+                    }
+
+                    // Mostrar el error solo si estoy en Edit o ya hay una asociación válida
+                    if (modoVista === 'Edit' || idAsociacion) {
+                        mostrarErrorSwal('Datos insuficientes', mensaje);
+                    }
+                } else {
+                    $('#btnAbrirModalEgreso').prop('disabled', false);
+                }
+            } else {
+                $('#btnAbrirModalEgreso').prop('disabled', true);
+                mostrarErrorSwal('Error al verificar asociación', response.message);
+            }
+        });
+    }
+
+
+    verificarDisponibilidadDatosAsociacion();
+
+
+    $('#IdAsociacion').change(function () {
+        verificarDisponibilidadDatosAsociacion();
+    });
+
+    function seleccionarComboForzado(selector, valor, textoFallback) {
+        const $select = $(selector);
+        if (!$select.find(`option[value="${valor}"]`).length) {
+            $select.append(`<option value="${valor}">${textoFallback}</option>`);
+        }
+        $select.val(valor);
+    }
 
     $('#detailsTableEgreso').on('click', '.btn-edit-egreso', function () {
         limpiarErrores();
+
         const fila = $(this).closest('tr');
+        filaEgresoEditando = fila;
+        esEdicionEgreso = true;
 
-        const idAcuerdo = fila.data('idacuerdo');
-        const idFactura = fila.data('idfactura');
-        const idCheque = fila.data('idcheque');
-        const monto = fila.data('monto');
-        const descripcion = fila.attr('data-descripcion');
+        const idAcuerdo = fila.attr('data-idacuerdo');
+        const idFactura = fila.attr('data-idfactura');
+        const idCheque = fila.attr('data-idcheque');
+        const monto = fila.attr('data-monto');
+        const descripcion = fila.attr('data-descripcion') ?? '';
 
-        $('#modalIdAcuerdo').val(idAcuerdo);
-        $('#modalIdFactura').val(idFactura);
-        $('#modalIdCheque').val(idCheque);
+        const numeroCheque = fila.attr('data-numerocheque') ?? `Cheque ${idCheque}`;
+        const numeroFactura = fila.attr('data-numerofactura') ?? `Factura ${idFactura}`;
+        const textoAcuerdo = fila.attr('data-numeroacuerdo') ?? `Acuerdo ${idAcuerdo}`;
+
+        seleccionarComboForzado('#modalIdAcuerdo', idAcuerdo, textoAcuerdo);
+        seleccionarComboForzado('#modalIdFactura', idFactura, numeroFactura);
+        seleccionarComboForzado('#modalIdCheque', idCheque, numeroCheque);
+
+        $('#modalMontoVisible').val(parseFloat(monto).toLocaleString('es-CR', { style: 'currency', currency: 'CRC' }));
         $('#modalMonto').val(monto);
 
         $('#summernoteAcuerdo').summernote({
@@ -416,14 +552,19 @@
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['view', ['codeview']]
             ]
-        });
-        $('#summernoteAcuerdo').summernote('code', descripcion);
+        }).summernote('code', descripcion);
 
-        filaEgresoEditando = fila;
-        esEdicionEgreso = true; // activar modo edición
+        if (modoVista === 'Edit') {
+            $('#camposOcultablesEdit').hide();
+        } else {
+            $('#camposOcultablesEdit').show();
+        }
 
         $('#detailModalEgreso').modal('show');
     });
+
+
+
 
 
     $('#detailModalEgreso').on('hidden.bs.modal', function () {
@@ -431,6 +572,10 @@
         limpiarCamposModalEgreso();
         filaEgresoEditando = null;
         esEdicionEgreso = false;
+
+        $('#camposOcultablesEdit').show(); // Asegura que se restablezca al cerrar
+
+
     });
 
     $('#detailsTableEgreso').on('click', '.btn-remove-egreso', function () {
@@ -451,19 +596,34 @@
             }
         });
     });
-
     $('form').on('submit', function (e) {
+        e.preventDefault(); // Detener el envío por defecto
         limpiarErrores();
 
         const detallesChequFactura = recolectarDetalleChequeFactura();
 
         if (detallesChequFactura.length === 0) {
             $('#detailsTableEgreso').after('<div id="errorTablaEgreso" class="text-danger mt-1">Debe agregar al menos un egreso.</div>');
-            e.preventDefault();
-        } else {
-            $('#DetalleChequeFacturaEgresoJason').val(JSON.stringify(detallesChequFactura));
-        }   
+            return; // No continuar
+        }
+
+        // Si hay detalles, preguntar antes de enviar
+        Swal.fire({
+            title: '¿Desea guardar el movimiento?',
+            text: 'Esta acción guardará los datos del egreso.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Serializar y enviar
+                $('#DetalleChequeFacturaEgresoJason').val(JSON.stringify(detallesChequFactura));
+                e.target.submit(); // Enviar el formulario manualmente
+            }
+        });
     });
+
 
 
     $('#modalIdCheque').on('change', function () {
@@ -537,8 +697,10 @@
 
         // También puedes formatearlo visualmente si quieres mostrarlo en un campo visible aparte
         $('#Monto').closest('.mb-3').find('.text-info-monto-total').remove();
-        $('#Monto').after(`<div class="text-info text-info-monto-total mt-1">Total: ₡${total.toLocaleString('es-CR')}</div>`);
+        $('#MontoTotal').after(`<div class="text-info text-info-monto-total mt-1">Total: ₡${total.toLocaleString('es-CR')}</div>`);
     }
+
+   
 
 
 

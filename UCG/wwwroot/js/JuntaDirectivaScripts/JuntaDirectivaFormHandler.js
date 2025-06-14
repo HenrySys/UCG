@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    const idAsociacionTemp = $('#tempDataSwal').data('asociacion');
+    //const idAsociacionTemp = $('#tempDataSwal').data('asociacion');
     const successMessage = $('#tempDataSwal').data('success');
     const errorMessage = $('#tempDataSwal').data('error');
     const modoVista = $('form').data('mode');
@@ -97,7 +97,7 @@
     }
 
     function prepararModalMiembro() {
-        $('#detailModalMiembrosJunta').off('show.bs.modal').on('show.bs.modal', function (e) {
+        $('#btnAbrirModalMiembro').off('click').on('click', function (e) {
             let IdAsociacion = $('#IdAsociacion').val();
             if (!IdAsociacion || parseInt(IdAsociacion) === 0) {
                 e.preventDefault();
@@ -124,32 +124,50 @@
                 }).get();
 
             fetchDropdownData(rutasJuntaDirectiva.obtenerAsociados, { idAsociacion: IdAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
-                
-                const agregados = asociadosYaAgregados.length;
+                const asociadosDisponibles = data.filter(item => !asociadosYaAgregados.includes(item.idAsociado.toString()));
 
-                if (agregados === data.length) {
+                if (asociadosDisponibles.length === 0) {
+                    e.preventDefault(); //  evitar que se abra el modal
                     cerrarModalConMensaje('#detailModalMiembrosJunta', {
-                        titulo: 'Todos agregados',
-                        texto: 'Todos los asociados ya han sido agregados a la lista.'
+                        titulo: 'Sin asociados disponibles',
+                        texto: 'Todos los asociados ya han sido asignados a la junta.'
                     });
-
                     return;
                 }
 
-                data.forEach(item => {
+                // Poblamos el dropdown solo con los que no están en la tabla
+                asociadosDisponibles.forEach(item => {
                     const nombreCompleto = `${item.nombre} ${item.apellido1}`;
-                    if (!asociadosYaAgregados.includes(item.idAsociado.toString())) {
-                        dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
-                    }
+                    dropdown.append(`<option value="${item.idAsociado}">${nombreCompleto}</option>`);
                 });
 
+                // Filtro dinámico de puestos
+                const puestosDisponibles = $('#modalIdPuesto option').filter(function () {
+                    const val = $(this).val();
+                    return val === '0' || !puestosYaAgregados.includes(val);
+                });
+
+                if (puestosDisponibles.length <= 1) { // solo opción por defecto
+                    e.preventDefault(); //  evitar que se abra el modal
+                    cerrarModalConMensaje('#detailModalMiembrosJunta', {
+                        titulo: 'Sin puestos disponibles',
+                        texto: 'Todos los puestos ya han sido asignados.'
+                    });
+                    return;
+                }
+
+                // Mostrar solo los puestos que aún no han sido asignados
                 $('#modalIdPuesto option').each(function () {
                     const val = $(this).val();
                     $(this).toggle(!puestosYaAgregados.includes(val) || val === '0');
                 });
 
                 $('#modalIdPuesto').val('0');
+
+                // Si todo bien, abrir modal
+                $('#detailModalMiembrosJunta').modal('show');
             });
+
         });
     }
 
@@ -270,8 +288,8 @@
         const nombreJunta = $('#Nombre').val().trim();
         let error = false;
 
-        if (miembros.length < 6) {
-            $('#detailsTableMiembros').after('<div class="text-danger mt-1">Debe agregar al menos 6 miembros.</div>');
+        if (miembros.length < 1) {
+            $('#detailsTableMiembros').after('<div class="text-danger mt-1">Debe agregar al menos 1 miembros.</div>');
             error = true;
         }
 
@@ -287,4 +305,41 @@
             $('#MiembrosJuntaJson').val(JSON.stringify(miembros));
         }
     });
+
+
+    if (modoVista === 'Edit') {
+        $('#btnAbrirModalMiembro').off('click').on('click', function (e) {
+            e.preventDefault();
+
+            const idJunta = $('#IdJuntaDirectiva').val(); // Asegurate de tener este input hidden en la vista Edit
+
+            if (!idJunta) {
+                Swal.fire("Error", "No se pudo obtener el ID de la junta.", "error");
+                return;
+            }
+
+            const miembros = recolectarMiembros();
+            $('#MiembrosJuntaJson').val(JSON.stringify(miembros));
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Guarde los cambios',
+                text: 'Debe guardar la junta antes de agregar miembros.',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar y continuar',
+                cancelButtonText: 'Cancelar'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'RedirigirMiembro',
+                        value: 'true'
+                    }).appendTo('form');
+
+                    $('form').submit();
+                }
+            });
+        });
+    }
+
 });

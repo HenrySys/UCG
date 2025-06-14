@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
+using UCG.Models.ValidationModels;
 using UCG.Models.ViewModels;
 
 namespace UCG.Controllers
@@ -109,6 +110,22 @@ namespace UCG.Controllers
             };
         }
 
+        private ActividadViewModel MapearActividadViewModel(TbActividad actividad)
+        {
+            return new ActividadViewModel
+            {
+                IdActividad = actividad.IdActividad,
+                Nombre = actividad.Nombre,
+                Fecha = actividad.Fecha,
+                FechaTextoActividad = actividad.Fecha?.ToString("yyyy-MM-dd"),
+                Razon = actividad.Razon,
+                IdAsociacion = actividad.IdAsociacion,
+                IdAsociado = actividad.IdAsociado,
+                IdActa = actividad.IdActa,
+                Lugar = actividad.Lugar,
+                Observaciones = actividad.Observaciones
+            };
+        }
 
 
         private async Task ConfigurarAsociacionActividadAsync(ActividadViewModel actividad)
@@ -139,7 +156,7 @@ namespace UCG.Controllers
                         .ToListAsync();
 
                     ViewData["IdAsociado"] = new SelectList(asociados, "IdAsociado", "Nombre", actividad.IdAsociado);
-                    ViewData["IdActa"] = new SelectList(actas, "IdActa", "Titulo", actividad.IdActa); // Cambiá "Titulo" si tu campo de texto es otro
+                    ViewData["IdActa"] = new SelectList(actas, "IdActa", "NumeroActa", actividad.IdActa); // Cambiá "Titulo" si tu campo de texto es otro
                 }
             }
             else
@@ -161,7 +178,7 @@ namespace UCG.Controllers
                         .ToListAsync();
 
                     ViewData["IdAsociado"] = new SelectList(asociados, "IdAsociado", "Nombre", actividad.IdAsociado);
-                    ViewData["IdActa"] = new SelectList(actas, "IdActa", "Titulo", actividad.IdActa);
+                    ViewData["IdActa"] = new SelectList(actas, "IdActa", "NumeroActa", actividad.IdActa);
                 }
                 else
                 {
@@ -251,58 +268,88 @@ namespace UCG.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TbActividads == null)
-            {
                 return NotFound();
-            }
 
-            var tbActividad = await _context.TbActividads.FindAsync(id);
-            if (tbActividad == null)
-            {
+            var actividad = await _context.TbActividads
+                .Include(a => a.IdAsociacionNavigation)
+                .Include(a => a.IdAsociadoNavigation)
+                .Include(a => a.IdActaNavigation)
+                .FirstOrDefaultAsync(a => a.IdActividad == id);
+
+            if (actividad == null)
                 return NotFound();
-            }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbActividad.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActividad.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActividad.IdAsociado);
-            return View(tbActividad);
+
+            var model = MapearActividadViewModel(actividad);
+
+
+
+            await ConfigurarAsociacionActividadAsync(model);
+            return View(model);
         }
 
-        // POST: TbActividads/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdActividad,Nombre,Fecha,Razon,IdAsociacion,IdAsociado,IdActa,Lugar,Observaciones")] TbActividad tbActividad)
+        public async Task<IActionResult> Edit(int id, ActividadViewModel model)
         {
-            if (id != tbActividad.IdActividad)
-            {
+            if (id != model.IdActividad)
                 return NotFound();
+
+            // Validar fecha
+            var fechaOk = await ParseFechaActividadAsync(model);
+            if (!fechaOk)
+            {
+                TempData["ErrorMessage"] = "Verifique la fecha ingresada.";
+                await ConfigurarAsociacionActividadAsync(model);
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            // Validar con FluentValidation si lo tenés implementado
+            var validator = new ActividadViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(tbActividad);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbActividadExists(tbActividad.IdActividad))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Hay errores de validación.";
+                await ConfigurarAsociacionActividadAsync(model);
+                return View(model);
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbActividad.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbActividad.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbActividad.IdAsociado);
-            return View(tbActividad);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var actividadExistente = await _context.TbActividads.FindAsync(id);
+                if (actividadExistente == null)
+                    return NotFound();
+
+                // Mapear valores nuevos
+                actividadExistente.Nombre = model.Nombre;
+                actividadExistente.Fecha = model.Fecha;
+                actividadExistente.Razon = model.Razon;
+                actividadExistente.IdAsociacion = model.IdAsociacion;
+                actividadExistente.IdAsociado = model.IdAsociado;
+                actividadExistente.IdActa = model.IdActa;
+                actividadExistente.Lugar = model.Lugar;
+                actividadExistente.Observaciones = model.Observaciones;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Actividad actualizada correctamente.";
+                return RedirectToAction(nameof(Edit), new { id });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar la actividad: " + ex.Message;
+                await ConfigurarAsociacionActividadAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbActividads/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -325,24 +372,40 @@ namespace UCG.Controllers
             return View(tbActividad);
         }
 
-        // POST: TbActividads/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.TbActividads == null)
             {
-                return Problem("Entity set 'UcgdbContext.TbActividads'  is null.");
+                return Problem("El conjunto de entidades 'TbActividads' es null.");
             }
-            var tbActividad = await _context.TbActividads.FindAsync(id);
-            if (tbActividad != null)
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                _context.TbActividads.Remove(tbActividad);
+                var actividad = await _context.TbActividads.FindAsync(id);
+                if (actividad == null)
+                {
+                    TempData["ErrorMessage"] = "La actividad no fue encontrada.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.TbActividads.Remove(actividad);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Actividad eliminada correctamente.";
+                return RedirectToAction(nameof(Index));
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = $"Ocurrió un error al eliminar la actividad: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
+
 
         private bool TbActividadExists(int id)
         {

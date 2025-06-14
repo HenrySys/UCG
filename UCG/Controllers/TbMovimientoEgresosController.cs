@@ -192,12 +192,40 @@ namespace UCG.Controllers
                     IdCheque = chequeFactura.IdCheque,
                     IdFactura = chequeFactura.IdFactura,
                     Monto = chequeFactura.Monto,
-                    Observacion = chequeFactura.Observacion
+                    Observacion = chequeFactura.Descripcion
 
                 });
                 
             }
         }
+        private MovimientoEgresoViewModel MapearMovimientoEgresoViewModel(TbMovimientoEgreso egreso)
+        {
+            return new MovimientoEgresoViewModel
+            {
+                IdMovimientoEgreso = egreso.IdMovimientoEgreso,
+                IdAsociacion = egreso.IdAsociacion,
+                IdAsociado = egreso.IdAsociado,
+                IdActa = egreso.IdActa,
+                Monto = egreso.Monto,
+                Descripcion = egreso.Descripcion,
+                Fecha = egreso.Fecha, // Asumiendo que en BD es DateTime
+                FechaTextoEgreso = egreso.Fecha.ToString("yyyy-MM-dd"),
+                DetalleChequeFacturaEgreso = egreso.TbDetalleChequeFacturas.Select(d => new DetalleChequeFacturaViewModel
+                {
+                    IdDetalleChequeFactura = d.IdDetalleChequeFactura,
+                    IdMovimientoEgreso = d.IdMovimientoEgreso,
+                    IdAcuerdo = d.IdAcuerdo,
+                    IdCheque = d.IdCheque,
+                    IdFactura = d.IdFactura,
+                    NumeroCheque = d.IdChequeNavigation?.NumeroCheque,
+                    NumeroFactura = d.IdFacturaNavigation?.NumeroFactura,
+                    NumeroAcuerdo = d.IdAcuerdoNavigation?.NumeroAcuerdo,
+                    Monto = d.Monto,
+                    Descripcion = d.Observacion // <== CAMBIAR AQUI
+                }).ToList(),
+            };
+        }
+
 
 
         private async Task ConfigurarAsociacionMovimientoEgresoAsync(MovimientoEgresoViewModel model)
@@ -392,63 +420,146 @@ namespace UCG.Controllers
             return Json(factura);
         }
 
-
-        // GET: TbMovimientoEgresos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public JsonResult VerificarDatosAsociacion(int idAsociacion)
         {
-            if (id == null || _context.TbMovimientoEgresos == null)
+            try
             {
-                return NotFound();
-            }
+                var tieneCheques = _context.TbCheques.Any(c => c.IdAsociacion == idAsociacion);
+                var tieneFacturas = _context.TbFacturas.Any(f => f.IdAsociacion == idAsociacion);
 
-            var tbMovimientoEgreso = await _context.TbMovimientoEgresos.FindAsync(id);
-            if (tbMovimientoEgreso == null)
-            {
-                return NotFound();
+                return Json(new
+                {
+                    success = true,
+                    tieneCheques,
+                    tieneFacturas
+                });
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbMovimientoEgreso.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbMovimientoEgreso.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbMovimientoEgreso.IdAsociado);
-            return View(tbMovimientoEgreso);
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Error al verificar los datos de la asociación: " + ex.Message
+                });
+            }
         }
 
-        // POST: TbMovimientoEgresos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var egreso = await _context.TbMovimientoEgresos
+                .Include(e => e.TbDetalleChequeFacturas)
+                    .ThenInclude(d => d.IdChequeNavigation)
+                .Include(e => e.TbDetalleChequeFacturas)
+                    .ThenInclude(d => d.IdFacturaNavigation)
+                .FirstOrDefaultAsync(e => e.IdMovimientoEgreso == id);
+
+            if (egreso == null)
+                return NotFound();
+
+            var model = MapearMovimientoEgresoViewModel(egreso);
+            model.DetalleChequeFacturaEgresoJason = JsonConvert.SerializeObject(model.DetalleChequeFacturaEgreso);
+
+            await ConfigurarAsociacionMovimientoEgresoAsync(model);
+
+            // 🔽 Cargá los combos del modal de forma global
+            ViewBag.IdAcuerdo = new SelectList(
+                await _context.TbAcuerdos
+                    .Where(a => a.IdActa == model.IdActa)
+                    .ToListAsync(),
+                "IdAcuerdo", "NumeroAcuerdo");
+
+            ViewBag.IdCheque = new SelectList(
+                await _context.TbCheques
+                    .Where(c => c.IdAsociacion == model.IdAsociacion)
+                    .ToListAsync(),
+                "IdCheque", "NumeroCheque");
+
+            ViewBag.IdFactura = new SelectList(
+                await _context.TbFacturas
+                    .Where(f => f.IdAsociacion == model.IdAsociacion)
+                    .ToListAsync(),
+                "IdFactura", "NumeroFactura");
+
+            return View(model);
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdMovimientoEgreso,IdAsociacion,IdAsociado,IdConceptoAsociacion,IdActa,Monto,Fecha,Descripcion")] TbMovimientoEgreso tbMovimientoEgreso)
+        public async Task<IActionResult> Edit(int id, MovimientoEgresoViewModel model)
         {
-            if (id != tbMovimientoEgreso.IdMovimientoEgreso)
-            {
+            if (id != model.IdMovimientoEgreso)
                 return NotFound();
+
+            if (!await ParseFechaEmisionAsync(model))
+            {
+                TempData["ErrorMessage"] = "Debe ingresar una fecha válida de egreso.";
+                await ConfigurarAsociacionMovimientoEgresoAsync(model);
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            if (!await DeserializarJsonAsync(model))
             {
-                try
-                {
-                    _context.Update(tbMovimientoEgreso);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TbMovimientoEgresoExists(tbMovimientoEgreso.IdMovimientoEgreso))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Error en los detalles de cheques y facturas.";
+                await ConfigurarAsociacionMovimientoEgresoAsync(model);
+                return View(model);
             }
-            ViewData["IdActa"] = new SelectList(_context.TbActa, "IdActa", "IdActa", tbMovimientoEgreso.IdActa);
-            ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "IdAsociacion", tbMovimientoEgreso.IdAsociacion);
-            ViewData["IdAsociado"] = new SelectList(_context.TbAsociados, "IdAsociado", "IdAsociado", tbMovimientoEgreso.IdAsociado);
-            return View(tbMovimientoEgreso);
+
+            var validator = new MovimientoEgresoViewModelValidator(_context);
+            var validationResult = await validator.ValidateAsync(model);
+
+            foreach (var error in validationResult.Errors)
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Hay errores de validación en el formulario.";
+                await ConfigurarAsociacionMovimientoEgresoAsync(model);
+                return View(model);
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var egresoExistente = await _context.TbMovimientoEgresos
+                    .Include(e => e.TbDetalleChequeFacturas)
+                    .FirstOrDefaultAsync(e => e.IdMovimientoEgreso == id);
+
+                if (egresoExistente == null)
+                    return NotFound();
+
+                // Actualizar campos principales
+                egresoExistente.IdAsociacion = model.IdAsociacion;
+                egresoExistente.IdAsociado = model.IdAsociado;
+                egresoExistente.IdActa = model.IdActa;
+                egresoExistente.Fecha = model.Fecha;
+                egresoExistente.Monto = model.Monto;
+                egresoExistente.Descripcion = model.Descripcion;
+
+                // Reemplazar detalles anteriores
+                _context.TbDetalleChequeFacturas.RemoveRange(egresoExistente.TbDetalleChequeFacturas);
+                await GuardarDetallesChequeFacturasAsync(model.DetalleChequeFacturaEgreso, id);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El movimiento de egreso fue actualizado exitosamente.";
+                return RedirectToAction(nameof(Edit), new { id });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el movimiento: " + ex.Message;
+                await ConfigurarAsociacionMovimientoEgresoAsync(model);
+                return View(model);
+            }
         }
+
 
         // GET: TbMovimientoEgresos/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -458,17 +569,18 @@ namespace UCG.Controllers
                 return NotFound();
             }
 
-            var tbMovimientoEgreso = await _context.TbMovimientoEgresos
-                .Include(t => t.IdActaNavigation)
-                .Include(t => t.IdAsociacionNavigation)
-                .Include(t => t.IdAsociadoNavigation)
+            var movimiento = await _context.TbMovimientoEgresos
+                .Include(m => m.IdAsociacionNavigation)
+                .Include(m => m.IdAsociadoNavigation)
+                .Include(m => m.IdActaNavigation)
                 .FirstOrDefaultAsync(m => m.IdMovimientoEgreso == id);
-            if (tbMovimientoEgreso == null)
+
+            if (movimiento == null)
             {
                 return NotFound();
             }
 
-            return View(tbMovimientoEgreso);
+            return View(movimiento);
         }
 
         // POST: TbMovimientoEgresos/Delete/5
@@ -476,19 +588,42 @@ namespace UCG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.TbMovimientoEgresos == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                return Problem("Entity set 'UcgdbContext.TbMovimientoEgresos'  is null.");
+                var movimiento = await _context.TbMovimientoEgresos
+                    .Include(m => m.TbDetalleChequeFacturas)
+                    .FirstOrDefaultAsync(m => m.IdMovimientoEgreso == id);
+
+                if (movimiento == null)
+                {
+                    TempData["ErrorMessage"] = "El movimiento no fue encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Primero eliminá los detalles
+                if (movimiento.TbDetalleChequeFacturas.Any())
+                {
+                    _context.TbDetalleChequeFacturas.RemoveRange(movimiento.TbDetalleChequeFacturas);
+                }
+
+                // Luego el movimiento
+                _context.TbMovimientoEgresos.Remove(movimiento);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "El movimiento fue eliminado correctamente.";
             }
-            var tbMovimientoEgreso = await _context.TbMovimientoEgresos.FindAsync(id);
-            if (tbMovimientoEgreso != null)
+            catch (Exception ex)
             {
-                _context.TbMovimientoEgresos.Remove(tbMovimientoEgreso);
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "Error al eliminar el movimiento: " + ex.Message;
             }
-            
-            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool TbMovimientoEgresoExists(int id)
         {

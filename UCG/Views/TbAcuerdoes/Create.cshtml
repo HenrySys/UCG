@@ -18,10 +18,10 @@
 <form asp-action="Create" data-mode="Create" id="miFormulario">
     <div class="row g-4">
         <!-- Card izquierda: IdActa Número, Nombre -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card shadow">
                 <div class="card-header">
-                    Información del Acta
+                    Información del Acuerdo
                 </div>
                 <div class="card-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -44,7 +44,7 @@
 
                     <div class="mb-3">
                         <label asp-for="NumeroAcuerdo" class="form-label"></label>
-                        <input asp-for="NumeroAcuerdo" class="form-control" />
+                        <input asp-for="NumeroAcuerdo" class="form-control" placeholder="Ingrese el número del acuerdo" />
                         <span asp-validation-for="NumeroAcuerdo" class="text-danger"></span>
                     </div>
 
@@ -58,23 +58,25 @@
                     </div>
 
 
-                    <div class="mb-3">
-                        <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
-                        <span asp-validation-for="Nombre" class="text-danger"></span>
-                    </div>    
-
+                   
                 </div>
             </div>
         </div>
 
         <!-- Card derecha: Descripción, Monto -->
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header">
                     Detalles del Acuerdo
                 </div>
+                
+
                 <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Nombre del acuerdo..." />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
                     <div class="mb-3" id="descripcionAcuerdo">
                         <label for="summernoteAcuerdo" class="form-label">Descripción</label>
                         <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
@@ -82,14 +84,16 @@
                     </div>
                 </div>
             </div>
+            <!-- Botones -->
+            <div class="mt-4 d-flex justify-content-between">
+                <input type="submit" value="Guardar" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-secondary">Volver</a>
+            </div>
         </div>
+        
     </div>
 
-    <!-- Botones -->
-    <div class="mt-4 d-flex justify-content-between">
-        <input type="submit" value="Guardar" class="btn btn-success" />
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
-    </div>
+   
 </form>
 
 

@@ -6,7 +6,7 @@ $(document).ready(function () {
     if (successMessage) {
         Swal.fire({
             icon: 'success',
-            title: '¡Éxito!',
+            title: '¡Exito!',
             text: successMessage,
             confirmButtonText: 'Ir al listado'
         }).then((result) => {
@@ -23,10 +23,30 @@ $(document).ready(function () {
         });
     }
 
+
+    let colaErroresSwal = [];
+    let swalMostrandose = false;
+
     function mostrarErrorSwal(titulo, mensaje) {
-        Swal.fire({ icon: 'warning', title: titulo, text: mensaje });
+        colaErroresSwal.push({ titulo, mensaje });
+        procesarColaSwal();
     }
 
+    function procesarColaSwal() {
+        if (swalMostrandose || colaErroresSwal.length === 0) return;
+
+        swalMostrandose = true;
+        const { titulo, mensaje } = colaErroresSwal.shift();
+
+        Swal.fire({
+            icon: 'warning',
+            title: titulo,
+            text: mensaje
+        }).then(() => {
+            swalMostrandose = false;
+            procesarColaSwal(); // Mostrar el siguiente si existe
+        });
+    }
     function fetchDropdownData(url, data, selector, placeholder, renderFn) {
         $.ajax({
             url: url,

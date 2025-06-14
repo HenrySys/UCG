@@ -1,4 +1,7 @@
-﻿@model UCG.Models.ViewModels.ActividadViewModel
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbActividad;
+
+@model ActividadViewModel
 
 @{
     ViewData["Title"] = "Crear Actividad";
@@ -15,17 +18,16 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Formulario de Actividad
-            </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                    <!-- ASOCIACIÓN -->
+    <div class="row g-3">
+        <!-- CARD 1: Información General de la Actividad -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
                         @if (Convert.ToBoolean(ViewBag.EsAdmin))
@@ -42,7 +44,7 @@
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
-                    <!-- ASOCIADO -->
+                    <!-- Asociado -->
                     <div class="mb-3">
                         <label asp-for="IdAsociado" class="form-label"></label>
                         <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
@@ -51,6 +53,7 @@
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
                     </div>
 
+                    <!-- Acta -->
                     <div class="mb-3">
                         <label asp-for="IdActa" class="form-label"></label>
                         <select asp-for="IdActa" class="form-select" asp-items="actas" id="IdActa">
@@ -59,45 +62,61 @@
                         <span asp-validation-for="IdActa" class="text-danger"></span>
                     </div>
 
+                    <!-- Nombre -->
                     <div class="mb-3">
                         <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre de la actividad" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
 
+                    <!-- Fecha -->
                     <div class="mb-3">
                         <label asp-for="FechaTextoActividad" class="form-label"></label>
-                        <input asp-for="FechaTextoActividad" type="date" class="form-control" />
+                        <input asp-for="FechaTextoActividad" type="date" class="form-control" placeholder="Seleccione la fecha de la actividad" />
                         <span asp-validation-for="FechaTextoActividad" class="text-danger"></span>
                     </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- CARD 2: Detalle de la Actividad -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Detalle de la Actividad</div>
+                <div class="card-body">
+                    <!-- Razón -->
                     <div class="mb-3">
                         <label asp-for="Razon" class="form-label"></label>
-                        <input asp-for="Razon" class="form-control" />
+                        <input asp-for="Razon" class="form-control" placeholder="Ingrese la razón de la actividad" />
                         <span asp-validation-for="Razon" class="text-danger"></span>
                     </div>
 
+                    <!-- Lugar -->
                     <div class="mb-3">
                         <label asp-for="Lugar" class="form-label"></label>
-                        <input asp-for="Lugar" class="form-control" />
+                        <input asp-for="Lugar" class="form-control" placeholder="Ingrese el lugar de la actividad" />
                         <span asp-validation-for="Lugar" class="text-danger"></span>
                     </div>
 
+                    <!-- Observaciones -->
                     <div class="mb-3">
                         <label asp-for="Observaciones" class="form-label"></label>
-                        <input asp-for="Observaciones" class="form-control" />
+                        <input asp-for="Observaciones" class="form-control" placeholder="Ingrese observaciones adicionales" />
                         <span asp-validation-for="Observaciones" class="text-danger"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-primary">Crear</button>
-                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-                    </div>
-                </form>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">Crear</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>
 
 @section Scripts {
     @{

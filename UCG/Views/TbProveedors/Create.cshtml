@@ -5,7 +5,6 @@
 @{
     ViewData["Title"] = "Crear Proveedor";
     var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
-
 }
 
 <h1 class="text-center mb-4">Crear Proveedor</h1>
@@ -16,96 +15,133 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Información del Proveedor
-            </div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                    <dl class="row">
-                        <dt class="col-sm-4 mb-3"><label asp-for="IdAsociacion" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            @if (!Convert.ToBoolean(ViewBag.EsAdmin))
-                            {
-                                <!-- Usuario NO es admin → puede elegir -->
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
-                                    <option disabled selected>Seleccione una asociación</option>
-                                </select>
-                            }
-                            else
-                            {
-                                <!-- Usuario ES admin → asociación fija -->
-                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                            }
-                            <span asp-validation-for="IdAsociacion" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="NombreEmpresa" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="NombreEmpresa" class="form-control" placeholder="Ingrese el nombre de la empresa" />
-                            <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="CedulaJuridica" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="CedulaJuridica" class="form-control" placeholder="Ingrese la cédula jurídica" />
-                            <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="NombreContacto" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="NombreContacto" class="form-control" placeholder="Ingrese el nombre del contacto" />
-                            <span asp-validation-for="NombreContacto" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="CedulaContacto" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="CedulaContacto" class="form-control" placeholder="Ingrese la cédula del contacto" />
-                            <span asp-validation-for="CedulaContacto" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Direccion" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Direccion" class="form-control" placeholder="Ingrese la dirección" />
-                            <span asp-validation-for="Direccion" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Telefono" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Telefono" class="form-control" placeholder="Ingrese el teléfono" />
-                            <span asp-validation-for="Telefono" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Correo" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Correo" class="form-control" placeholder="Ingrese el correo electrónico" />
-                            <span asp-validation-for="Correo" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Fax" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Fax" class="form-control" placeholder="Ingrese el número de fax" />
-                            <span asp-validation-for="Fax" class="text-danger"></span>
-                        </dd>
-                    </dl>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <input type="submit" value="Guardar Proveedor" class="btn btn-primary" />
-                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+    <div class="row g-3">
+        <!-- CARD 1: Información General del Proveedor -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (!Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
-                </form>
+
+                    <!-- Nombre Empresa -->
+                    <div class="mb-3">
+                        <label asp-for="NombreEmpresa" class="form-label"></label>
+                        <input asp-for="NombreEmpresa" class="form-control" placeholder="Ingrese el nombre de la empresa" />
+                        <span asp-validation-for="NombreEmpresa" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cédula Jurídica -->
+                    <div class="mb-3">
+                        <label asp-for="CedulaJuridica" class="form-label"></label>
+                        <input asp-for="CedulaJuridica" class="form-control" placeholder="Ingrese la cédula jurídica" />
+                        <span asp-validation-for="CedulaJuridica" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TipoProveedor" class="form-label"></label>
+                        <select asp-for="TipoProveedor" class="form-select" asp-items="Html.GetEnumSelectList<TipoDeProveedor>()">
+                            <option value="" disabled selected>Seleccione un tipo de proveedor</option>
+                        </select>
+                        <span asp-validation-for="TipoProveedor" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeProveedor>()">
+                            <option value="" disabled selected>Seleccione un tipo de proveedor</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Información de Contacto -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información de Contacto</div>
+                <div class="card-body">
+                    <!-- Nombre del Contacto -->
+                    <div class="mb-3">
+                        <label asp-for="NombreContacto" class="form-label"></label>
+                        <input asp-for="NombreContacto" class="form-control" placeholder="Ingrese el nombre del contacto" />
+                        <span asp-validation-for="NombreContacto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cédula del Contacto -->
+                    <div class="mb-3">
+                        <label asp-for="CedulaContacto" class="form-label"></label>
+                        <input asp-for="CedulaContacto" class="form-control" placeholder="Ingrese la cédula del contacto" />
+                        <span asp-validation-for="CedulaContacto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="mb-3">
+                        <label asp-for="Direccion" class="form-label"></label>
+                        <input asp-for="Direccion" class="form-control" placeholder="Ingrese la dirección" />
+                        <span asp-validation-for="Direccion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="Ingrese el teléfono" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <!-- Correo -->
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control" placeholder="Ingrese el correo electrónico" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fax -->
+                    <div class="mb-3">
+                        <label asp-for="Fax" class="form-label"></label>
+                        <input asp-for="Fax" class="form-control" placeholder="Ingrese el número de fax" />
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <input type="submit" value="Guardar Proveedor" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <script src="~/js/ProveedorScripts/ProveedorFormHandler.js"></script>
 }

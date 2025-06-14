@@ -17,65 +17,69 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">Información del Folio</div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+    <div class="row g-3">
+        <!-- CARD 1: Información del Folio -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información del Folio</div>
+                <div class="card-body">
+                    <!-- Asociación -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        @if (!Convert.ToBoolean(ViewBag.EsAdmin))
-                        {
-                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
-                                <option disabled selected>Seleccione una asociación</option>
-                            </select>
-                        }
-                        else
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
                         {
                             <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
                             <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
                         }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
+                    <!-- Asociado -->
                     <div class="mb-3">
                         <label asp-for="IdAsociado" class="form-label"></label>
-                        @if (!Convert.ToBoolean(ViewBag.EsAdmin))
-						{
-							<!-- Usuario NO es admin → puede elegir -->
-                            <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
-								<option disabled selected>Seleccione un asociado</option>
-							</select>
-						}
-						else
-						{
-							<!-- Usuario ES admin → asociación fija -->
-                            <select asp-for="IdAsociado" class="form-select" id="IdAsociado">
-                                <option disabled selected>Seleccione un asociado</option>
-                            </select>
-						}
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
+                            <option disabled selected>Seleccione un asociado</option>
+                        </select>
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
                     </div>
 
+                    <!-- Fechas -->
                     <div class="mb-3">
                         <label asp-for="FechaTextoEmision" class="form-label"></label>
-                        <input asp-for="FechaTextoEmision" class="form-control" type="date" />
+                        <input asp-for="FechaTextoEmision" type="date" class="form-control" />
                         <span asp-validation-for="FechaTextoEmision" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label asp-for="FechaTextoCierre" class="form-label"></label>
-                        <input asp-for="FechaTextoCierre" class="form-control" type="date" />
+                        <input asp-for="FechaTextoCierre" type="date" class="form-control" />
                         <span asp-validation-for="FechaTextoCierre" class="text-danger"></span>
                     </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- CARD 2: Detalle del Folio -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Detalle del Folio</div>
+                <div class="card-body">
+                    <!-- Número de folio -->
                     <div class="mb-3">
                         <label asp-for="NumeroFolio" class="form-label"></label>
-                        <input asp-for="NumeroFolio" class="form-control" />
+                        <input asp-for="NumeroFolio" class="form-control" placeholder="Número de folio" />
                         <span asp-validation-for="NumeroFolio" class="text-danger"></span>
                     </div>
+
+                    <!-- Estado -->
                     <div class="mb-3">
                         <label asp-for="Estado" class="form-label"></label>
                         <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeFolio>()">
@@ -84,21 +88,23 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Descripcion" class="form-label"></label>
-                        <textarea asp-for="Descripcion" class="form-control"></textarea>
-                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    <!-- Descripción -->
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="summernoteObservacion" class="form-label">Descripción</label>
+                        <textarea id="summernoteObservacion" name="Descripcion" class="form-control"></textarea>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
                     </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <input type="submit" value="Guardar" class="btn btn-success" />
-                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <input type="submit" value="Guardar" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
 
 @section Scripts {
     @{
@@ -106,7 +112,16 @@
     }
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+   
+
     <script>
         const rutasFolio = {
             obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbFolios")',

@@ -7,7 +7,7 @@
 <h1 class="text-center mb-4">Detalle de la Factura</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header">
                 Información de la Factura
@@ -36,24 +36,39 @@
                     @if (Model.IdAsociadoNavigation != null)
                     {
                         <dt class="col-sm-4 mb-3">Asociado</dt>
-                        <dd class="col-sm-8 mb-3">@Model.IdAsociadoNavigation.Nombre</dd>
+                        <dd class="col-sm-8 mb-3">
+                            <a asp-controller="TbAsociados" asp-action="Details" asp-route-id="@Model.IdAsociadoNavigation.IdAsociado">
+                                @Model.IdAsociadoNavigation.Nombre
+                            </a>
+                        </dd>
                     }
 
                     @if (Model.IdColaboradorNavigation != null)
                     {
                         <dt class="col-sm-4 mb-3">Colaborador</dt>
-                        <dd class="col-sm-8 mb-3">@Model.IdColaboradorNavigation.Nombre</dd>
+                        <dd class="col-sm-8 mb-3">
+                            <a asp-controller="TbColaboradors" asp-action="Details" asp-route-id="@Model.IdColaboradorNavigation.IdColaborador">
+                                @Model.IdColaboradorNavigation.Nombre
+                            </a>
+                        </dd>
                     }
 
                     @if (Model.IdProveedorNavigation != null)
                     {
                         <dt class="col-sm-4 mb-3">Proveedor</dt>
-                        <dd class="col-sm-8 mb-3">@Model.IdProveedorNavigation.NombreEmpresa</dd>
+                        <dd class="col-sm-8 mb-3">
+                            <a asp-controller="TbProveedors" asp-action="Details" asp-route-id="@Model.IdProveedorNavigation.IdProveedor">
+                                @Model.IdProveedorNavigation.NombreEmpresa
+                            </a>
+                        </dd>
                     }
                 </dl>
 
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Edit" asp-route-id="@Model.IdFactura" class="btn btn-warning">Editar</a>
+                    <a asp-controller="FacturaPdf" asp-action="DetalleFacturaPdf" asp-route-id="@Model.IdFactura" class="btn btn-danger" target="_blank">
+                        Descargar PDF
+                    </a>
                     <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
                 </div>
             </div>

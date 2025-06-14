@@ -1,0 +1,114 @@
+@model UCG.Models.TbCheque
+
+@{
+    Layout = null;
+    ViewData["Title"] = "ChequeIndividualPdf";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Cheque @Model.NumeroCheque</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #333;
+        }
+
+        .cheque-container {
+            border: 1px solid #ccc;
+            padding: 30px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section label {
+                font-weight: bold;
+                display: inline-block;
+                width: 180px;
+            }
+
+        .amount-box {
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 10px 20px;
+            display: inline-block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="cheque-container">
+        <div class="header">
+            <div>
+                <div><strong>@Model.IdCuentaNavigation?.Banco</strong></div>
+                <div>@Model.IdCuentaNavigation?.NumeroCuenta</div>
+                <div>@Model.IdCuentaNavigation?.TituloCuenta</div>
+                <div>@Model.IdCuentaNavigation?.TipoCuenta</div>
+            </div>
+            <div>
+                <strong>Nº @Model.NumeroCheque</strong>
+            </div>
+        </div>
+
+        <div class="section">
+            <label>Beneficiario:</label> @Model.Beneficiario
+        </div>
+
+        <div class="section">
+            <label>Monto:</label>
+            <span class="amount-box">&#8353;@Model.Monto.ToString("N2")</span>
+        </div>
+
+        <div class="section">
+            <label>Fecha de Emisión:</label> @Model.FechaEmision.ToString("dd/MM/yyyy")
+        </div>
+
+        <div class="section">
+            <label>Fecha de Pago:</label> @Model.FechaPago.ToString("dd/MM/yyyy")
+        </div>
+
+        <div class="section">
+            <label>Asociación:</label> @Model.IdAsociacionNavigation?.Nombre
+        </div>
+
+        @if (Model.IdAsociadoAutorizaNavigation != null)
+        {
+            <div class="section">
+                <label>Autorizado por:</label> @Model.IdAsociadoAutorizaNavigation?.Nombre
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+        {
+            <div class="section">
+                <label>Observaciones:</label> @Model.Observaciones
+            </div>
+        }
+    </div>
+
+    <div class="footer">
+        Generado automáticamente por el sistema UCG
+    </div>
+</body>
+</html>

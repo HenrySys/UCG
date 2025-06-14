@@ -379,7 +379,13 @@ namespace UCG.Controllers
 				await transaction.CommitAsync();
 
 				TempData["SuccessMessage"] = "La junta directiva fue actualizada correctamente.";
-				return RedirectToAction(nameof(Edit), new { id });
+
+                if (Request.Form["RedirigirMiembro"] == "true")
+                {
+                    return RedirectToAction("Create", "TbMiembroJuntaDirectivas", new { id = model.IdJuntaDirectiva });
+                }
+
+                return RedirectToAction(nameof(Edit), new { id });
 			}
 			catch (Exception ex)
 			{

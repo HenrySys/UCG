@@ -107,10 +107,13 @@
                     <!-- Monto -->
                     <div class="mb-3 mt-3">
                         <label asp-for="Monto" class="form-label"></label>
-                        <input asp-for="Monto" class="form-control" />
+                        <div class="input-group" id="MontoTotal">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="Monto" class="form-control" placeholder="Ingrese el monto en colones" readonly />
+                        </div>
                         <span asp-validation-for="Monto" class="text-danger"></span>
                     </div>
-                </div>
+
                 
             </div>
         </div>     

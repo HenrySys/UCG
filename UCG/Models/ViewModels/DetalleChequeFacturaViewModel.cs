@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models.ViewModels
 {
@@ -22,7 +23,14 @@ namespace UCG.Models.ViewModels
         public decimal Monto { get; set; }
 
         [Display(Name = "Observacion")]
-        public string? Observacion { get; set; }
-        
+        public string? Descripcion { get; set; }
+
+        [BindNever]
+        public string? NumeroFactura { get; set; }
+        [BindNever]
+        public string? NumeroCheque { get; set; }
+        [BindNever]
+        public string? NumeroAcuerdo { get; set; }
+
     }
 }

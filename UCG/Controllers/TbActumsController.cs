@@ -489,6 +489,7 @@ namespace UCG.Controllers
                 actaExistente.IdAsociacion = model.IdAsociacion;
                 actaExistente.IdAsociado = model.IdAsociado;
                 actaExistente.IdFolio = model.IdFolio;
+                actaExistente.Tipo = model.Tipo;
                 actaExistente.FechaSesion = model.FechaSesion;
                 actaExistente.NumeroActa = model.NumeroActa;
                 actaExistente.Descripcion = model.Descripcion;
@@ -506,6 +507,13 @@ namespace UCG.Controllers
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "El acta fue actualizada exitosamente.";
+
+                //  AQUI validamos si se quiere redirigir a asistencia
+                if (Request.Form["RedirigirAsistencia"] == "true")
+                {
+                    return RedirectToAction("Create", "TbActaAsistenciums", new { id = model.IdActa });
+                }
+
                 return RedirectToAction(nameof(Edit), new { idActa });
             }
             catch (Exception ex)

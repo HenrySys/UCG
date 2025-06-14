@@ -9,9 +9,8 @@
     var folios = ViewData["IdFolio"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
-<h1>Edit</h1>
+<h1>Editar Acta</h1>
 
-<h4>TbActum</h4>
 <hr />
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
@@ -20,7 +19,7 @@
     
 </div>
 <form asp-action="Edit" data-mode="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="IdActa" />
 
     <div class="row g-3 mb-4">
@@ -53,6 +52,14 @@
                             <option disabled selected>Seleccione un folio</option>
                         </select>
                         <span asp-validation-for="IdFolio" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Tipo" class="form-label"></label>
+                        <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<TipoDeActa>()">
+                            <option value="" disabled selected>Seleccione un tipo de acuerdo</option>
+                        </select>
+
+                        <span asp-validation-for="Tipo" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">

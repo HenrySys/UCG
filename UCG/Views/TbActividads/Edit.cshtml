@@ -1,69 +1,135 @@
-﻿@model UCG.Models.TbActividad
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbActividad;
+
+@model ActividadViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Crear Actividad";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var actas = ViewData["IdActa"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
-<h1>Edit</h1>
-
-<h4>TbActividad</h4>
+<h1 class="text-center mb-4">Editar Actividad</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdActividad" />
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Fecha" class="control-label"></label>
-                <input asp-for="Fecha" class="form-control" />
-                <span asp-validation-for="Fecha" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Razon" class="control-label"></label>
-                <input asp-for="Razon" class="form-control" />
-                <span asp-validation-for="Razon" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class="form-control" asp-items="ViewBag.IdAsociacion"></select>
-                <span asp-validation-for="IdAsociacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class="form-control" asp-items="ViewBag.IdAsociado"></select>
-                <span asp-validation-for="IdAsociado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdActa" class="control-label"></label>
-                <select asp-for="IdActa" class="form-control" asp-items="ViewBag.IdActa"></select>
-                <span asp-validation-for="IdActa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Lugar" class="control-label"></label>
-                <input asp-for="Lugar" class="form-control" />
-                <span asp-validation-for="Lugar" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observaciones" class="control-label"></label>
-                <input asp-for="Observaciones" class="form-control" />
-                <span asp-validation-for="Observaciones" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="IdActividad" />
+
+
+    <div class="row g-3">
+        <!-- CARD 1: Información General de la Actividad -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Asociado -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
+                            <option disabled selected>Seleccione un autorizado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <!-- Acta -->
+                    <div class="mb-3">
+                        <label asp-for="IdActa" class="form-label"></label>
+                        <select asp-for="IdActa" class="form-select" asp-items="actas" id="IdActa">
+                            <option disabled selected>Seleccione un acta</option>
+                        </select>
+                        <span asp-validation-for="IdActa" class="text-danger"></span>
+                    </div> 
+
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre de la actividad" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoActividad" class="form-label"></label>
+                        <input asp-for="FechaTextoActividad" type="date" class="form-control" placeholder="Seleccione la fecha de la actividad" />
+                        <span asp-validation-for="FechaTextoActividad" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Detalle de la Actividad -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Detalle de la Actividad</div>
+                <div class="card-body">
+                    <!-- Razón -->
+                    <div class="mb-3">
+                        <label asp-for="Razon" class="form-label"></label>
+                        <input asp-for="Razon" class="form-control" placeholder="Ingrese la razón de la actividad" />
+                        <span asp-validation-for="Razon" class="text-danger"></span>
+                    </div>
+
+                    <!-- Lugar -->
+                    <div class="mb-3">
+                        <label asp-for="Lugar" class="form-label"></label>
+                        <input asp-for="Lugar" class="form-control" placeholder="Ingrese el lugar de la actividad" />
+                        <span asp-validation-for="Lugar" class="text-danger"></span>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <input asp-for="Observaciones" class="form-control" placeholder="Ingrese observaciones adicionales" />
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-warning ">Editar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const rutasFolio = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbActividads")',
+            obtenerActas: '@Url.Action("ObtenerActasPorAsociacion", "TbActividads")'
+        };
+    </script>
+    <script src="~/js/ActividadScripts/ActividadFormHandler.js"></script>
 }

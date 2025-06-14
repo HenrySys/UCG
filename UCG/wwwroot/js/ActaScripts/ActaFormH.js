@@ -121,8 +121,9 @@
             limpiarErrores();
 
             const asociadosYaAgregados = $('#detailsTableAsistencia tbody tr').map(function () {
-                return $(this).find('td:eq(1)').text();
+                return $(this).data('id-asociado')?.toString();
             }).get();
+
 
             fetchDropdownData(rutasMovimiento.obtenerAsociados, { idAsociacion }, '#modalIdAsociado', 'Seleccione un asociado', function (data, dropdown) {
                 let agregados = 0;
@@ -167,15 +168,15 @@
         $('#detailsTableAsistencia tbody').empty();
 
         asistenciasCargadas.forEach((a, index) => {
-            const nombreCompleto = `${a.Nombre} ${a.Apellido1 || ''}`.trim();
 
             $('#detailsTableAsistencia tbody').append(`
-            <tr data-id-asociado="${a.IdAsociado}" data-nombre="${a.Nombre}" data-apellido1="${a.Apellido1}">
-                <td>${a.Fecha}</td>
-                <td>${nombreCompleto}</td>
-                <td><button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button></td>
-            </tr>
-        `);
+                <tr data-id-asociado="${a.IdAsociado}" data-nombre="${a.Nombre}" data-apellido1="${a.Apellido1}">
+                    <td>${a.Fecha}</td>
+                    <td><span class="asociado-id">${a.Nombre} ${a.Apellido1 || ''}</span></td>
+                    <td><button type="button" class="btn btn-danger btn-sm removeRow" data-index="${index}">Eliminar</button></td>
+                </tr>
+            `);
+
         });
     }
 
@@ -431,13 +432,42 @@
 
 
     $('#detailModalAsistenciaEdit').click(function () {
-        var idActa = $(this).data("id"); // <-- aquí sí se obtiene correctamente el ID del botón
-        console.log("ID Acta:", idActa);
-
-        if (idActa) {
-            window.location.href = "/TbActaAsistenciums/Create/" + idActa;
+        var idActa = $('#IdActa').val(); // Obtener el ID directamente del input hidden
+        if (!idActa) {
+            Swal.fire("Error", "No se pudo obtener el ID del acta.", "error");
+            return;
         }
+
+        // Primero recolectamos los datos temporales
+        const asistencias = recolectarAsistencias();
+        const acuerdos = recolectarAcuerdos();
+
+        $('#ActaAsistenciaJason').val(JSON.stringify(asistencias));
+        $('#ActaAcuerdoJason').val(JSON.stringify(acuerdos));
+
+        // Mostrar alerta para guardar
+        Swal.fire({
+            icon: 'info',
+            title: 'Guarde los cambios',
+            text: 'Debe guardar el acta antes de agregar asistencias.',
+            showCancelButton: true,
+            confirmButtonText: 'Guardar y continuar',
+            cancelButtonText: 'Cancelar'
+        }).then(result => {
+            if (result.isConfirmed) {
+                // Agregamos un campo oculto para saber que luego queremos ir a la vista Create Asistencia
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'RedirigirAsistencia',
+                    value: 'true'
+                }).appendTo('form');
+
+                $('form').submit();
+            }
+        });
     });
+
+
 
     $('#detailsTableAcuerdo').on('click', '.btn-edit-acuerdo', function () {
         limpiarErrores(); // Borra errores anteriores
