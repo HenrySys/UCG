@@ -368,7 +368,7 @@ namespace UCG.Controllers
                 Tipo = acta.Tipo,
                 FechaSesion = acta.FechaSesion,
                 FechaSesionTexto = acta.FechaSesion.ToString("yyyy-MM-dd"),
-                NumeroActa = acta.NumeroActa,
+                NumeroActa = acta.NumeroActa,   
                 Descripcion = acta.Descripcion,
                 Estado = acta.Estado,
                 ActaAsistencia = acta.TbActaAsistencias.Select(a => new ActaAsistenciaViewModel
@@ -560,6 +560,7 @@ namespace UCG.Controllers
             if (tbActum != null)
             {
                 _context.TbActa.Remove(tbActum);
+                TempData["SuccessMessage"] = "El Acta fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

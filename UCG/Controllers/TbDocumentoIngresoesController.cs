@@ -183,6 +183,7 @@ namespace UCG.Controllers
             if (tbDocumentoIngreso != null)
             {
                 _context.TbDocumentoIngresos.Remove(tbDocumentoIngreso);
+                TempData["SuccessMessage"] = "El Documento Ingreso fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

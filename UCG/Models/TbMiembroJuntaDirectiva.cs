@@ -18,15 +18,19 @@ public partial class TbMiembroJuntaDirectiva
 
     public int? IdJuntaDirectiva { get; set; }
 
-    public int IdAsociado { get; set; } 
+    public int IdAsociado { get; set; }
 
     public int IdPuesto { get; set; }
-    [Display(Name = "Estado")]
+
+     [Display(Name = "Estado")]
     public EstadoDeMiembroJD? Estado { get; set; } = null!;
+
     [Display(Name = "Asociado")]
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
+
     [Display(Name = "JuntaDirectiva")]
     public virtual TbJuntaDirectiva? IdJuntaDirectivaNavigation { get; set; }
+
     [Display(Name = "Puesto")]
     public virtual TbPuesto? IdPuestoNavigation { get; set; }
 }

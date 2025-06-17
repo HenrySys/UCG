@@ -254,6 +254,7 @@ namespace UCG.Controllers
             if (tbAsociado != null)
             {
                 _context.TbAsociados.Remove(tbAsociado);
+                TempData["SuccessMessage"] = "El Asociado fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

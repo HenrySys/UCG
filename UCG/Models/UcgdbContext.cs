@@ -41,6 +41,8 @@ public partial class UcgdbContext : DbContext
 
     public virtual DbSet<TbDetalleChequeFactura> TbDetalleChequeFacturas { get; set; }
 
+    public virtual DbSet<TbDetalleFactura> TbDetalleFacturas { get; set; }
+
     public virtual DbSet<TbDocumentoIngreso> TbDocumentoIngresos { get; set; }
 
     public virtual DbSet<TbFactura> TbFacturas { get; set; }
@@ -48,6 +50,8 @@ public partial class UcgdbContext : DbContext
     public virtual DbSet<TbFinancistum> TbFinancista { get; set; }
 
     public virtual DbSet<TbFolio> TbFolios { get; set; }
+
+    public virtual DbSet<TbFondosRecaudadosActividad> TbFondosRecaudadosActividads { get; set; }
 
     public virtual DbSet<TbJuntaDirectiva> TbJuntaDirectivas { get; set; }
 
@@ -63,9 +67,7 @@ public partial class UcgdbContext : DbContext
 
     public virtual DbSet<TbUsuario> TbUsuarios { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;database=ucgdb;uid=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.3.0-mysql"));
+   
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -169,7 +171,7 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.IdAsociado).HasColumnName("id_asociado");
             entity.Property(e => e.IdFolio).HasColumnName("id_folio");
             entity.Property(e => e.NumeroActa)
-                .HasMaxLength(20)
+                .HasMaxLength(30)
                 .HasColumnName("numero_acta");
             entity.Property(e => e.Tipo)
                 .HasColumnType("enum('Ordinario','Extraordinaria')")
@@ -429,7 +431,6 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Telefono)
                 .HasMaxLength(25)
                 .HasColumnName("telefono");
-           
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbClientes)
                 .HasForeignKey(d => d.IdAsociacion)
@@ -445,14 +446,17 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdAsociacion, "fk_tb_colaborador_tb_asociacion");
 
-            entity.Property(e => e.IdColaborador)
-                .HasColumnName("id_colaborador");
+            entity.Property(e => e.IdColaborador).HasColumnName("id_colaborador");
             entity.Property(e => e.Cedula)
                 .HasMaxLength(20)
                 .HasColumnName("cedula");
             entity.Property(e => e.Correo)
                 .HasMaxLength(100)
                 .HasColumnName("correo");
+            entity.Property(e => e.Direccion)
+                .HasMaxLength(100)
+                .HasColumnName("direccion");
+            entity.Property(e => e.IdAsociacion).HasColumnName("id_asociacion");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .HasColumnName("nombre");
@@ -462,8 +466,13 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Telefono)
                 .HasMaxLength(20)
                 .HasColumnName("telefono");
-            entity.Property(e => e.IdAsociacion)
-                .HasColumnName("id_asociacion");
+            entity.Property(e => e.Apellido1)
+                .HasMaxLength(100)
+                .HasColumnName("apellido_1");
+            entity.Property(e => e.Apellido2)
+                .HasMaxLength(100)
+                .HasColumnName("apellido_2");
+
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbColaboradors)
                 .HasForeignKey(d => d.IdAsociacion)
                 .OnDelete(DeleteBehavior.Cascade)
@@ -605,6 +614,50 @@ public partial class UcgdbContext : DbContext
                 .HasConstraintName("fk_tb_detalle_cheque_factura_tb_movimiento_egreso");
         });
 
+        modelBuilder.Entity<TbDetalleFactura>(entity =>
+        {
+            entity.HasKey(e => e.IdDetalleFactura).HasName("PRIMARY");
+
+            entity.ToTable("tb_detalle_factura");
+
+            entity.HasIndex(e => e.IdFactura, "fk_tb_detalle_factura");
+
+            entity.Property(e => e.IdDetalleFactura).HasColumnName("id_detalle_factura");
+            entity.Property(e => e.BaseImponible)
+                .HasPrecision(15, 2)
+                .HasColumnName("base_imponible");
+            entity.Property(e => e.Cantidad).HasColumnName("cantidad");
+            entity.Property(e => e.Descripcion)
+                .HasColumnType("text")
+                .HasColumnName("descripcion");
+            entity.Property(e => e.Descuento)
+                .HasPrecision(15, 2)
+                .HasColumnName("descuento");
+            entity.Property(e => e.IdFactura).HasColumnName("id_factura");
+            entity.Property(e => e.MontoIva)
+                .HasPrecision(15, 2)
+                .HasColumnName("monto_iva");
+            entity.Property(e => e.PorcentajeDescuento)
+                .HasPrecision(5, 2)
+                .HasColumnName("porcentaje_descuento");
+            entity.Property(e => e.PorcentajeIva)
+                .HasPrecision(5, 2)
+                .HasColumnName("porcentaje_iva");
+            entity.Property(e => e.PrecioUnitario)
+                .HasPrecision(15, 2)
+                .HasColumnName("precio_unitario");
+            entity.Property(e => e.TotalLinea)
+                .HasPrecision(15, 2)
+                .HasColumnName("total_linea");
+            entity.Property(e => e.Unidad)
+                .HasMaxLength(50)
+                .HasColumnName("unidad");
+
+            entity.HasOne(d => d.IdFacturaNavigation).WithMany(p => p.TbDetalleFacturas)
+                .HasForeignKey(d => d.IdFactura)
+                .HasConstraintName("fk_tb_detalle_factura");
+        });
+
         modelBuilder.Entity<TbDocumentoIngreso>(entity =>
         {
             entity.HasKey(e => e.IdDocumentoIngreso).HasName("PRIMARY");
@@ -697,6 +750,10 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Descripcion)
                 .HasColumnType("text")
                 .HasColumnName("descripcion");
+            entity.Property(e => e.Estado)
+                .HasDefaultValueSql("'Pendiente'")
+                .HasColumnType("enum('Pendiente','Pagada','Rechazada')")
+                .HasColumnName("estado");
             entity.Property(e => e.FechaEmision).HasColumnName("fecha_emision");
             entity.Property(e => e.FechaSubida)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -716,10 +773,12 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.NumeroFactura)
                 .HasMaxLength(50)
                 .HasColumnName("numero_factura");
-
-            entity.Property(e => e.Estado)
-               .HasColumnType("enum('Pendiente','Pagada','Rechazada')")
-               .HasColumnName("estado");
+            entity.Property(e => e.Subtotal)
+                .HasPrecision(15, 2)
+                .HasColumnName("subtotal");
+            entity.Property(e => e.TotalIva)
+                .HasPrecision(15, 2)
+                .HasColumnName("total_iva");
 
             entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbFacturas)
                 .HasForeignKey(d => d.IdAsociacion)
@@ -811,6 +870,29 @@ public partial class UcgdbContext : DbContext
                 .HasConstraintName("fk_tb_folio_tb_asociado");
         });
 
+        modelBuilder.Entity<TbFondosRecaudadosActividad>(entity =>
+        {
+            entity.HasKey(e => e.IdFondosRecaudadosActividad).HasName("PRIMARY");
+
+            entity.ToTable("tb_fondos_recaudados_actividad");
+
+            entity.HasIndex(e => e.IdActividad, "fk_tb_fondos_recaudados_actividad");
+
+            entity.Property(e => e.IdFondosRecaudadosActividad).HasColumnName("id_fondos_recaudados_actividad");
+            entity.Property(e => e.Detalle)
+                .HasColumnType("text")
+                .HasColumnName("detalle");
+            entity.Property(e => e.FechaRegistro).HasColumnName("fecha_registro");
+            entity.Property(e => e.IdActividad).HasColumnName("id_actividad");
+            entity.Property(e => e.Monto)
+                .HasPrecision(15, 2)
+                .HasColumnName("monto");
+
+            entity.HasOne(d => d.IdActividadNavigation).WithMany(p => p.TbFondosRecaudadosActividads)
+                .HasForeignKey(d => d.IdActividad)
+                .HasConstraintName("fk_tb_fondos_recaudados_actividad");
+        });
+
         modelBuilder.Entity<TbJuntaDirectiva>(entity =>
         {
             entity.HasKey(e => e.IdJuntaDirectiva).HasName("PRIMARY");
@@ -819,7 +901,7 @@ public partial class UcgdbContext : DbContext
 
             entity.HasIndex(e => e.IdActa, "fk_tb_junta_directiva_tb_acta");
 
-            entity.HasIndex(e => e.IdAsociacion, "id_asociacion").IsUnique();
+            entity.HasIndex(e => e.IdAsociacion, "fk_tb_junta_directiva_tb_asociacion");
 
             entity.Property(e => e.IdJuntaDirectiva).HasColumnName("id_junta_directiva");
             entity.Property(e => e.Estado)
@@ -839,8 +921,8 @@ public partial class UcgdbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_junta_directiva_tb_acta");
 
-            entity.HasOne(d => d.IdAsociacionNavigation).WithOne(p => p.TbJuntaDirectiva)
-                .HasForeignKey<TbJuntaDirectiva>(d => d.IdAsociacion)
+            entity.HasOne(d => d.IdAsociacionNavigation).WithMany(p => p.TbJuntaDirectivas)
+                .HasForeignKey(d => d.IdAsociacion)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tb_junta_directiva_tb_asociacion");
         });
@@ -970,6 +1052,9 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Correo)
                 .HasMaxLength(120)
                 .HasColumnName("correo");
+            entity.Property(e => e.Descripcion)
+                .HasColumnType("text")
+                .HasColumnName("descripcion");
             entity.Property(e => e.Direccion)
                 .HasMaxLength(120)
                 .HasColumnName("direccion");

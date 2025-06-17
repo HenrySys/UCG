@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace UCG.Models;
 
 public partial class TbAsociacion
@@ -56,6 +55,8 @@ public partial class TbAsociacion
 
     public virtual ICollection<TbCliente> TbClientes { get; } = new List<TbCliente>();
 
+    public virtual ICollection<TbColaborador> TbColaboradors { get; } = new List<TbColaborador>();
+
     public virtual ICollection<TbConceptoAsociacion> TbConceptoAsociacions { get; } = new List<TbConceptoAsociacion>();
 
     public virtual ICollection<TbCuentum> TbCuenta { get; } = new List<TbCuentum>();
@@ -66,7 +67,7 @@ public partial class TbAsociacion
 
     public virtual ICollection<TbFolio> TbFolios { get; } = new List<TbFolio>();
 
-    public virtual TbJuntaDirectiva? TbJuntaDirectiva { get; set; }
+    public virtual ICollection<TbJuntaDirectiva> TbJuntaDirectivas { get; } = new List<TbJuntaDirectiva>();
 
     public virtual ICollection<TbMovimientoEgreso> TbMovimientoEgresos { get; } = new List<TbMovimientoEgreso>();
 
@@ -75,6 +76,4 @@ public partial class TbAsociacion
     public virtual ICollection<TbProveedor> TbProveedors { get; } = new List<TbProveedor>();
 
     public virtual ICollection<TbUsuario> TbUsuarios { get; } = new List<TbUsuario>();
-
-    public virtual ICollection<TbColaborador> TbColaboradors { get; } = new List<TbColaborador>();
 }

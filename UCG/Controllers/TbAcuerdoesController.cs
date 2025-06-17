@@ -220,6 +220,7 @@ namespace UCG.Controllers
             if (tbAcuerdo != null)
             {
                 _context.TbAcuerdos.Remove(tbAcuerdo);
+                TempData["SuccessMessage"] = "El Acuerdo fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

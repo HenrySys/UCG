@@ -1,0 +1,84 @@
+﻿@model UCG.Models.TbDetalleFactura
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>TbDetalleFactura</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdDetalleFactura" />
+            <div class="form-group">
+                <label asp-for="IdFactura" class="control-label"></label>
+                <select asp-for="IdFactura" class="form-control" asp-items="ViewBag.IdFactura"></select>
+                <span asp-validation-for="IdFactura" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Unidad" class="control-label"></label>
+                <input asp-for="Unidad" class="form-control" />
+                <span asp-validation-for="Unidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cantidad" class="control-label"></label>
+                <input asp-for="Cantidad" class="form-control" />
+                <span asp-validation-for="Cantidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PorcentajeIva" class="control-label"></label>
+                <input asp-for="PorcentajeIva" class="form-control" />
+                <span asp-validation-for="PorcentajeIva" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PrecioUnitario" class="control-label"></label>
+                <input asp-for="PrecioUnitario" class="form-control" />
+                <span asp-validation-for="PrecioUnitario" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PorcentajeDescuento" class="control-label"></label>
+                <input asp-for="PorcentajeDescuento" class="form-control" />
+                <span asp-validation-for="PorcentajeDescuento" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Descuento" class="control-label"></label>
+                <input asp-for="Descuento" class="form-control" />
+                <span asp-validation-for="Descuento" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MontoIva" class="control-label"></label>
+                <input asp-for="MontoIva" class="form-control" />
+                <span asp-validation-for="MontoIva" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BaseImponible" class="control-label"></label>
+                <input asp-for="BaseImponible" class="form-control" />
+                <span asp-validation-for="BaseImponible" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalLinea" class="control-label"></label>
+                <input asp-for="TotalLinea" class="form-control" />
+                <span asp-validation-for="TotalLinea" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

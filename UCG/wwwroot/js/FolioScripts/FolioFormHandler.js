@@ -82,4 +82,6 @@ $(document).ready(function () {
         $('#summernoteObservacion').val(cleanText);
     });
 
+   
+
 });

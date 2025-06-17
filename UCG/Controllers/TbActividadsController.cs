@@ -41,6 +41,7 @@ namespace UCG.Controllers
                 .Include(t => t.IdActaNavigation)
                 .Include(t => t.IdAsociacionNavigation)
                 .Include(t => t.IdAsociadoNavigation)
+                .Include(t => t.TbFondosRecaudadosActividads)
                 .FirstOrDefaultAsync(m => m.IdActividad == id);
             if (tbActividad == null)
             {

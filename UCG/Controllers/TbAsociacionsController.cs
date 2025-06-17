@@ -175,6 +175,7 @@ namespace UCG.Controllers
             if (tbAsociacion != null)
             {
                 _context.TbAsociacions.Remove(tbAsociacion);
+                TempData["SuccessMessage"] = "La Asociacion fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

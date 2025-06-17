@@ -7,6 +7,7 @@
 
 
 <head>
+    <meta charset="utf-8" />
     <!-- DataTables CSS con Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <!-- Box Icons -->
@@ -15,6 +16,10 @@
     <link rel="stylesheet" href="~/css/Tables.css">
 </head>
 
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
 
 <div class="table-container">
     <!-- Encabezado y botón Create -->

@@ -1,0 +1,147 @@
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbDetalleFactura;
+@model DetalleFacturaViewModel
+
+@{
+    ViewData["Title"] = "Agregar Detalle de Factura";
+
+}
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-factura="@ViewData["IdFactura"]">
+</div>
+
+<h1 class="text-center mb-4">Agregar Detalle de Factura</h1>
+<hr />
+
+
+<form asp-action="Create">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    Información del Detalle
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Factura -->
+                    <div class="mb-3">
+                        <label asp-for="IdFactura" class="form-label"></label>
+                        <select asp-for="IdFactura" class="form-select" asp-items="ViewBag.IdFactura">
+                            <option disabled selected>Seleccione una factura</option>
+                        </select>
+                        <span asp-validation-for="IdFactura" class="text-danger"></span>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <input asp-for="Descripcion" class="form-control" placeholder="Ej: Servicio de limpieza" />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Unidad / Cantidad -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Unidad" class="form-label"></label>
+                            <input asp-for="Unidad" class="form-control" placeholder="Ej: Unidad" />
+                            <span asp-validation-for="Unidad" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Cantidad" class="form-label"></label>
+                            <input asp-for="Cantidad" class="form-control" placeholder="Ej: 5" />
+                            <span asp-validation-for="Cantidad" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Precio Unitario / % IVA -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PrecioUnitario" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                <input asp-for="PrecioUnitario" class="form-control" />
+                            </div>
+                            <span asp-validation-for="PrecioUnitario" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PorcentajeIva" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="PorcentajeIva" class="form-control" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <span asp-validation-for="PorcentajeIva" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- % Descuento / Monto Descuento -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PorcentajeDescuento" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="PorcentajeDescuento" class="form-control" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <span asp-validation-for="PorcentajeDescuento" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Descuento" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                <input asp-for="Descuento" class="form-control" readonly />
+                            </div>
+                            <span asp-validation-for="Descuento" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Base Imponible / IVA -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BaseImponible" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                <input asp-for="BaseImponible" class="form-control" readonly />
+                            </div>
+                            <span asp-validation-for="BaseImponible" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MontoIva" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₡</span>
+                                <input asp-for="MontoIva" class="form-control" readonly />
+                            </div>
+                            <span asp-validation-for="MontoIva" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Total Línea -->
+                    <div class="mb-3">
+                        <label asp-for="TotalLinea" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="TotalLinea" class="form-control" readonly />
+                        </div>
+                        <span asp-validation-for="TotalLinea" class="text-danger"></span>
+                    </div>
+
+                    
+                </div>
+            </div>
+            <!-- Botones -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+
+

@@ -6,7 +6,7 @@ namespace UCG.Models;
 
 public partial class TbActum
 {
-     public enum EstadoDeActa
+    public enum EstadoDeActa
     {
         [Display(Name = "Cerrado")]
         Cerrado = 1,
@@ -51,6 +51,8 @@ public partial class TbActum
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
     [Display(Name = "Folio")]
     public virtual TbFolio? IdFolioNavigation { get; set; }
+
+
 
     public virtual ICollection<TbActaAsistencium> TbActaAsistencias { get; } = new List<TbActaAsistencium>();
 

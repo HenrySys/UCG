@@ -268,6 +268,7 @@ namespace UCG.Controllers
             if (tbFinancistum != null)
             {
                 _context.TbFinancista.Remove(tbFinancistum);
+                TempData["SuccessMessage"] = "El financista fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

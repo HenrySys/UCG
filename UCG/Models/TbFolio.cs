@@ -16,12 +16,13 @@ public partial class TbFolio
 
         [Display(Name= "Cerrado")]
         Cerrado = 3
-    }   
+    }
     public int IdFolio { get; set; }
 
     public int? IdAsociacion { get; set; }
 
     public int? IdAsociado { get; set; }
+
     [Display(Name = "Fecha Emision")]
     public DateOnly FechaEmision { get; set; }
     [Display(Name = "Numero Folio")]
@@ -35,6 +36,7 @@ public partial class TbFolio
     [Display(Name = "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
     [Display(Name = "Asociado")]
+
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
 
     public virtual ICollection<TbActum> TbActa { get; } = new List<TbActum>();

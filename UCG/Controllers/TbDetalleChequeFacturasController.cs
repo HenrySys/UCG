@@ -171,6 +171,7 @@ namespace UCG.Controllers
             if (tbDetalleChequeFactura != null)
             {
                 _context.TbDetalleChequeFacturas.Remove(tbDetalleChequeFactura);
+                TempData["SuccessMessage"] = "El Detalle de Cheque-Factura fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

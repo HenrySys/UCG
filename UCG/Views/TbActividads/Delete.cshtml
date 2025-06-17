@@ -48,7 +48,7 @@
                 <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="IdActividad" />
                     <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
                         <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
                     </div>
                 </form>

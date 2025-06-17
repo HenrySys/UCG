@@ -254,6 +254,7 @@ namespace UCG.Controllers
            if (tbUsuario != null)
            {
                _context.TbUsuarios.Remove(tbUsuario);
+               TempData["SuccessMessage"] = "El Usuario fue eliminado correctamente.";
            }
             
            await _context.SaveChangesAsync();

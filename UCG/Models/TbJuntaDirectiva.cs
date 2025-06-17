@@ -19,16 +19,22 @@ public partial class TbJuntaDirectiva
     public int? IdAsociacion { get; set; }
 
     public int? IdActa { get; set; }
+
     [Display(Name = "Periodo Inicio")]
     public DateOnly? PeriodoInicio { get; set; }
+
     [Display(Name = "Periodo Fin")]
     public DateOnly? PeriodoFin { get; set; }
+
     [Display(Name = "Nombre")]
     public string? Nombre { get; set; }
+
     [Display(Name = "Estado")]
     public EstadoDeJuntaDirectiva? Estado { get; set; } = null!;
+    
     [Display(Name = "Acta")]
     public virtual TbActum? IdActaNavigation { get; set; }
+
     [Display(Name = "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
 

@@ -1,4 +1,4 @@
-$(document).ready(function () {
+ï»¿$(document).ready(function () {
     const successMessage = $('#tempDataSwal').data('success');
     const errorMessage = $('#tempDataSwal').data('error');
 
@@ -6,7 +6,7 @@ $(document).ready(function () {
     if (successMessage) {
         Swal.fire({
             icon: 'success',
-            title: '¡Éxito!',
+            title: 'Â¡Exito!',
             text: successMessage,
             confirmButtonText: 'Ir al listado'
         }).then((result) => {
@@ -22,4 +22,27 @@ $(document).ready(function () {
             confirmButtonText: 'Aceptar'
         });
     }
+
+
+    // Inicializa Summernote
+    $('#summernoteAcuerdo').summernote({
+        height: 125,
+        placeholder: 'Escriba el acuerdo aqui...',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['view', ['codeview']]
+        ],
+
+    });
+
+    $('form').on('submit', function () {
+        const rawHtml = $('#summernoteAcuerdo').summernote('code');
+        const cleanText = $('<div>').html(rawHtml).text().trim(); // Extrae solo el texto plano
+        $('#summernoteAcuerdo').val(cleanText);
+    });
+
+
+    
+
 });

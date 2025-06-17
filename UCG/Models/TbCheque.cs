@@ -26,7 +26,6 @@ public partial class TbCheque
     }
     public int IdCheque { get; set; }
     public int IdAsociacion { get; set; }
-    public int? IdAsociadoAutoriza { get; set; }
     public int IdCuenta { get; set; }
 
     [Display(Name = "Numero Cheque")]
@@ -58,6 +57,8 @@ public partial class TbCheque
 
     [Display(Name = "MontoRestante")]
     public decimal? MontoRestante { get; set; }
+
+    public int IdAsociadoAutoriza { get; set; } 
 
     [Display(Name = "Asociacion")]
     public virtual TbAsociacion IdAsociacionNavigation { get; set; } = null!;

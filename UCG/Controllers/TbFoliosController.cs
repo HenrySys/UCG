@@ -379,6 +379,7 @@ namespace UCG.Controllers
             if (tbFolio != null)
             {
                 _context.TbFolios.Remove(tbFolio);
+                TempData["SuccessMessage"] = "El Folio fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

@@ -181,6 +181,7 @@ namespace UCG.Controllers
             if (tbPuesto != null)
             {
                 _context.TbPuestos.Remove(tbPuesto);
+                TempData["SuccessMessage"] = "El puesto fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

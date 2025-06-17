@@ -51,7 +51,12 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="IdDetalleChequeFactura" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button> |
         <a asp-action="Index">Back to List</a>
     </form>
+
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/DetalleChequeFacturaScripts/DetalleChequeFacturaDelete.js"></script>
+    }
 </div>

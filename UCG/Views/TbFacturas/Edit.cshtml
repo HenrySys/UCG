@@ -1,7 +1,7 @@
 ﻿@model UCG.Models.ViewModels.FacturaViewModel
 
 @{
-    ViewData["Title"] = "Editar Factura";
+    ViewData["Title"] = "Crear Factura";
     var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
     var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
     var colaboradores = ViewData["IdColaborador"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
@@ -9,42 +9,40 @@
     var conceptos = ViewData["IdConceptoAsociacion"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
-<h1 class="text-center mb-4">Editar Factura</h1>
+<h1>Editar Factura</h1>
 <hr />
 
 <div id="tempDataSwal"
      data-success="@TempData["SuccessMessage"]"
      data-error="@TempData["ErrorMessage"]"
-     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewBag.IdAsociacion : "")">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow">
-            <div class="card-header">
-                Actualizar Información de la Factura
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="IdFactura" />
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+    <div class="row g-3 mb-4">
+        <!-- CARD 1: Información de la Factura -->
+        <div class="col-lg-4">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información de la Factura</div>
+                <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="FechaTextoEmision" class="form-label"></label>
-                        <input asp-for="FechaTextoEmision" class="form-control" type="date" />
+                        <input asp-for="FechaTextoEmision" class="form-control" type="date" placeholder="Seleccione la fecha de emisión" />
                         <span asp-validation-for="FechaTextoEmision" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        @if (ViewBag.EsAdmin == true)
                         {
-                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="text" class="form-control" value="@ViewBag.Nombre" disabled placeholder="Nombre de la asociación" />
                             <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
                         }
                         else
                         {
-                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
                                 <option disabled selected>Seleccione una asociación</option>
                             </select>
                         }
@@ -59,53 +57,199 @@
                         <span asp-validation-for="IdConceptoAsociacion" class="text-danger"></span>
                     </div>
 
+                    <!-- Proveedor -->
                     <div id="grupoProveedor" class="mb-3" style="display: none;">
                         <label asp-for="IdProveedor" class="form-label"></label>
-                        <select asp-for="IdProveedor" class="form-control" data-selected="@Model.IdProveedor"></select>
+                        <select asp-for="IdProveedor" class="form-control" data-selected="@Model.IdProveedor">
+                            <option disabled selected>Seleccione un proveedor</option>
+                        </select>
                         <span asp-validation-for="IdProveedor" class="text-danger"></span>
                     </div>
 
+                    <!-- Asociado -->
                     <div id="grupoAsociado" class="mb-3" style="display: none;">
                         <label asp-for="IdAsociado" class="form-label"></label>
-                        <select asp-for="IdAsociado" class="form-control" data-selected="@Model.IdAsociado"></select>
+                        <select asp-for="IdAsociado" class="form-control" data-selected="@Model.IdAsociado">
+                            <option disabled selected>Seleccione un asociado</option>
+                        </select>
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
                     </div>
 
+                    <!-- Colaborador -->
                     <div id="grupoColaborador" class="mb-3" style="display: none;">
                         <label asp-for="IdColaborador" class="form-label"></label>
-                        <select asp-for="IdColaborador" class="form-control" data-selected="@Model.IdColaborador"></select>
+                        <select asp-for="IdColaborador" class="form-control" data-selected="@Model.IdColaborador">
+                            <option disabled selected>Seleccione un colaborador</option>
+                        </select>
                         <span asp-validation-for="IdColaborador" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="NumeroFactura" class="form-label"></label>
-                        <input asp-for="NumeroFactura" class="form-control" />
+                        <input asp-for="NumeroFactura" class="form-control" placeholder="Ej: FAC-2024-001" />
                         <span asp-validation-for="NumeroFactura" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Descripcion" class="form-label"></label>
-                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <textarea asp-for="Descripcion" class="form-control" placeholder="Breve descripción de la factura..."></textarea>
                         <span asp-validation-for="Descripcion" class="text-danger"></span>
                     </div>
 
+
                     <div class="mb-3">
                         <label asp-for="MontoTotal" class="form-label"></label>
-                        <input asp-for="MontoTotal" class="form-control" />
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="MontoTotal" class="form-control" inputmode="decimal" step="0.01" placeholder="Ingrese el monto en colones" readonly />
+                        </div>
                         <span asp-validation-for="MontoTotal" class="text-danger"></span>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <input type="submit" value="Actualizar Factura" class="btn btn-primary" />
-                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        <!-- CARD 2: Detalles de la Factura -->
+        <div class="col-lg-8">
+            <div class="card h-100 shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Detalles de la Factura</span>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModalDetalleFactura">
+                        Agregar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="detailsTableFactura">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Unidad</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>% IVA</th>
+                                <th>% Desc.</th>
+                                <th>Descuento</th>
+                                <th>Monto IVA</th>
+                                <th>Base Imponible</th>
+                                <th>Total Línea</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <input type="submit" value="Crear" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+    </div>
+
+    <input type="hidden" id="DetalleFacturaJason" name="DetalleFacturaJason" value='@Html.Raw(Model.DetalleFacturaJason)' />
+</form>
+
+<!-- Modal Detalle de Factura -->
+<div class="modal fade" id="detailModalDetalleFactura" tabindex="-1" aria-labelledby="modalDetalleFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-secondary-emphasis">
+                <h5 class="modal-title" id="modalDetalleFacturaLabel">Agregar Detalle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label for="modalDescripcion" class="form-label">Descripción</label>
+                        <input type="text" id="modalDescripcion" class="form-control" required placeholder="Ingrese descripción del producto o servicio">
                     </div>
 
-                    <input type="hidden" asp-for="TipoEmisor" id="TipoEmisor" />
-                </form>
+                    <div class="col-md-4">
+                        <label for="modalUnidad" class="form-label">Unidad</label>
+                        <select id="modalUnidad" class="form-select">
+                            <option value="" disabled selected>Seleccione una unidad</option>
+                            <option value="unidad">Unidad</option>
+                            <option value="hora">Hora</option>
+                            <option value="servicio">Servicio</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="col-md-4">
+                        <label for="modalCantidad" class="form-label">Cantidad</label>
+                        <input type="number" id="modalCantidad" class="form-control" min="1" step="1" required placeholder="Ej: 2">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalPrecioUnitario" class="form-label">Precio Unitario</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input type="number" id="modalPrecioUnitario" class="form-control" step="0.01" min="0" placeholder="₡0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalPorcentajeDescuento" class="form-label">Porcentaje Descuento (%)</label>
+                        <div class="input-group">
+                            <input type="number" id="modalPorcentajeDescuento" class="form-control" step="0.01" min="0" max="100" placeholder="Ej: 5">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalPorcentajeIva" class="form-label">Porcentaje IVA (%)</label>
+                        <div class="input-group">
+                            <input type="number" id="modalPorcentajeIva" class="form-control" step="0.01" min="0" max="100" placeholder="Ej: 13">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="modalDescuento" class="form-label">Monto Descuento</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input type="number" id="modalDescuento" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalBaseImponible" class="form-label">Base Imponible</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input type="number" id="modalBaseImponible" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalMontoIva" class="form-label">Monto IVA</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input type="number" id="modalMontoIva" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="modalTotalLinea" class="form-label">Total Línea</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input type="number" id="modalTotalLinea" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="addDetalleBtn" class="btn btn-success">Agregar</button>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 @section Scripts {
     @{

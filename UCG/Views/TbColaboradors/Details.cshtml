@@ -19,7 +19,7 @@
                     <dt class="col-sm-4 mb-3">Asociación</dt>
                     <dd class="col-sm-8 mb-3">
                         <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacion">
-                            @Model.IdAsociacionNavigation.Nombre
+                            @Model.IdAsociacionNavigation!.Nombre
                         </a>
                     </dd>
 
@@ -48,7 +48,7 @@
     </div>
 
     <!-- card derecha: historial de facturas -->
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="card shadow h-100">
             <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
                 <span>Facturas Relacionadas</span>

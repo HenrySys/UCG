@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using System.ComponentModel.DataAnnotations;
 
 namespace UCG.Models;
@@ -47,7 +46,6 @@ public partial class TbAsociado
         [Display(Name = "Union libre")]
         UnionLibre= 5
     }
-
     public int IdAsociado { get; set; }
 
     public int? IdAsociacion { get; set; }

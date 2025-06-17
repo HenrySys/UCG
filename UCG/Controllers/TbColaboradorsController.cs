@@ -22,30 +22,11 @@ namespace UCG.Controllers
             _context = context;
         }
 
-        // GET: TbColaboradors
+        // GET: TbActums
         public async Task<IActionResult> Index()
         {
-            IQueryable<TbColaborador> filtroAsociacion = _context.TbColaboradors.Include(t => t.IdAsociacionNavigation);
-            try
-            {
-                if (rol == "Admin"){
-                    var idAsociacionClaim = User.FindFirst("IdAsociacion")?.Value;
-                    if (int.TryParse(idAsociacionClaim, out int idAsociacion))
-                    {
-                        filtroAsociacion = filtroAsociacion.Where(t => t.IdAsociacion == idAsociacion);
-                    }
-                }
-                return View(await filtroAsociacion.ToListAsync());
-
-            }
-            catch
-            {
-                TempData["ErrorMessage"] = "Ocurrió un error al cargar los Colaboradores.";
-                return RedirectToAction("Error");
-            }
-            //   return _context.TbColaboradors != null ? 
-            //               View(await _context.TbColaboradors.ToListAsync()) :
-            //               Problem("Entity set 'UcgdbContext.TbColaboradors'  is null.");
+            var ucgdbContext = _context.TbColaboradors.Include(t => t.IdAsociacionNavigation);
+            return View(await ucgdbContext.ToListAsync());
         }
 
         // GET: TbColaboradors/Details/5
@@ -128,7 +109,10 @@ namespace UCG.Controllers
                 Cedula = model.Cedula,
                 Telefono = model.Telefono,
                 Correo = model.Correo,
-                Observaciones = model.Observaciones
+                Observaciones = model.Observaciones,
+                Apellido1 = model.Apellido1!,
+                Apellido2 = model.Apellido2!,
+                Direccion = model.Direccion
             };
         }
 
@@ -179,7 +163,10 @@ namespace UCG.Controllers
                 Cedula = colaborador.Cedula,
                 Telefono = colaborador.Telefono,
                 Correo = colaborador.Correo,
-                Observaciones = colaborador.Observaciones
+                Observaciones = colaborador.Observaciones,
+                Apellido1 = colaborador.Apellido1,
+                Apellido2 = colaborador.Apellido2,
+                Direccion = colaborador.Direccion
             };
 
             await ConfigurarAsociacionColaboradorAsync(model);
@@ -220,6 +207,9 @@ namespace UCG.Controllers
                 existente.Telefono = model.Telefono;
                 existente.Correo = model.Correo;
                 existente.Observaciones = model.Observaciones;
+                existente.Apellido1 = model.Apellido1!;
+                existente.Apellido2 = model.Apellido2!;
+                existente.Direccion = model.Direccion;
 
                 _context.Update(existente);
                 await _context.SaveChangesAsync();
@@ -270,6 +260,7 @@ namespace UCG.Controllers
             if (tbColaborador != null)
             {
                 _context.TbColaboradors.Remove(tbColaborador);
+                TempData["SuccessMessage"] = "El Colaborador fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

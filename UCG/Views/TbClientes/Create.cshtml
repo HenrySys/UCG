@@ -1,11 +1,10 @@
-﻿@using UCG.Models.ViewModels;
-@using static UCG.Models.TbCliente;
+﻿@using UCG.Models.ViewModels
+@using static UCG.Models.TbCliente
 @model ClienteViewModel
 
 @{
     ViewData["Title"] = "Crear Cliente";
     var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
-
 }
 
 <h1 class="text-center mb-4">Crear Cliente</h1>
@@ -16,112 +15,115 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Información del Cliente
-            </div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                    <dl class="row">
-                        <dt class="col-sm-4 mb-3">
-                            <label asp-for="IdAsociacion" class="form-label"></label>
-                        </dt>
-                        <dd class="col-sm-8 mb-3">
-                            @if (!Convert.ToBoolean(ViewBag.EsAdmin))
-                            {
-                                <!-- Usuario NO es admin → puede elegir -->
-                                <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
-                                    <option disabled selected>Seleccione una asociación</option>
-                                </select>
-                            }
-                            else
-                            {
-                                <!-- Usuario ES admin → asociación fija -->
-                                <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
-                                <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
-                            }
-                            <span asp-validation-for="IdAsociacion" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Apellido1" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Apellido1" class="form-control" />
-                            <span asp-validation-for="Apellido1" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Apellido2" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Apellido2" class="form-control" />
-                            <span asp-validation-for="Apellido2" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Nombre" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Nombre" class="form-control" />
-                            <span asp-validation-for="Nombre" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Cedula" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Cedula" class="form-control" />
-                            <span asp-validation-for="Cedula" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Telefono" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Telefono" class="form-control" />
-                            <span asp-validation-for="Telefono" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Correo" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Correo" class="form-control" />
-                            <span asp-validation-for="Correo" class="text-danger"></span>
-                        </dd>
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Direccion" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <input asp-for="Direccion" class="form-control" />
-                            <span asp-validation-for="Direccion" class="text-danger"></span>
-                        </dd>
-
-
-                        <dt class="col-sm-4 mb-3"><label asp-for="Estado" class="form-label"></label></dt>
-                        <dd class="col-sm-8 mb-3">
-                            <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeCliente>()">
-                                <option disabled selected>Seleccione un Estado</option>
+    <div class="row g-3">
+        <!-- CARD 1: Información General -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        @if (!Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                <option disabled selected>Seleccione una asociación</option>
                             </select>
-                            <span asp-validation-for="Estado" class="text-danger"></span>
-                        </dd>
-
-                    </dl>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <input type="submit" value="Guardar" class="btn btn-success" />
-                        <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
-                </form>
+
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <!-- Apellido1 -->
+                    <div class="mb-3">
+                        <label asp-for="Apellido1" class="form-label"></label>
+                        <input asp-for="Apellido1" class="form-control" placeholder="Ingrese el primer apellido" />
+                        <span asp-validation-for="Apellido1" class="text-danger"></span>
+                    </div>
+
+                    <!-- Apellido2 -->
+                    <div class="mb-3">
+                        <label asp-for="Apellido2" class="form-label"></label>
+                        <input asp-for="Apellido2" class="form-control" placeholder="Ingrese el segundo apellido" />
+                        <span asp-validation-for="Apellido2" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cédula -->
+                    <div class="mb-3">
+                        <label asp-for="Cedula" class="form-label"></label>
+                        <input asp-for="Cedula" class="form-control" placeholder="Ingrese la cédula" />
+                        <span asp-validation-for="Cedula" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Contacto y Dirección -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información de Contacto</div>
+                <div class="card-body">
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="Ingrese el teléfono" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <!-- Correo -->
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control" placeholder="Ingrese el correo electrónico" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="mb-3">
+                        <label asp-for="Direccion" class="form-label"></label>
+                        <input asp-for="Direccion" class="form-control" placeholder="Ingrese la dirección" />
+                        <span asp-validation-for="Direccion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeCliente>()">
+                            <option disabled selected>Seleccione un Estado</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <input type="submit" value="Guardar Cliente" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="~/js/ClienteScripts\ClienteFormHandler.js"></script>
-
+    <script src="~/js/ClienteScripts/ClienteFormHandler.js"></script>
 }

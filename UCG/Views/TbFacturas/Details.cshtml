@@ -1,23 +1,26 @@
 ﻿@model UCG.Models.TbFactura
 
 @{
-    ViewData["Title"] = "Detalle de la Factura";
+    ViewData["Title"] = "Detalle de Factura";
 }
 
-<h1 class="text-center mb-4">Detalle de la Factura</h1>
+<h1 class="text-center mb-4">Detalle de Factura</h1>
 <hr />
-<div class="row justify-content-center">
-    <div class="col-lg-6">
+
+<div class="row g-3 mb-4">
+
+    <!-- Información General -->
+    <div class="col-lg-4">
         <div class="card shadow">
             <div class="card-header">
-                Información de la Factura
+                Información General
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-4 mb-3">Número de Factura</dt>
+                    <dt class="col-sm-4 mb-3">Número</dt>
                     <dd class="col-sm-8 mb-3">@Model.NumeroFactura</dd>
 
-                    <dt class="col-sm-4 mb-3">Fecha de Emisión</dt>
+                    <dt class="col-sm-4 mb-3">Fecha Emisión</dt>
                     <dd class="col-sm-8 mb-3">@Model.FechaEmision.ToString("yyyy-MM-dd")</dd>
 
                     <dt class="col-sm-4 mb-3">Descripción</dt>
@@ -63,15 +66,71 @@
                         </dd>
                     }
                 </dl>
+            </div>
+        </div>
+    </div>
 
-                <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="Edit" asp-route-id="@Model.IdFactura" class="btn btn-warning">Editar</a>
-                    <a asp-controller="FacturaPdf" asp-action="DetalleFacturaPdf" asp-route-id="@Model.IdFactura" class="btn btn-danger" target="_blank">
-                        Descargar PDF
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
-                </div>
+    <!-- Detalles de la Factura -->
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                Detalles de la Factura
+            </div>
+            <div class="card-body">
+                <table id="tablaDetallesFactura" class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Unidad</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>% IVA</th>
+                            <th>% Desc.</th>
+                            <th>Descuento</th>
+                            <th>IVA</th>
+                            <th>Base Imponible</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model.TbDetalleFacturas)
+                        {
+                            <tr data-id="@Model.IdFactura">
+                                <td>@d.Descripcion</td>
+                                <td>@d.Unidad</td>
+                                <td>@d.Cantidad</td>
+                                <td>₡@d.PrecioUnitario?.ToString("N2")</td>
+                                <td>@d.PorcentajeIva %</td>
+                                <td>@d.PorcentajeDescuento %</td>
+                                <td>₡@d.Descuento?.ToString("N2")</td>
+                                <td>₡@d.MontoIva?.ToString("N2")</td>
+                                <td>₡@d.BaseImponible?.ToString("N2")</td>
+                                <td>₡@d.TotalLinea?.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Botones -->
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.IdFactura" class="btn btn-warning">Editar</a>
+    <a asp-controller="FacturaPdf" asp-action="DetalleFacturaPdf" asp-route-id="@Model.IdFactura" class="btn btn-danger" target="_blank">Descargar PDF</a>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+</div>
+
+<!-- Estilos de DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="~/js/FacturaScripts/FacturaDetail.js"></script>
+
+}
+

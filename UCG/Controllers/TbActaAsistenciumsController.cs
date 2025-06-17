@@ -341,6 +341,7 @@ namespace UCG.Controllers
             if (tbActaAsistencium != null)
             {
                 _context.TbActaAsistencia.Remove(tbActaAsistencium);
+                TempData["SuccessMessage"] = "El Acta de Asistencia fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

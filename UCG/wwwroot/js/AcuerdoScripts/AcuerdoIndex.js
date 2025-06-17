@@ -24,4 +24,29 @@
             window.location.href = "/TbAcuerdoes/Details/" + idAcuerdo;
         }
     });
+
+    // SweetAlert desde TempData
+    const swalContainer = document.getElementById('tempDataSwal');
+    if (swalContainer) {
+        const success = swalContainer.dataset.success?.trim();
+        const error = swalContainer.dataset.error?.trim();
+
+        if (success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Exito',
+                text: success,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error,
+                confirmButtonText: 'OK'
+            });
+        }
+    }
 });

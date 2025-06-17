@@ -254,6 +254,7 @@ namespace UCG.Controllers
             if (tbCliente != null)
             {
                 _context.TbClientes.Remove(tbCliente);
+                TempData["SuccessMessage"] = "El Cliente fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

@@ -6,7 +6,7 @@ namespace UCG.Models;
 
 public partial class TbCliente
 {
-    public enum EstadoDeCliente
+     public enum EstadoDeCliente
     {
         [Display(Name = "Activo")]
         Activo = 1,

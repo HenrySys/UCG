@@ -49,7 +49,19 @@ namespace UCG.Models.ViewModels
         [BindNever]
         public DateTime? FechaSubida { get; set; }
 
-        public string? TipoEmisor { get; set; } 
+        public string? TipoEmisor { get; set; }
+
+        public decimal? Subtotal { get; set; }
+
+        [Display(Name = "Total IVA")]
+
+        public decimal? TotalIva { get; set; }
+
+
+        public string DetalleFacturaJason { get; set; } = null!;
+
+        public List<DetalleFacturaViewModel > DetalleFactura { get; set; } = new();
+
 
 
     }

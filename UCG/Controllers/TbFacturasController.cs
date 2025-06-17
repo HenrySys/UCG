@@ -8,6 +8,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using UCG.Models;
 using UCG.Models.ValidationModels;
 using UCG.Models.ViewModels;
@@ -39,12 +40,14 @@ namespace UCG.Controllers
             }
 
             var tbFactura = await _context.TbFacturas
-                .Include(t => t.IdAsociacionNavigation)
-                .Include(t => t.IdConceptoAsociacionNavigation)
-                .Include(t => t.IdAsociadoNavigation)
-                .Include(t => t.IdColaboradorNavigation)
-                .Include(t => t.IdProveedorNavigation)
-                .FirstOrDefaultAsync(m => m.IdFactura == id);
+                .Include(f => f.IdAsociacionNavigation)
+                .Include(f => f.IdConceptoAsociacionNavigation)
+                .Include(f => f.IdAsociadoNavigation)
+                .Include(f => f.IdColaboradorNavigation)
+                .Include(f => f.IdProveedorNavigation)
+                .Include(f => f.TbDetalleFacturas) // INCLUIR LOS DETALLES DE LA FACTURA
+                .FirstOrDefaultAsync(f => f.IdFactura == id);
+
             if (tbFactura == null)
             {
                 return NotFound();
@@ -52,6 +55,7 @@ namespace UCG.Controllers
 
             return View(tbFactura);
         }
+
 
         public async Task<IActionResult> Create()
         {
@@ -65,17 +69,23 @@ namespace UCG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FacturaViewModel model)
         {
-            // 1. Validar fechas
+            // 1. Parsear fecha
             var fechaEmisionValida = await ParseFechaEmisionAsync(model);
-            //var fechaSubidaValida = await ParseFechaSubidaAsync(model);
-
             if (!fechaEmisionValida)
+            {
+                TempData["ErrorMessage"] = "Debe ingresar una fecha de emisión válida.";
+                await ConfigurarAsociacionFacturaAsync(model);
+                return View(model);
+            }
+
+            // 2. Deserializar detalles de factura
+            if (!await DeserializarDetalleFacturaJsonAsync(model))
             {
                 await ConfigurarAsociacionFacturaAsync(model);
                 return View(model);
             }
 
-            // 2. Validar con FluentValidation
+            // 3. Validar modelo con FluentValidation
             var validator = new FacturaViewModelValidator(_context);
             var validationResult = await validator.ValidateAsync(model);
 
@@ -89,13 +99,17 @@ namespace UCG.Controllers
                 return View(model);
             }
 
-            // 3. Guardar con transacción
+            // 4. Guardar en transacción
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Guardar factura principal
                 var factura = MapearFactura(model);
                 _context.TbFacturas.Add(factura);
                 await _context.SaveChangesAsync();
+
+                // Guardar detalles relacionados
+                await GuardarDetallesFacturaAsync(model.DetalleFactura, factura.IdFactura);
 
                 await transaction.CommitAsync();
 
@@ -110,6 +124,7 @@ namespace UCG.Controllers
                 return View(model);
             }
         }
+
 
         private async Task ConfigurarAsociacionFacturaAsync(FacturaViewModel model)
         {
@@ -178,6 +193,27 @@ namespace UCG.Controllers
                 }
             }
         }
+        private async Task<bool> DeserializarDetalleFacturaJsonAsync(FacturaViewModel model)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.DetalleFacturaJason))
+                {
+                    model.DetalleFactura = JsonConvert.DeserializeObject<List<DetalleFacturaViewModel>>(model.DetalleFacturaJason);
+                }
+
+                model.DetalleFactura ??= new();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al deserializar los detalles de factura: " + ex.Message;
+                return false;
+            }
+        }
+
+
 
 
         private TbFactura MapearFactura(FacturaViewModel model)
@@ -194,11 +230,37 @@ namespace UCG.Controllers
                 IdAsociacion = model.IdAsociacion,
                 IdAsociado = model.IdAsociado,
                 MontoTotal = model.MontoTotal,
-                //ArchivoUrl = model.ArchivoUrl,
-                //NombreArchivo = model.NombreArchivo,
-                //FechaSubida = model.FechaSubida                  
+                FechaSubida = model.FechaSubida,
+                Subtotal = model.Subtotal,
+                TotalIva = model.TotalIva           
             };
+        
         }
+        private async Task GuardarDetallesFacturaAsync(List<DetalleFacturaViewModel> detalles, int idFactura)
+        {
+            foreach (var detalle in detalles)
+            {
+                var nuevoDetalle = new TbDetalleFactura
+                {
+                    IdFactura = idFactura,
+                    Descripcion = detalle.Descripcion,
+                    Unidad = detalle.Unidad,
+                    Cantidad = detalle.Cantidad,
+                    PorcentajeIva = detalle.PorcentajeIva,
+                    PrecioUnitario = detalle.PrecioUnitario,
+                    PorcentajeDescuento = detalle.PorcentajeDescuento,
+                    Descuento = detalle.Descuento,
+                    MontoIva = detalle.MontoIva,
+                    BaseImponible = detalle.BaseImponible,
+                    TotalLinea = detalle.TotalLinea
+                };
+
+                _context.TbDetalleFacturas.Add(nuevoDetalle);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
 
 
         private async Task<bool> ParseFechaEmisionAsync(FacturaViewModel model)
@@ -223,27 +285,7 @@ namespace UCG.Controllers
             return false;
         }
 
-        //private async Task<bool> ParseFechaSubidaAsync(FacturaViewModel model)
-        //{
-        //    if (!string.IsNullOrWhiteSpace(model.FechaTextoSubida))
-        //    {
-        //        if (DateTime.TryParseExact(model.FechaTextoSubida, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fechaSubida))
-        //        {
-        //            model.FechaSubida = fechaSubida;
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            TempData["ErrorMessage"] = "Debe ingresar una fecha de subida válida (formato: yyyy-MM-dd).";
-        //            TempData.Keep("ErrorMessage");
-        //            return false;
-        //        }
-        //    }
-
-        //    TempData["ErrorMessage"] = "Debe ingresar la fecha de subida.";
-        //    TempData.Keep("ErrorMessage");
-        //    return false;
-        //}
+        
 
 
 
@@ -358,44 +400,65 @@ namespace UCG.Controllers
             }
         }
 
-        // GET: TbFacturas/Edit/5
+
+        private FacturaViewModel MapearFacturaViewModel(TbFactura factura)
+        {
+            return new FacturaViewModel
+            {
+                IdFactura = factura.IdFactura,
+                NumeroFactura = factura.NumeroFactura,
+                FechaEmision = factura.FechaEmision,
+                FechaTextoEmision = factura.FechaEmision.ToString("yyyy-MM-dd"),
+                Descripcion = factura.Descripcion,
+                IdConceptoAsociacion = factura.IdConceptoAsociacion,
+                IdColaborador = factura.IdColaborador,
+                IdProveedor = factura.IdProveedor,
+                IdAsociacion = factura.IdAsociacion,
+                IdAsociado = factura.IdAsociado,
+                MontoTotal = factura.MontoTotal,
+
+                DetalleFactura = factura.TbDetalleFacturas?.Select(d => new DetalleFacturaViewModel
+                {
+                    IdDetalleFactura = d.IdDetalleFactura,
+                    Descripcion = d.Descripcion,
+                    Unidad = d.Unidad,
+                    Cantidad = d.Cantidad,
+                    PorcentajeIva = d.PorcentajeIva,
+                    PrecioUnitario = d.PrecioUnitario,
+                    PorcentajeDescuento = d.PorcentajeDescuento,
+                    Descuento = d.Descuento,
+                    MontoIva = d.MontoIva,
+                    BaseImponible = d.BaseImponible,
+                    TotalLinea = d.TotalLinea
+                }).ToList() ?? new List<DetalleFacturaViewModel>()
+            };
+        }
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TbFacturas == null)
-            {
                 return NotFound();
-            }
 
             var tbFactura = await _context.TbFacturas
                 .Include(f => f.IdAsociacionNavigation)
                 .Include(f => f.IdAsociadoNavigation)
                 .Include(f => f.IdColaboradorNavigation)
                 .Include(f => f.IdProveedorNavigation)
+                .Include(f => f.TbDetalleFacturas)
                 .FirstOrDefaultAsync(f => f.IdFactura == id);
 
             if (tbFactura == null)
-            {
                 return NotFound();
-            }
 
-            var model = new FacturaViewModel
-            {
-                IdFactura = tbFactura.IdFactura,
-                NumeroFactura = tbFactura.NumeroFactura,
-                FechaEmision = tbFactura.FechaEmision,
-                Descripcion = tbFactura.Descripcion,
-                IdConceptoAsociacion = tbFactura.IdConceptoAsociacion,
-                IdColaborador = tbFactura.IdColaborador,
-                IdProveedor = tbFactura.IdProveedor,
-                IdAsociacion = tbFactura.IdAsociacion,
-                IdAsociado = tbFactura.IdAsociado,
-                MontoTotal = tbFactura.MontoTotal,
-                FechaTextoEmision = tbFactura.FechaEmision.ToString("yyyy-MM-dd")
-            };
+            var model = MapearFacturaViewModel(tbFactura);
+
+            // ESTA LÍNEA FALTABA
+            model.DetalleFacturaJason = JsonConvert.SerializeObject(model.DetalleFactura);
 
             await ConfigurarAsociacionFacturaAsync(model);
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -404,7 +467,7 @@ namespace UCG.Controllers
             if (idFactura != model.IdFactura)
                 return NotFound();
 
-            // Parsear la fecha desde el texto
+            // Parsear fecha desde texto
             if (!await ParseFechaEmisionAsync(model))
             {
                 TempData["ErrorMessage"] = "Debe ingresar una fecha de emisión válida.";
@@ -412,7 +475,15 @@ namespace UCG.Controllers
                 return View(model);
             }
 
-            // Validar el modelo con FluentValidation
+            // Deserializar detalles de factura desde JSON
+            if (!await DeserializarDetalleFacturaJsonAsync(model))
+            {
+                TempData["ErrorMessage"] = "Error en los datos de los detalles de factura.";
+                await ConfigurarAsociacionFacturaAsync(model);
+                return View(model);
+            }
+
+            // Validación con FluentValidation
             var validator = new FacturaViewModelValidator(_context);
             var validationResult = await validator.ValidateAsync(model);
 
@@ -430,27 +501,45 @@ namespace UCG.Controllers
             try
             {
                 var facturaExistente = await _context.TbFacturas
+                    .Include(f => f.TbDetalleFacturas)
                     .FirstOrDefaultAsync(f => f.IdFactura == idFactura);
 
                 if (facturaExistente == null)
                     return NotFound();
 
-                // Actualizar campos
+                // Actualizar campos principales
                 facturaExistente.NumeroFactura = model.NumeroFactura;
                 facturaExistente.FechaEmision = model.FechaEmision;
                 facturaExistente.Descripcion = model.Descripcion;
-                facturaExistente.MontoTotal = model.MontoTotal;
-                facturaExistente.IdAsociacion = model.IdAsociacion;
-                facturaExistente.IdAsociado = model.IdAsociado;
+                facturaExistente.IdConceptoAsociacion = model.IdConceptoAsociacion;
                 facturaExistente.IdColaborador = model.IdColaborador;
                 facturaExistente.IdProveedor = model.IdProveedor;
-                facturaExistente.IdConceptoAsociacion = model.IdConceptoAsociacion;
+                facturaExistente.IdAsociacion = model.IdAsociacion;
+                facturaExistente.IdAsociado = model.IdAsociado;
+                facturaExistente.MontoTotal = model.MontoTotal;
+                facturaExistente.Estado = model.Estado;
+                facturaExistente.ArchivoUrl = model.ArchivoUrl;
+                facturaExistente.NombreArchivo = model.NombreArchivo;
+                facturaExistente.FechaSubida = model.FechaSubida;
+                facturaExistente.Subtotal = model.Subtotal;
+                facturaExistente.TotalIva = model.TotalIva;
+
+                // Reemplazar detalles
+                _context.TbDetalleFacturas.RemoveRange(facturaExistente.TbDetalleFacturas);
+                await GuardarDetallesFacturaAsync(model.DetalleFactura, idFactura);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "La factura fue actualizada exitosamente.";
-                return RedirectToAction(nameof(Edit), new { idFactura });
+
+                // Si se quiere redirigir a agregar detalles (opcional)
+                if (Request.Form["RedirigirDetalle"] == "true")
+                {
+                    return RedirectToAction("Create", "TbDetalleFacturas", new { id = model.IdFactura });
+                }
+
+                return RedirectToAction(nameof(Edit));
             }
             catch (Exception ex)
             {
@@ -460,6 +549,7 @@ namespace UCG.Controllers
                 return View(model);
             }
         }
+
 
 
         // GET: TbFacturas/Delete/5
@@ -497,6 +587,7 @@ namespace UCG.Controllers
             if (tbFactura != null)
             {
                 _context.TbFacturas.Remove(tbFactura);
+                TempData["SuccessMessage"] = "La Factura fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

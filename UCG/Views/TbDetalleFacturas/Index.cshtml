@@ -1,0 +1,91 @@
+﻿@model IEnumerable<UCG.Models.TbDetalleFactura>
+
+@{
+    ViewData["Title"] = "Detalle Factura";
+}
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="~/css/Tables.css">
+</head>
+
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="table-container">
+    <div class="table-header center-header">
+        <div style="width: 100%; text-align: center;">
+            <h1 class="table-title" style="margin-bottom: 15px;">Detalle Factura</h1>
+            <div class="table-actions">
+                <a asp-controller="Home" asp-action="Asociacion" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </a>
+                <a asp-action="Create" class="btn btn-create">
+                    <i class='bx bx-plus'></i> Crear Detalle Factura
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="miTabla" class="universal-table display compact">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+                <th>@Html.DisplayNameFor(model => model.Unidad)</th>
+                <th>@Html.DisplayNameFor(model => model.Cantidad)</th>
+                <th>@Html.DisplayNameFor(model => model.PrecioUnitario)</th>
+                <th>@Html.DisplayNameFor(model => model.PorcentajeDescuento)</th>
+                <th>@Html.DisplayNameFor(model => model.Descuento)</th>
+                <th>@Html.DisplayNameFor(model => model.PorcentajeIva)</th>
+                <th>@Html.DisplayNameFor(model => model.MontoIva)</th>
+                <th>@Html.DisplayNameFor(model => model.BaseImponible)</th>
+                <th>@Html.DisplayNameFor(model => model.TotalLinea)</th>
+                <th>@Html.DisplayNameFor(model => model.IdFacturaNavigation)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-id="@item.IdDetalleFactura">
+                    <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Unidad)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Cantidad)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PrecioUnitario)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PorcentajeDescuento)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Descuento)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PorcentajeIva)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MontoIva)</td>
+                    <td>@Html.DisplayFor(modelItem => item.BaseImponible)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TotalLinea)</td>
+                    <td>@Html.DisplayFor(modelItem => item.IdFacturaNavigation.IdFactura)</td>
+                    <td class="action-links text-end">
+                        <a asp-action="Edit" asp-route-id="@item.IdDetalleFactura" class="btn btn-secondary" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.IdDetalleFactura" class="btn btn-secondary" title="Detalles">
+                            <i class='bx bxs-detail'></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.IdDetalleFactura" class="btn btn-create" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @{
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/DetalleFacturaScripts/DetalleFacturaIndex.js"></script>
+    }
+}

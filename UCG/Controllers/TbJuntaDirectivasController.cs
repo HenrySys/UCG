@@ -284,7 +284,7 @@ namespace UCG.Controllers
                 MiembroJunta = junta.TbMiembroJuntaDirectivas.Select(m => new MiembroJuntaDirectivaViewModel
                 {
                     IdAsociado = m.IdAsociado,
-                    IdPuesto = m.IdPuesto,
+                    IdPuesto = m.IdPuesto!,
                     Estado = m.Estado,
                     Nombre = m.IdAsociadoNavigation!.Nombre + " " + m.IdAsociadoNavigation.Apellido1,
                     Puesto = m.IdPuestoNavigation!.Nombre
@@ -432,6 +432,7 @@ namespace UCG.Controllers
             if (tbJuntaDirectiva != null)
             {
                 _context.TbJuntaDirectivas.Remove(tbJuntaDirectiva);
+                TempData["SuccessMessage"] = "La Junta Directiva fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

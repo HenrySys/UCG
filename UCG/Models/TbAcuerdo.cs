@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace UCG.Models;
 
 public partial class TbAcuerdo
@@ -18,6 +17,7 @@ public partial class TbAcuerdo
         [Display(Name = "Ordinario")]
         Ordinario = 3 
     }
+
     public int IdAcuerdo { get; set; }
 
     public int? IdActa { get; set; }

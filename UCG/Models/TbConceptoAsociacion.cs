@@ -10,17 +10,17 @@ public partial class TbConceptoAsociacion
 
     public int? IdAsociacion { get; set; }
 
-
     public int? IdConcepto { get; set; }
-    
+
     [Display(Name= "Descripcion")]
     public string? DescripcionPersonalizada { get; set; }
+
     [Display(Name= "Asociacion")]
     public virtual TbAsociacion? IdAsociacionNavigation { get; set; }
-    [Display(Name= "Concepto Movimiento")]
-    public virtual TbConceptoMovimiento? IdConceptoNavigation { get; set; }
 
+    [Display(Name= "Concepto Movimiento")]
     public virtual ICollection<TbDocumentoIngreso> TbDocumentoIngresos { get; } = new List<TbDocumentoIngreso>();
 
     public virtual ICollection<TbFactura> TbFacturas { get; } = new List<TbFactura>();
+    public virtual TbConceptoMovimiento IdConceptoNavigation { get; internal set; } = null!;
 }

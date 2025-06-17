@@ -185,7 +185,7 @@ namespace UCG.Controllers
                 Monto = model.Monto,
                 Estado = model.Estado!.Value,
                 Observaciones = model.Observaciones,
-                IdAsociadoAutoriza = model.IdAsociadoAutoriza,
+                IdAsociadoAutoriza = model.IdAsociadoAutoriza!.Value,
                 MontoRestante = model.MontoRestante
             };
         }
@@ -434,6 +434,7 @@ namespace UCG.Controllers
             if (tbCheque != null)
             {
                 _context.TbCheques.Remove(tbCheque);
+                TempData["SuccessMessage"] = "El Cheque fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

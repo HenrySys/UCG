@@ -245,6 +245,7 @@ namespace UCG.Controllers
             if (tbConceptoAsociacion != null)
             {
                 _context.TbConceptoAsociacions.Remove(tbConceptoAsociacion);
+                TempData["SuccessMessage"] = "Concepto Asociacion fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

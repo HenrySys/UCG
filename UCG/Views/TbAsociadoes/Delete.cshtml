@@ -62,10 +62,15 @@
                 <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="IdAsociado" />
                     <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
                         <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
                     </div>
                 </form>
+
+                @section Scripts {
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script src="~/js/AsociadoScripts/AsociadoDelete.js"></script>
+                }
             </div>
         </div>
     </div>

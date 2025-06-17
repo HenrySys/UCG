@@ -15,78 +15,101 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Formulario de Edición
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="IdFinancista" />
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+    <div class="row g-3">
+        <!-- CARD 1: Información General -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones"></select>
+                        @if (!Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
+                    <!-- Nombre -->
                     <div class="mb-3">
                         <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del financista" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
 
+                    <!-- Tipo Entidad -->
                     <div class="mb-3">
                         <label asp-for="TipoEntidad" class="form-label"></label>
                         <select asp-for="TipoEntidad" class="form-select" asp-items="Html.GetEnumSelectList<TipoEntidades>()">
-                            <option disabled selected>Seleccione un tipo de entidad</option>
+                            <option disabled selected>Seleccione un tipo</option>
                         </select>
                         <span asp-validation-for="TipoEntidad" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Descripcion" class="form-label"></label>
-                        <textarea asp-for="Descripcion" class="form-control"></textarea>
-                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    <!-- Descripción -->
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
+                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
                     </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- CARD 2: Contacto y Web -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información de Contacto</div>
+                <div class="card-body">
+                    <!-- Teléfono -->
                     <div class="mb-3">
                         <label asp-for="Telefono" class="form-label"></label>
-                        <input asp-for="Telefono" class="form-control" />
+                        <input asp-for="Telefono" class="form-control" placeholder="Ingrese el teléfono" />
                         <span asp-validation-for="Telefono" class="text-danger"></span>
                     </div>
 
+                    <!-- Correo -->
                     <div class="mb-3">
                         <label asp-for="Correo" class="form-label"></label>
-                        <input asp-for="Correo" class="form-control" />
+                        <input asp-for="Correo" class="form-control" placeholder="Ingrese el correo electrónico" />
                         <span asp-validation-for="Correo" class="text-danger"></span>
                     </div>
 
+                    <!-- Sitio Web -->
                     <div class="mb-3">
                         <label asp-for="SitioWeb" class="form-label"></label>
-                        <input asp-for="SitioWeb" class="form-control" />
+                        <input asp-for="SitioWeb" class="form-control" placeholder="Ingrese el sitio web (opcional)" />
                         <span asp-validation-for="SitioWeb" class="text-danger"></span>
                     </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-warning">Editar</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <input type="submit" value="Guardar Financista" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="~/js/FinancistaScripts/FinancistaFormHandler.js"></script>
 }

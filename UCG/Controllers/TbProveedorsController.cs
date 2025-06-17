@@ -109,6 +109,7 @@ namespace UCG.Controllers
                 Correo = model.Correo!,
                 Direccion = model.Direccion!,
                 Fax = model.Fax!,
+                Descripcion = model.Descripcion!,
                 Estado = model.Estado
             };
         }
@@ -164,6 +165,7 @@ namespace UCG.Controllers
                 Correo = entidad.Correo,
                 Direccion = entidad.Direccion,
                 Fax = entidad.Fax,
+                Descripcion = entidad.Descripcion,
                 Estado = entidad.Estado!.Value
             };
 
@@ -207,6 +209,7 @@ namespace UCG.Controllers
                 proveedor.Correo = model.Correo!;
                 proveedor.Direccion = model.Direccion!;
                 proveedor.Fax = model.Fax!;
+                proveedor.Descripcion = model.Descripcion!;
                 proveedor.Estado = model.Estado;
 
                 _context.Update(proveedor);

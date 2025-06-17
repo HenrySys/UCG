@@ -25,6 +25,25 @@
         });
     }
 
+    $('#summernoteAcuerdo').summernote({
+        height: 125,
+        placeholder: 'Escriba el acuerdo aquí...',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['view', ['codeview']]
+        ],
+
+    });
+
+    $('form').on('submit', function () {
+        const rawHtml = $('#summernoteAcuerdo').summernote('code');
+        const cleanText = $('<div>').html(rawHtml).text().trim();
+        $('#summernoteAcuerdo').val(cleanText);
+    });
+
+
+
 
 
 });

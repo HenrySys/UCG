@@ -75,7 +75,7 @@ namespace UCG.Models.ValidationModels
         }
         private bool SerFechaValida(string? fecha)
         {
-            return DateTime.TryParseExact(fecha, "yyyy-MM-dd",
+            return DateTime.TryParseExact(fecha, "yyyy-MM-aa",
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None, out _);
         }

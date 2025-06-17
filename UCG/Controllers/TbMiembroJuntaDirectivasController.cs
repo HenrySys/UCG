@@ -397,6 +397,7 @@ namespace UCG.Controllers
             if (tbMiembroJuntaDirectiva != null)
             {
                 _context.TbMiembroJuntaDirectivas.Remove(tbMiembroJuntaDirectiva);
+                TempData["SuccessMessage"] = "El Miembro de la Junta Directiva fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

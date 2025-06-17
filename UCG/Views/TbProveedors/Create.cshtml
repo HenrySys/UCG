@@ -16,7 +16,7 @@
 </div>
 
 <form asp-action="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="row g-3">
         <!-- CARD 1: Información General del Proveedor -->
@@ -69,6 +69,12 @@
                             <option value="" disabled selected>Seleccione un tipo de proveedor</option>
                         </select>
                         <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
+                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
                     </div>
 
 
@@ -140,8 +146,12 @@
     }
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
 
     <script src="~/js/ProveedorScripts/ProveedorFormHandler.js"></script>
 }

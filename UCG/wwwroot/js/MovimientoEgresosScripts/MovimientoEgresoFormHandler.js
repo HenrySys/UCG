@@ -351,14 +351,14 @@
 
 
         
-    //$('#IdAsociacion').change(function () {
-    //    const nuevaAsociacion = $(this).val();
-    //    if (!nuevaAsociacion) return;
+    $('#IdAsociacion').change(function () {
+        const nuevaAsociacion = $(this).val();
+        if (!nuevaAsociacion) return;
 
-    //    cargarAsociados(nuevaAsociacion);
-    //    cargarActas(nuevaAsociacion);
+        cargarAsociados(nuevaAsociacion);
+        cargarActas(nuevaAsociacion);
 
-    //});
+    });
 
     
 
@@ -701,7 +701,7 @@
     }
 
    
-
+   
 
 
 

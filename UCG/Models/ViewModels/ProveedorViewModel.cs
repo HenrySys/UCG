@@ -16,6 +16,9 @@ namespace UCG.Models.ViewModels
         [Display(Name = "Nombre Empresa")]
         public string? NombreEmpresa { get; set; }
 
+        [Display(Name = "Descripcion")]
+        public string? Descripcion { get; set; } 
+
         [Display(Name = "Cedula Juridica")]
         public string? CedulaJuridica { get; set; }
 

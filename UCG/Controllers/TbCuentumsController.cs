@@ -92,15 +92,38 @@ namespace UCG.Controllers
         }
 
 
+        [HttpGet]
+        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var asociados = _context.TbAsociados
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!asociados.Any())
+                {
+                    return Json(new { success = false, message = "No hay asociados disponibles." });
+                }
+
+                return Json(new { success = true, data = asociados });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
+            }
+        }
+
+
         private TbCuentum MapearCuenta(CuentumViewModel model)
         {
             return new TbCuentum
             {
                 IdCuenta = model.IdCuenta,
-                IdAsociacion = model.IdAsociacion.Value,
-                IdAsociado = model.IdAsociado.Value,
-                TipoCuenta = model.TipoCuenta.Value,
-                TituloCuenta = model.TituloCuenta,
+                IdAsociacion = model.IdAsociacion,
+                IdAsociado = model.IdAsociado,
+                TipoCuenta = model.TipoCuenta,
+                TituloCuenta = model.TituloCuenta!,
                 NumeroCuenta = model.NumeroCuenta!,
                 Telefono = model.Telefono!,
                 Estado = model.Estado!.Value,
@@ -193,13 +216,13 @@ namespace UCG.Controllers
                     return NotFound();
 
                 // Actualizar campos manualmente
-                cuentaExistente.IdAsociacion = model.IdAsociacion.Value;
-                cuentaExistente.IdAsociado = model.IdAsociado.Value;
-                cuentaExistente.TipoCuenta = model.TipoCuenta.Value;
+                cuentaExistente.IdAsociacion = model.IdAsociacion;
+                cuentaExistente.IdAsociado = model.IdAsociado;
+                cuentaExistente.TipoCuenta = model.TipoCuenta;
                 cuentaExistente.TituloCuenta = model.TituloCuenta;
                 cuentaExistente.NumeroCuenta = model.NumeroCuenta;
                 cuentaExistente.Telefono = model.Telefono;
-                cuentaExistente.Estado = model.Estado.Value;
+                cuentaExistente.Estado = model.Estado;
                 cuentaExistente.Banco = model.Banco;
 
                 _context.Update(cuentaExistente);
@@ -251,6 +274,7 @@ namespace UCG.Controllers
             if (tbCuentum != null)
             {
                 _context.TbCuenta.Remove(tbCuentum);
+                TempData["SuccessMessage"] = "La Cuenta fue eliminada correctamente.";
             }
             
             await _context.SaveChangesAsync();

@@ -7,7 +7,7 @@
 <h1 class="text-center mb-4">Eliminar Cuenta</h1>
 <hr />
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-5">
         <div class="card shadow">
             <div class="card-header bg-danger text-white">
                 Confirmación de Eliminación
@@ -38,10 +38,15 @@
                 <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="IdCuenta" />
                     <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
                         <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
                     </div>
                 </form>
+
+                @section Scripts {
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script src="~/js/CuentaScripts/CuentaDelete.js"></script>
+                }
             </div>
         </div>
     </div>

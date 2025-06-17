@@ -159,6 +159,7 @@ namespace UCG.Controllers
             if (tbMovimientoIngreso != null)
             {
                 _context.TbMovimientoIngresos.Remove(tbMovimientoIngreso);
+                TempData["SuccessMessage"] = "El Movimiento Ingreso fue eliminado correctamente.";
             }
             
             await _context.SaveChangesAsync();

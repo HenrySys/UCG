@@ -4,9 +4,9 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<h1>Eliminar</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Estas seguro de eliminar este Registro?</h3>
 <div>
     <h4>TbMovimientoEgreso</h4>
     <hr />
@@ -52,7 +52,12 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="IdMovimientoEgreso" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button> |
+        <a asp-action="Index">Regresar a la Lista</a>
     </form>
+
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/MovimientoEgresosScripts/MovimientoEgresoDelete.js"></script>
+    }
 </div>
