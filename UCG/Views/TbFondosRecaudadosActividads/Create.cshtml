@@ -1,47 +1,85 @@
-﻿@model UCG.Models.TbFondosRecaudadosActividad
+﻿@using UCG.Models.ViewModels
+@model FondosRecaudadosActividadViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Agregar Fondos Recaudados";
+    var actividades = ViewData["IdActividad"] as SelectList;
 }
 
-<h1>Create</h1>
-
-<h4>TbFondosRecaudadosActividad</h4>
+<h1 class="text-center mb-4">Agregar Fondos Recaudados</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdActividad" class="control-label"></label>
-                <select asp-for="IdActividad" class ="form-control" asp-items="ViewBag.IdActividad"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Detalle" class="control-label"></label>
-                <input asp-for="Detalle" class="form-control" />
-                <span asp-validation-for="Detalle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Monto" class="control-label"></label>
-                <input asp-for="Monto" class="form-control" />
-                <span asp-validation-for="Monto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaRegistro" class="control-label"></label>
-                <input asp-for="FechaRegistro" class="form-control" />
-                <span asp-validation-for="FechaRegistro" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-actividad="@ViewData["IdActividad"]">
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-action="Create" data-mode="Create" id="formFondosRecaudados">
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    Información del Fondo Recaudado
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    @if (Model.IdActividad != null && Model.IdActividad > 0)
+                    {
+                        <input type="hidden" asp-for="IdActividad" />
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label asp-for="IdActividad" class="form-label"></label>
+                            <select asp-for="IdActividad" id="IdActividad" class="form-select" asp-items="actividades">
+                                <option disabled selected>Seleccione una actividad</option>
+                            </select>
+                            <span asp-validation-for="IdActividad" class="text-danger"></span>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoRegistro" class="form-label"></label>
+                        <input asp-for="FechaTextoRegistro" class="form-control" type="date" />
+                        <span asp-validation-for="FechaTextoRegistro" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Monto" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="Monto" class="form-control" type="number" id="modalPrecioUnitario" step="0.01" min="0" placeholder="₡0.00" />
+                        </div>
+                        <span asp-validation-for="Monto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="Detalle" class="form-label">Detalle</label>
+                        <textarea asp-for="Detalle" id="summernoteAcuerdo" class="form-control"></textarea>
+                        <span asp-validation-for="Detalle" class="text-danger"></span>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between">
+                        <input type="submit" value="Guardar" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/FondosRecaudadosActividadScripts/FondosRecaudadosActividadFormHandler.js"></script>
 }

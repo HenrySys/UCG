@@ -15,7 +15,7 @@
         console.log("ID Factura:", idActividad);
 
         if (idActividad) {
-            window.location.href = "/TbFondosR/Details/" + idActividad;
+            window.location.href = "/TbFondosRecaudadosActividads/Details/" + idActividad;
         }
     });
 

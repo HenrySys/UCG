@@ -18,7 +18,7 @@ namespace UCG.Models.ValidationModels
               .GreaterThan(0).WithMessage("Debe seleccionar una Asociación valida.")
                .MustAsync(async (id, cancellation) =>
                {
-                   return await _context.TbClientes.AnyAsync(a => a.IdAsociacion == id);
+                   return await _context.TbAsociacions.AnyAsync(a => a.IdAsociacion == id);
                })
                .WithMessage("La Asociación seleccionada no existe.");
 

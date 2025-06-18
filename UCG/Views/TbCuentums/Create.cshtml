@@ -54,7 +54,7 @@
                     <!-- Estado -->
                     <div class="mb-3">
                         <label asp-for="Estado" class="form-label"></label>
-                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<BancoDeCuenta>()">
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeCuenta>()">
                             <option disabled selected>Seleccione un estado</option>
                         </select>
                         <span asp-validation-for="Estado" class="text-danger"></span>
@@ -63,7 +63,7 @@
                     <!-- Banco -->
                     <div class="mb-3">
                         <label asp-for="Banco" class="form-label"></label>
-                        <select asp-for="Banco" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeCuenta>()">
+                        <select asp-for="Banco" class="form-select" asp-items="Html.GetEnumSelectList<BancoDeCuenta>()">
                             <option disabled selected>Seleccione un banco</option>
                         </select>
                         <span asp-validation-for="Banco" class="text-danger"></span>

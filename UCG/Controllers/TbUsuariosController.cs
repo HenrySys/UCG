@@ -102,7 +102,7 @@ namespace UCG.Controllers
                 ViewData["IdAsociacion"] = new SelectList(_context.TbAsociacions, "IdAsociacion", "Nombre");
 
                 ViewBag.EsAdmin = false;
-                return View();
+                return View(model);
             }
        }
 

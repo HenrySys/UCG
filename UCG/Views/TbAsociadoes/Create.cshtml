@@ -46,6 +46,7 @@
                         <label asp-for="IdUsuario" class="form-label"></label>
                         <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.IdUsuario">
                             <option disabled selected>Seleccione un usuario</option>
+                            <option value="">(No Registrar Usuario)</option>
                         </select>
                         <span asp-validation-for="IdUsuario" class="text-danger"></span>
                     </div>
@@ -97,31 +98,31 @@
 
                     <div class="mb-3">
                         <label asp-for="Cedula" class="form-label"></label>
-                        <input asp-for="Cedula" class="form-control" />
+                        <input asp-for="Cedula" class="form-control" placeholder="Ingrese la cédula" />
                         <span asp-validation-for="Cedula" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="FechaTexto" class="form-label"></label>
-                        <input asp-for="FechaTexto" class="form-control" type="date" />
+                        <input asp-for="FechaTexto" class="form-control" type="date" placeholder="Seleccione una fecha" />
                         <span asp-validation-for="FechaTexto" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Apellido1" class="form-label"></label>
-                        <input asp-for="Apellido1" class="form-control" />
+                        <input asp-for="Apellido1" class="form-control" placeholder="Ingrese el primer apellido" />
                         <span asp-validation-for="Apellido1" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Apellido2" class="form-label"></label>
-                        <input asp-for="Apellido2" class="form-control" />
+                        <input asp-for="Apellido2" class="form-control" placeholder="Ingrese el segundo apellido" />
                         <span asp-validation-for="Apellido2" class="text-danger"></span>
                     </div>
 
@@ -129,19 +130,19 @@
 
                     <div class="mb-3">
                         <label asp-for="Telefono" class="form-label"></label>
-                        <input asp-for="Telefono" class="form-control" />
+                        <input asp-for="Telefono" class="form-control" placeholder="Ingrese el número de teléfono" />
                         <span asp-validation-for="Telefono" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Correo" class="form-label"></label>
-                        <input asp-for="Correo" class="form-control" />
+                        <input asp-for="Correo" class="form-control" placeholder="Ingrese el correo electrónico" />
                         <span asp-validation-for="Correo" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Direccion" class="form-label"></label>
-                        <input asp-for="Direccion" class="form-control" />
+                        <input asp-for="Direccion" class="form-control" placeholder="Ingrese la dirección" />
                         <span asp-validation-for="Direccion" class="text-danger"></span>
                     </div>
 

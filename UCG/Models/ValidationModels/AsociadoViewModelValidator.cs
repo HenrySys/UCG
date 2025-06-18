@@ -24,15 +24,18 @@ namespace UCG.Models.ValidationModels
                .WithMessage("La Asociación seleccionada no existe.");
 
             RuleFor(x => x.IdUsuario)
-              .NotNull().WithMessage("Debe seleccionar un Usuario.")
-              .GreaterThan(0).WithMessage("Debe seleccionar un Usuario valido.")
-               .MustAsync(async (id, cancellation) =>
-               {
-                   return await _context.TbUsuarios.AnyAsync(u =>
-                       u.IdUsuario == id &&
-                       !_context.TbAsociados.Any(a => a.IdUsuario == u.IdUsuario));
-               })
-                .WithMessage("El usuario ya tiene un asociado asignado.");
+                .MustAsync(async (id, cancellation) =>
+                {
+                    // Si no se seleccionó usuario, está permitido
+                    if (!id.HasValue || id == 0)
+                        return true;
+
+                    // Si se seleccionó, validar que no esté repetido
+                    return await _context.TbUsuarios.AnyAsync(u =>
+                        u.IdUsuario == id &&
+                        !_context.TbAsociados.Any(a => a.IdUsuario == u.IdUsuario));
+                })
+                .WithMessage("El usuario ya tiene un asociado asignado o no es válido.");
 
                
 

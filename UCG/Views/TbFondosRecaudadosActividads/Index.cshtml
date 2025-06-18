@@ -1,53 +1,80 @@
 ﻿@model IEnumerable<UCG.Models.TbFondosRecaudadosActividad>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Fondos Recaudados";
 }
 
-<h1>Index</h1>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="~/css/Tables.css">
+</head>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Detalle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Monto)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaRegistro)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdActividadNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Detalle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Monto)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaRegistro)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdActividadNavigation.IdActividad)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdFondosRecaudadosActividad">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdFondosRecaudadosActividad">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdFondosRecaudadosActividad">Delete</a>
-            </td>
-        </tr>
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>
+
+<div class="table-container">
+    <div class="table-header center-header">
+        <div style="width: 100%; text-align: center;">
+            <h1 class="table-title" style="margin-bottom: 15px;">Fondos Recaudados</h1>
+            <div class="table-actions">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </a>
+
+                <a asp-action="Create" class="btn btn-create">
+                    <i class='bx bx-plus'></i> Registrar Fondo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="miTabla" class="universal-table display compact">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Detalle)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Monto)</th>
+                <th>@Html.DisplayNameFor(model => model.First().FechaRegistro)</th>
+                <th>Actividad</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-id="@item.IdFondosRecaudadosActividad">
+                    <td>@Html.DisplayFor(m => item.Detalle)</td>
+                    <td>₡@item.Monto?.ToString("N2")</td>
+                    <td>@item.FechaRegistro?.ToString("dd/MM/yyyy")</td>
+                    <td>@item.IdActividadNavigation?.Nombre</td>
+                    <td class="action-links text-end">
+                        <a asp-action="Edit" asp-route-id="@item.IdFondosRecaudadosActividad" class="btn btn-secondary" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.IdFondosRecaudadosActividad" class="btn btn-secondary" title="Detalles">
+                            <i class='bx bxs-detail'></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.IdFondosRecaudadosActividad" class="btn btn-create" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @{
+        <!-- Tu script separado -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+        <script src="~/js/JuntaDirectivaScripts/JuntaDirectivaIndex.js"></script>
+    }
 }
-    </tbody>
-</table>
