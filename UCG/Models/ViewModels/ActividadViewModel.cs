@@ -33,5 +33,8 @@ namespace UCG.Models.ViewModels
         [BindNever]
         public DateOnly? Fecha { get; set; }
 
+        [Display(Name = "Monto total recaudado")]
+        public decimal? MontoTotalRecuadado { get; set; }
+
     }
 }

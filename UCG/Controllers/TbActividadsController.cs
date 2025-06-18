@@ -107,7 +107,9 @@ namespace UCG.Controllers
                 IdAsociado = model.IdAsociado,
                 IdActa = model.IdActa,
                 Lugar = model.Lugar,
-                Observaciones = model.Observaciones
+                Observaciones = model.Observaciones,
+                MontoTotalRecuadado = model.MontoTotalRecuadado
+
             };
         }
 
@@ -124,7 +126,9 @@ namespace UCG.Controllers
                 IdAsociado = actividad.IdAsociado,
                 IdActa = actividad.IdActa,
                 Lugar = actividad.Lugar,
-                Observaciones = actividad.Observaciones
+                Observaciones = actividad.Observaciones,
+                MontoTotalRecuadado = actividad.MontoTotalRecuadado
+
             };
         }
 

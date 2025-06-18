@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using UCG.Models.ViewModels;
 
 namespace UCG.Models.ValidationModels
@@ -12,15 +13,7 @@ namespace UCG.Models.ValidationModels
         {
             _context = context;
 
-            RuleFor(x => x.IdAsociacion)
-                .NotNull().WithMessage("Debe de tener un id.")
-                .GreaterThan(0).WithMessage("Debe seleccionar una id valido.")
-                .MustAsync(async (id, cancellation) =>
-                {
-                    return !await _context.TbAsociacions.AnyAsync(a => a.IdAsociacion == id);
-                })
-                .WithMessage("Ya existe una asociación con ese id.");
-
+           
             RuleFor(x => x.CedulaJuridica)
                 .NotNull().WithMessage("Debe ingresar una Cedula Juridica.")
                 .NotEmpty().WithMessage("Debe ingresar una Cedula Juridica.")
@@ -36,9 +29,9 @@ namespace UCG.Models.ValidationModels
                 .NotEmpty().WithMessage("Debe ingresar un nombre.")
                 .MaximumLength(100).WithMessage("El nombre no puede superar los 100 caracteres.");
 
-            RuleFor(x => x.FechaConstitucion)
-               .NotNull().WithMessage("Debe seleccionar una fecha.")
-               .NotEmpty().WithMessage("Debe ingresar una fecha válida.");
+            RuleFor(x => x.FechaConstitucionTexto)
+                .NotNull().WithMessage("Debe seleccionar una fecha.")
+                .Must(ValidarFechaTexto).WithMessage("La fecha debe tener el formato válido yyyy-MM-dd y estar entre el año 1940 y hoy.");
 
             RuleFor(x => x.Telefono)
                 .NotNull().WithMessage("Debe ingresar una Telefono.")
@@ -88,6 +81,19 @@ namespace UCG.Models.ValidationModels
             RuleFor(x => x.Estado)
                .IsInEnum().WithMessage("Debe seleccionar una estado valido.")
                .NotEmpty().WithMessage("Debe ingresar un estado.");
+        }
+        private bool ValidarFechaTexto(string? fechaTexto)
+        {
+            if (string.IsNullOrWhiteSpace(fechaTexto))
+                return false;
+
+            if (!DateOnly.TryParseExact(fechaTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fecha))
+                return false;
+
+            if (fecha > DateOnly.FromDateTime(DateTime.Today)) return false;
+            if (fecha < new DateOnly(1940, 1, 1)) return false;
+
+            return true;
         }
     }
 }

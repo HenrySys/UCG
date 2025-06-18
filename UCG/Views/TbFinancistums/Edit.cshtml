@@ -15,8 +15,9 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<form asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="IdFinancista" />
 
     <div class="row g-3">
         <!-- CARD 1: Información General -->
@@ -57,11 +58,11 @@
                         <span asp-validation-for="TipoEntidad" class="text-danger"></span>
                     </div>
 
-                    <!-- Descripción -->
+                    <!-- Observaciones -->
                     <div class="mb-3" id="descripcionAcuerdo">
-                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
-                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" id="summernoteAcuerdo" class="form-control"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
                     </div>
                 </div>
             </div>

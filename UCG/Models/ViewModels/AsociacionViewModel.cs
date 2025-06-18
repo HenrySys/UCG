@@ -17,8 +17,9 @@ namespace UCG.Models.ViewModels
         public string? Nombre { get; set; }
 
         [Display(Name = "Fecha Costitucion")]
-        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido.")]
         public DateOnly FechaConstitucion { get; set; }
+
+        public string? FechaConstitucionTexto { get; set; }
 
         [Display(Name = "Telefono")]
         public string? Telefono { get; set; }

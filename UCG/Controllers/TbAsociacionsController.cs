@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UCG.Models;
 using UCG.Models.ViewModels;
+using UCG.Services;
 
 namespace UCG.Controllers
 {
     public class TbAsociacionsController : Controller
     {
         private readonly UcgdbContext _context;
-
-        public TbAsociacionsController(UcgdbContext context)
+        private readonly HashingService _hashingService;
+        private string rol => User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+        
+        public TbAsociacionsController(UcgdbContext context, HashingService hashingService)
         {
             _context = context;
+            _hashingService = hashingService;
         }
 
         // GET: TbAsociacions
@@ -58,15 +64,68 @@ namespace UCG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdAsociacion,CedulaJuridica,CodigoRegistro,Nombre,FechaConstitucion,Telefono,Fax,Correo,Provincia,Canton,Distrito,Pueblo,Direccion,Descripcion,Estado")] TbAsociacion tbAsociacion)
+        public async Task<IActionResult> Create(AsociacionViewModel model)
         {
-            if (ModelState.IsValid)
+            if (model.Usuario.Contraseña != model.Usuario.ConfirmarContraseña)
             {
+                ModelState.AddModelError("Contraseña", "Las contraseñas no coinciden");
+                return View(model);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            Console.WriteLine($"FechaConstitucion: {model.FechaConstitucion}");
+
+
+            model.FechaConstitucion = DateOnly.ParseExact(model.FechaConstitucionTexto, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var tbAsociacion = new TbAsociacion
+            {
+                IdAsociacion = model.IdAsociacion,
+                CedulaJuridica = model.CedulaJuridica,
+                CodigoRegistro = model.CodigoRegistro,
+                Nombre = model.Nombre,
+                FechaConstitucion = model.FechaConstitucion,
+                Telefono = model.Telefono,
+                Fax = model.Fax,
+                Correo = model.Correo,
+                Provincia = model.Provincia,
+                Canton = model.Canton,
+                Distrito = model.Distrito,
+                Pueblo = model.Pueblo,
+                Direccion = model.Direccion,
+                Descripcion = model.Descripcion,
+                Estado = model.Estado
+            };
+            try
+            {
+
                 _context.Add(tbAsociacion);
                 await _context.SaveChangesAsync();
+
+                var tbUsuario = new TbUsuario
+                {
+                    IdAsociacion = tbAsociacion.IdAsociacion,
+                    NombreUsuario = model.Usuario.NombreUsuario,
+                    Contraseña = _hashingService.GenerateHash(model.Usuario.Contraseña),
+                    Correo = model.Usuario.Correo,
+                    Rol = model.Usuario.Rol ?? TbUsuario.RolUsuario.Admin,
+                    Estado = model.Usuario.Estado ?? TbUsuario.EstadoUsuario.Activo
+                };
+
+                _context.Add(tbUsuario);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
+
             }
-            return View(tbAsociacion);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocurrió un error al registrar la asociación y el usuario.");
+                Console.WriteLine($"Error al registrar: {ex.Message}");
+                return View(model);
+            }
         }
 
 

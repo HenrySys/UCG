@@ -1,51 +1,192 @@
-﻿@model UCG.Models.TbMovimientoIngreso
+﻿@model UCG.Models.ViewModels.MovimientoIngresoViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Movimiento Ingreso";
+    var asociaciones = new SelectList(ViewBag.IdAsociacion as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+    var asociados = new SelectList(ViewBag.IdAsociado as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+    var conceptos = new SelectList(ViewBag.IdConceptoAsociacion as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+    var donantes = new SelectList(ViewBag.IdDonante as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+    var actividades = new SelectList(ViewBag.IdActividad as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+    var financistas = new SelectList(ViewBag.IdFinancista as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+
 }
 
-<h1>Create</h1>
 
-<h4>TbMovimientoIngreso</h4>
+
+
+<h1 class="text-center mb-4">Crear Movimiento de Ingreso</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdAsociacion" class="control-label"></label>
-                <select asp-for="IdAsociacion" class ="form-control" asp-items="ViewBag.IdAsociacion"></select>
+
+
+
+<form asp-action="Create" method="post" data-mode="Create">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <!-- Información principal -->
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header">Información del Movimiento</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="FechaTextoIngreso" class="form-label"></label>
+                        <input asp-for="FechaTextoIngreso" class="form-control" type="date" />
+                        <span asp-validation-for="FechaTextoIngreso" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociacion" class="form-label"></label>
+                        <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones" id="IdAsociacion">
+                            <option disabled selected>Seleccione una asociación</option>
+                        </select>
+                        <span asp-validation-for="IdAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
+                            <option disabled selected>Seleccione un asociado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdConceptoAsociacion" class="form-label"></label>
+                        
+                        <select asp-for="IdConceptoAsociacion" class="form-select" asp-items="conceptos" id="IdConceptoAsociacion">
+                            <option disabled selected>Seleccione un Concepto Asociacion</option>
+                        </select>
+                        <span asp-validation-for="IdConceptoAsociacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 grupo-donante d-none" id="grupoDonante">
+                        <label asp-for="IdDonante" class="form-label"></label>
+                        
+                        <select asp-for="IdDonante" class="form-select" asp-items="donantes" id="IdDonante">
+                            <option disabled selected>Seleccione un Donante</option>
+                        </select>
+                        <span asp-validation-for="IdDonante" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 grupo-actividad d-none" id="grupoActividad">
+                        <label asp-for="IdActividad" class="form-label"></label>
+                        
+                        <select asp-for="IdActividad" class="form-select" asp-items="actividades" id="IdActividad">
+                            <option disabled selected>Seleccione un Actividad</option>
+                        </select>
+                        <span asp-validation-for="IdActividad" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 grupo-financista d-none" id="grupoFinancista">
+                        <label asp-for="IdFinancista" class="form-label"></label>
+                        <select asp-for="IdFinancista" class="form-select" asp-items="financistas" id="IdFinancista">
+                            <option disabled selected>Seleccione un Financista</option>
+                        </select>
+
+                        <span asp-validation-for="IdFinancista" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="IdAsociado" class="control-label"></label>
-                <select asp-for="IdAsociado" class ="form-control" asp-items="ViewBag.IdAsociado"></select>
+        </div>
+
+        <!-- Detalle de documentos -->
+        <div class="col-lg-6">
+            <div class="card shadow h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Documentos de Ingreso</span>
+                    <button type="button" class="btn btn-primary btn-sm" id="btnAbrirModalIngreso">Agregar</button>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-bordered" id="detailsTableIngreso">
+                        <thead>
+                            <tr>
+                                <th>Comprobante</th>
+                                <th>Método Pago</th>
+                                <th>Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="mt-3">
+                        <label asp-for="MontoTotalIngresado" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input id="MontoTotalIngresado" class="form-control" type="text" readonly />
+                            <input asp-for="MontoTotalIngresado" type="hidden" id="MontoTotalIngresadoHidden" name="MontoTotalIngresado" />
+
+                        </div>
+                        <span asp-validation-for="MontoTotalIngresado" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="FechaIngreso" class="control-label"></label>
-                <input asp-for="FechaIngreso" class="form-control" />
-                <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+        </div>
+    </div>
+
+    <input type="hidden" name="DetalleDocumentoIngresoJson" id="DetalleDocumentoIngresoJson" value="@Model.DetalleDocumentoIngresoJson" />
+    <input type="hidden" name="TipoOrigenIngreso" id="TipoOrigenIngreso" value="@Model.TipoOrigenIngreso" />
+
+    <div class="mt-4">
+        <input type="submit" value="Guardar Movimiento" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+
+<!-- Modal Documento Ingreso -->
+<div class="modal fade" id="detailModalIngreso" tabindex="-1" aria-labelledby="modalLabelIngreso" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalLabelIngreso">Agregar Documento de Ingreso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
+
+            <div class="modal-body">
+                
+                <div class="mb-2">
+                    <label class="form-label">N° Comprobante</label>
+                    <input type="text" id="modalNumComprobante" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Fecha Comprobante</label>
+                    <input type="date" id="modalFechaComprobante" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Monto</label>
+                    <input type="number" id="modalMonto" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Método de Pago</label>
+                    <select id="modalMetodoPago" class="form-select">
+                        <option value="1">Efectivo</option>
+                        <option value="2">Sinpe</option>
+                        <option value="3">Transferencia</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Descripción</label>
+                    <textarea id="modalDescripcion" class="form-control" rows="2"></textarea>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="MontoTotalIngresado" class="control-label"></label>
-                <input asp-for="MontoTotalIngresado" class="form-control" />
-                <span asp-validation-for="MontoTotalIngresado" class="text-danger"></span>
+
+            <div class="modal-footer">
+                <button type="button" id="addDetailIngresoBtn" class="btn btn-success">Agregar</button>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
+
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/MovimientoIngresosScripts/MovimientoIngresoFormHandler.js"></script>
 }

@@ -1,71 +1,146 @@
-﻿@model UCG.Models.TbCuentum
+﻿@using UCG.Models.ViewModels;
+@using static UCG.Models.TbCuentum;
+@model UCG.Models.ViewModels.CuentumViewModel
+
 
 @{
     ViewData["Title"] = "Editar Cuenta";
+    var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+    var asociados = ViewData["IdAsociado"] as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
 <h1 class="text-center mb-4">Editar Cuenta</h1>
 <hr />
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow">
-            <div class="card-header">
-                Formulario de Edición
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" asp-for="IdCuenta" />
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]">
+</div>>
 
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <!-- CARD 1: Información general -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Información General</div>
+                <div class="card-body">
+                    <!-- Asociación -->
                     <div class="mb-3">
                         <label asp-for="IdAsociacion" class="form-label"></label>
-                        <select asp-for="IdAsociacion" class="form-select" asp-items="ViewBag.IdAsociacion"></select>
+                        @if (Convert.ToBoolean(ViewBag.EsAdmin))
+                        {
+                            <input type="text" class="form-control mb-2" value="@ViewBag.Nombre" disabled />
+                            <input type="hidden" asp-for="IdAsociacion" value="@ViewBag.IdAsociacion" />
+                        }
+                        else
+                        {
+                            <select asp-for="IdAsociacion" class="form-select" asp-items="asociaciones">
+                                <option disabled selected>Seleccione una asociación</option>
+                            </select>
+                        }
                         <span asp-validation-for="IdAsociacion" class="text-danger"></span>
                     </div>
 
+                    <!-- Asociado -->
                     <div class="mb-3">
-                        <label asp-for="TipoCuenta" class="form-label"></label>
-                        <input asp-for="TipoCuenta" class="form-control" />
-                        <span asp-validation-for="TipoCuenta" class="text-danger"></span>
+                        <label asp-for="IdAsociado" class="form-label"></label>
+                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados">
+                            <option disabled selected>Seleccione un asociado</option>
+                        </select>
+                        <span asp-validation-for="IdAsociado" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="TituloCuenta" class="form-label"></label>
-                        <input asp-for="TituloCuenta" class="form-control" />
-                        <span asp-validation-for="TituloCuenta" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="NumeroCuenta" class="form-label"></label>
-                        <input asp-for="NumeroCuenta" class="form-control" />
-                        <span asp-validation-for="NumeroCuenta" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Telefono" class="form-label"></label>
-                        <input asp-for="Telefono" class="form-control" />
-                        <span asp-validation-for="Telefono" class="text-danger"></span>
-                    </div>
-
+                    <!-- Estado -->
                     <div class="mb-3">
                         <label asp-for="Estado" class="form-label"></label>
-                        <input asp-for="Estado" class="form-control" />
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<BancoDeCuenta>()">
+                            <option disabled selected>Seleccione un estado</option>
+                        </select>
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-warning">Editar</button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                    <!-- Banco -->
+                    <div class="mb-3">
+                        <label asp-for="Banco" class="form-label"></label>
+                        <select asp-for="Banco" class="form-select" asp-items="Html.GetEnumSelectList<EstadoDeCuenta>()">
+                            <option disabled selected>Seleccione un banco</option>
+                        </select>
+                        <span asp-validation-for="Banco" class="text-danger"></span>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Detalles de la cuenta -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow">
+                <div class="card-header">Detalles de la Cuenta</div>
+                <div class="card-body">
+                    <!-- TipoCuenta -->
+                    <div class="mb-3">
+                        <label asp-for="TipoCuenta" class="form-label"></label>
+                        <select asp-for="TipoCuenta" class="form-select" asp-items="Html.GetEnumSelectList<UCG.Models.TbCuentum.TipoDeCuenta>()">
+                            <option disabled selected>Seleccione un tipo de cuenta</option>
+                        </select>
+                        <span asp-validation-for="TipoCuenta" class="text-danger"></span>
+                    </div>
+
+                    <!-- Título -->
+                    <div class="mb-3">
+                        <label asp-for="TituloCuenta" class="form-label"></label>
+                        <input asp-for="TituloCuenta" class="form-control" placeholder="Ejemplo: Cuenta general UCG" />
+                        <span asp-validation-for="TituloCuenta" class="text-danger"></span>
+                    </div>
+
+                    <!-- Número de cuenta -->
+                    <div class="mb-3">
+                        <label asp-for="NumeroCuenta" class="form-label"></label>
+                        <input asp-for="NumeroCuenta" class="form-control" placeholder="Ejemplo: CR123456789" />
+                        <span asp-validation-for="NumeroCuenta" class="text-danger"></span>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="Ej: 8888-8888" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <!-- Saldo -->
+                    <div class="mb-3">
+                        <label asp-for="Saldo" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₡</span>
+                            <input asp-for="Saldo" class="form-control" placeholder="Ej: 50000" />
+                        </div>
+                        <span asp-validation-for="Saldo" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- BOTONES -->
+    <div class="mt-4">
+        <input type="submit" value="Editar Cuenta" class="btn btn-warning " />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+    </div>
+</form>
+
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const rutasCuenta = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbCuentums")',
+        };
+    </script>
+    <script src="~/js/CuentaScripts/CuentaFormHandler.js"></script>
 }

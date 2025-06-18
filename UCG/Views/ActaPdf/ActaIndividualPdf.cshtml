@@ -1,0 +1,87 @@
+@model UCG.Models.TbActum
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            margin: 40px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .subtitulo {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 13pt;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Acta de la sesión @Model.Tipo?.ToString().ToLower() No. @Model.NumeroActa</h1>
+
+    <p>
+        Acta de la sesión @Model.Tipo?.ToString().ToLower() número <span class="bold">@Model.NumeroActa</span> celebrada por la asociación <span class="bold">@Model.IdAsociacionNavigation?.Nombre</span>,
+        el día <span class="bold">@Model.FechaSesion.ToString("dd 'de' MMMM 'de' yyyy")</span>. La sesión fue presidida por
+        <span class="bold">@Model.IdAsociadoNavigation?.Nombre @Model.IdAsociadoNavigation?.Apellido1 @Model.IdAsociadoNavigation?.Apellido2 </span>.
+    </p>
+
+    <div class="subtitulo">Participantes:</div>
+    <ul>
+        @foreach (var asistencia in Model.TbActaAsistencias)
+        {
+            <li><span class="bold">@asistencia.IdAsociadoNavigation?.Nombre @asistencia.IdAsociadoNavigation?.Apellido1 @asistencia.IdAsociadoNavigation?.Apellido2</span></li>
+        }
+    </ul>
+
+    <div class="subtitulo">1. Agenda</div>
+    @if (ViewData.ContainsKey("AgendaHtml") && !string.IsNullOrWhiteSpace(ViewData["AgendaHtml"] as string))
+    {
+        @Html.Raw(ViewData["AgendaHtml"] as string)
+    }
+    else
+    {
+        <p><i>No se ha registrado una agenda personalizada.</i></p>
+    }
+
+
+
+
+    <div class="subtitulo">ACUERDO No. 1</div>
+    <p>Comprobado el quórum, se <span class="bold">@Model.Estado?.ToString().ToUpper()</span> el orden del día para la presente sesión. Votación unánime.</p>
+
+    <div class="subtitulo">2. Desarrollo</div>
+    <p>@Model.Descripcion</p>
+
+    @if (Model.TbAcuerdos.Any())
+    {
+        <div class="subtitulo">3. Acuerdos</div>
+        <ol>
+            @foreach (var acuerdo in Model.TbAcuerdos)
+            {
+                <li>@acuerdo.Descripcion</li>
+            }
+        </ol>
+    }
+
+</body>
+</html>

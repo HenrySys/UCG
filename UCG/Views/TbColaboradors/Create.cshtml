@@ -92,9 +92,9 @@
 
                     <!-- Observaciones -->
                     <div class="mb-3" id="descripcionAcuerdo">
-                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
-                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
+                        <label for="Observacion" class="form-label">Descripción</label>
+                        <textarea asp-for="Observaciones" id="summernoteAcuerdo" class="form-control"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
                     </div>
                 </div>
             </div>

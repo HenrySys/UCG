@@ -8,7 +8,7 @@ namespace UCG.Models.ViewModels
     public int IdDocumentoIngreso { get; set; }
 
     [Display(Name = "Fecha Comprobante")]
-    public string? FechaTextoComprobante { get; set; }
+    public string? FechaComprobante { get; set; }
 
     [Display(Name = "Numero Comprobante")]
     public string NumComprobante { get; set; } = null!;

@@ -5,33 +5,33 @@
 
 @{
     ViewData["Title"] = "Crear Asociación";
+
 }
 
 <h1 class="text-center mb-4">Crear Asociación</h1>
 <hr />
 
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+</div>
+
 <form asp-action="Create">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="row">
         <!-- Columna 1: Asociación con Tabs -->
         <div class="col-12 col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    Datos de la Asociación
-                </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs" id="asociacionTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="legal-tab" data-bs-toggle="tab" data-bs-target="#legal" type="button" role="tab">Información Legal</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="contacto-tab" data-bs-toggle="tab" data-bs-target="#contacto" type="button" role="tab">Contacto</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="ubicacion-tab" data-bs-toggle="tab" data-bs-target="#ubicacion" type="button" role="tab">Ubicación</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content pt-3" id="asociacionTabsContent">
-                        <div class="tab-pane fade show active" id="legal" role="tabpanel">
+            <div class="accordion" id="accordionAsociacion">
+                <!-- Información Legal -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingLegal">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLegal" aria-expanded="true" aria-controls="collapseLegal">
+                            Información Legal
+                        </button>
+                    </h2>
+                    <div id="collapseLegal" class="accordion-collapse collapse show" aria-labelledby="headingLegal" data-bs-parent="#accordionAsociacion">
+                        <div class="accordion-body">
+                            <!-- Contenido Información Legal -->
                             <div class="mb-3">
                                 <label asp-for="Nombre" class="form-label"></label>
                                 <input asp-for="Nombre" class="form-control" />
@@ -48,9 +48,9 @@
                                 <span asp-validation-for="CodigoRegistro" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
-                                <label asp-for="FechaConstitucion" class="form-label"></label>
-                                <input asp-for="FechaConstitucion" class="form-control" type="date" />
-                                <span asp-validation-for="FechaConstitucion" class="text-danger"></span>
+                                <label asp-for="FechaConstitucionTexto" class="form-label"></label>
+                                <input asp-for="FechaConstitucionTexto" class="form-control" type="date" />
+                                <span asp-validation-for="FechaConstitucionTexto" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
                                 <label asp-for="Descripcion" class="form-label"></label>
@@ -65,7 +65,18 @@
                                 <span asp-validation-for="Estado" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="contacto" role="tabpanel"> 
+                    </div>
+                </div>
+
+                <!-- Contacto -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingContacto">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContacto" aria-expanded="false" aria-controls="collapseContacto">
+                            Contacto
+                        </button>
+                    </h2>
+                    <div id="collapseContacto" class="accordion-collapse collapse" aria-labelledby="headingContacto" data-bs-parent="#accordionAsociacion">
+                        <div class="accordion-body">
                             <div class="mb-3">
                                 <label asp-for="Telefono" class="form-label"></label>
                                 <input asp-for="Telefono" class="form-control" />
@@ -82,25 +93,33 @@
                                 <span asp-validation-for="Fax" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="ubicacion" role="tabpanel">
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingUbicacion">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUbicacion" aria-expanded="false" aria-controls="collapseUbicacion">
+                            Ubicación
+                        </button>
+                    </h2>
+                    <div id="collapseUbicacion" class="accordion-collapse collapse" aria-labelledby="headingUbicacion" data-bs-parent="#accordionAsociacion">
+                        <div class="accordion-body">
                             <div class="mb-3">
                                 <label asp-for="Provincia" class="form-label"></label>
                                 <input asp-for="Provincia" class="form-control" />
                                 <span asp-validation-for="Provincia" class="text-danger"></span>
                             </div>
-
                             <div class="mb-3">
                                 <label asp-for="Canton" class="form-label"></label>
                                 <input asp-for="Canton" class="form-control" />
                                 <span asp-validation-for="Canton" class="text-danger"></span>
                             </div>
-
                             <div class="mb-3">
                                 <label asp-for="Distrito" class="form-label"></label>
                                 <input asp-for="Distrito" class="form-control" />
                                 <span asp-validation-for="Distrito" class="text-danger"></span>
                             </div>
-
                             <div class="mb-3">
                                 <label asp-for="Pueblo" class="form-label"></label>
                                 <input asp-for="Pueblo" class="form-control" />
@@ -115,6 +134,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Columna 2: Usuario -->
@@ -170,44 +190,10 @@
 
 
 
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-        // Datos de ejemplo: sustituye con JSON de provincias reales si lo deseas
-        const data = {
-            "San José": ["Central", "Escazú"],
-            "Alajuela": ["Central", "San Ramón"]
-        };
-
-        const cantonData = {
-            "Central": ["Carmen", "Merced"],
-            "Escazú": ["San Rafael", "San Antonio"],
-            "San Ramón": ["San Juan", "Volio"]
-        };
-
-        $(document).ready(function () {
-            const provinciaSelect = $('#Provincia');
-            const cantonSelect = $('#Canton');
-            const distritoSelect = $('#Distrito');
-
-            provinciaSelect.append(`<option disabled selected>Seleccione una provincia</option>`);
-            Object.keys(data).forEach(p => provinciaSelect.append(`<option value="${p}">${p}</option>`));
-
-            provinciaSelect.on('change', function () {
-                cantonSelect.empty().append(`<option disabled selected>Seleccione un cantón</option>`);
-                distritoSelect.empty().append(`<option disabled selected>Seleccione un distrito</option>`);
-                const cantones = data[this.value];
-                cantones.forEach(c => cantonSelect.append(`<option value="${c}">${c}</option>`));
-            });
-
-            cantonSelect.on('change', function () {
-                distritoSelect.empty().append(`<option disabled selected>Seleccione un distrito</option>`);
-                const distritos = cantonData[this.value] || [];
-                distritos.forEach(d => distritoSelect.append(`<option value="${d}">${d}</option>`));
-            });
-        });
-    </script>
 }

@@ -130,6 +130,9 @@ public partial class UcgdbContext : DbContext
             entity.Property(e => e.Razon)
                 .HasMaxLength(255)
                 .HasColumnName("razon");
+            entity.Property(e => e.MontoTotalRecuadado)
+               .HasPrecision(15, 2)
+               .HasColumnName("monto_total_recaudado");
 
             entity.HasOne(d => d.IdActaNavigation).WithMany(p => p.TbActividads)
                 .HasForeignKey(d => d.IdActa)

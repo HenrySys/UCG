@@ -159,7 +159,26 @@ namespace UCG.Controllers
                     await _context.TbAsociacions.ToListAsync(),
                     "IdAsociacion", "Nombre", model.IdAsociacion);
             }
+
+            // 🔹 NUEVO: mostrar nombre + apellido
+            if (model.IdAsociacion.HasValue && model.IdAsociacion > 0)
+            {
+                var asociados = await _context.TbAsociados
+                    .Where(a => a.IdAsociacion == model.IdAsociacion)
+                    .Select(a => new {
+                        a.IdAsociado,
+                        NombreCompleto = a.Nombre + " " + a.Apellido1
+                    })
+                    .ToListAsync();
+
+                ViewData["IdAsociado"] = new SelectList(asociados, "IdAsociado", "NombreCompleto", model.IdAsociado);
+            }
+            else
+            {
+                ViewData["IdAsociado"] = new SelectList(Enumerable.Empty<SelectListItem>());
+            }
         }
+
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -180,7 +199,7 @@ namespace UCG.Controllers
                 NumeroCuenta = cuenta.NumeroCuenta,
                 Telefono = cuenta.Telefono,
                 Estado = cuenta.Estado,
-                Banco = cuenta.Banco!.Value 
+                Banco = cuenta.Banco ?? TbCuentum.BancoDeCuenta.BN 
             };
 
             await ConfigurarAsociacionCuentaAsync(model);

@@ -2,7 +2,7 @@
 @model ColaboradorViewModel
 
 @{
-    ViewData["Title"] = "Crear Colaborador";
+    ViewData["Title"] = "Editar Colaborador";
     var asociaciones = ViewBag.IdAsociacion as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
 }
 
@@ -14,8 +14,9 @@
      data-error="@TempData["ErrorMessage"]">
 </div>
 
-<form asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="IdColaborador" />
 
     <div class="row g-3">
         <!-- CARD 1: Información General -->
@@ -92,9 +93,9 @@
 
                     <!-- Observaciones -->
                     <div class="mb-3" id="descripcionAcuerdo">
-                        <label for="summernoteAcuerdo" class="form-label">Descripción</label>
-                        <textarea id="summernoteAcuerdo" name="Descripcion" class="form-control"></textarea>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
+                        <label for="Observacion" class="form-label">Descripción</label>
+                        <textarea asp-for="Observaciones" id="summernoteAcuerdo" class="form-control"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
                     </div>
                 </div>
             </div>
