@@ -1,10 +1,9 @@
 ﻿$(document).ready(function () {
 
-
     const successMessage = $('#tempDataSwal').data('success');
     const errorMessage = $('#tempDataSwal').data('error');
 
-
+    // Mostrar mensaje de éxito si existe
     if (successMessage) {
         Swal.fire({
             icon: 'success',
@@ -16,7 +15,9 @@
                 window.location.href = '/TbProveedors/Index';
             }
         });
-    } else if (errorMessage) {
+    }
+    // Mostrar mensaje de error si existe
+    else if (errorMessage) {
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -25,7 +26,7 @@
         });
     }
 
-    //  Confirmación antes de eliminar
+    // Confirmación antes de eliminar
     const deleteBtn = document.getElementById('btnConfirmDelete');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function () {
@@ -42,15 +43,6 @@
                 }
             });
         });
-    }else if (errorMessage) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: errorMessage,
-            confirmButtonText: 'Aceptar'
-        });
     }
-
-
 
 });

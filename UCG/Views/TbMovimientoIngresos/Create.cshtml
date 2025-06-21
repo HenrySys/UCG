@@ -5,17 +5,17 @@
     var asociaciones = new SelectList(ViewBag.IdAsociacion as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
     var asociados = new SelectList(ViewBag.IdAsociado as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
     var conceptos = new SelectList(ViewBag.IdConceptoAsociacion as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
-    var donantes = new SelectList(ViewBag.IdDonante as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
-    var actividades = new SelectList(ViewBag.IdActividad as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
-    var financistas = new SelectList(ViewBag.IdFinancista as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>(), "Value", "Text", null);
+
 
 }
 
-
-
-
 <h1 class="text-center mb-4">Crear Movimiento de Ingreso</h1>
 <hr />
+<div id="tempDataSwal"
+     data-success="@TempData["SuccessMessage"]"
+     data-error="@TempData["ErrorMessage"]"
+     data-asociacion="@(ViewBag.EsAdmin == true ? ViewData["IdAsociacion"] : "")">
+</div>
 
 
 
@@ -44,7 +44,7 @@
 
                     <div class="mb-3">
                         <label asp-for="IdAsociado" class="form-label"></label>
-                        <select asp-for="IdAsociado" class="form-select" asp-items="asociados" id="IdAsociado">
+                        <select asp-for="IdAsociado" class="form-select" id="IdAsociado">
                             <option disabled selected>Seleccione un asociado</option>
                         </select>
                         <span asp-validation-for="IdAsociado" class="text-danger"></span>
@@ -52,43 +52,17 @@
 
                     <div class="mb-3">
                         <label asp-for="IdConceptoAsociacion" class="form-label"></label>
-                        
-                        <select asp-for="IdConceptoAsociacion" class="form-select" asp-items="conceptos" id="IdConceptoAsociacion">
-                            <option disabled selected>Seleccione un Concepto Asociacion</option>
+                        <select asp-for="IdConceptoAsociacion" class="form-select"  id="IdConceptoAsociacion">
+                            <option disabled selected>Seleccione un concepto</option>
                         </select>
                         <span asp-validation-for="IdConceptoAsociacion" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3 grupo-donante d-none" id="grupoDonante">
-                        <label asp-for="IdDonante" class="form-label"></label>
-                        
-                        <select asp-for="IdDonante" class="form-select" asp-items="donantes" id="IdDonante">
-                            <option disabled selected>Seleccione un Donante</option>
-                        </select>
-                        <span asp-validation-for="IdDonante" class="text-danger"></span>
-                    </div>
 
-                    <div class="mb-3 grupo-actividad d-none" id="grupoActividad">
-                        <label asp-for="IdActividad" class="form-label"></label>
-                        
-                        <select asp-for="IdActividad" class="form-select" asp-items="actividades" id="IdActividad">
-                            <option disabled selected>Seleccione un Actividad</option>
-                        </select>
-                        <span asp-validation-for="IdActividad" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3 grupo-financista d-none" id="grupoFinancista">
-                        <label asp-for="IdFinancista" class="form-label"></label>
-                        <select asp-for="IdFinancista" class="form-select" asp-items="financistas" id="IdFinancista">
-                            <option disabled selected>Seleccione un Financista</option>
-                        </select>
-
-                        <span asp-validation-for="IdFinancista" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Descripcion" class="form-label"></label>
-                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                    <!-- Observaciones -->
+                    <div class="mb-3" id="descripcionAcuerdo">
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" id="summernoteAcuerdo" class="form-control"></textarea>
                         <span asp-validation-for="Descripcion" class="text-danger"></span>
                     </div>
                 </div>
@@ -107,30 +81,37 @@
                         <thead>
                             <tr>
                                 <th>Comprobante</th>
+                                <th>Fecha</th>
                                 <th>Método Pago</th>
                                 <th>Monto</th>
+                                <th>Origen</th> <!-- Cliente / Financista / Actividad -->
+                                <th>Acción</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <!-- Aquí se cargarán dinámicamente los detalles desde JS -->
+                        </tbody>
                     </table>
-
-                    <div class="mt-3">
+                    <div class="mb-3 mt-3">
                         <label asp-for="MontoTotalIngresado" class="form-label"></label>
-                        <div class="input-group">
+                        <div class="input-group" id="MontoTotal">
                             <span class="input-group-text">₡</span>
-                            <input id="MontoTotalIngresado" class="form-control" type="text" readonly />
-                            <input asp-for="MontoTotalIngresado" type="hidden" id="MontoTotalIngresadoHidden" name="MontoTotalIngresado" />
-
+                            <input asp-for="MontoTotalIngresado" class="form-control" placeholder="Ingrese el monto en colones" readonly />
                         </div>
                         <span asp-validation-for="MontoTotalIngresado" class="text-danger"></span>
                     </div>
                 </div>
+               
             </div>
+            
         </div>
+
+       
+
+
     </div>
 
     <input type="hidden" name="DetalleDocumentoIngresoJson" id="DetalleDocumentoIngresoJson" value="@Model.DetalleDocumentoIngresoJson" />
-    <input type="hidden" name="TipoOrigenIngreso" id="TipoOrigenIngreso" value="@Model.TipoOrigenIngreso" />
 
     <div class="mt-4">
         <input type="submit" value="Guardar Movimiento" class="btn btn-success" />
@@ -148,7 +129,37 @@
             </div>
 
             <div class="modal-body">
-                
+              
+
+                <!-- Cliente -->
+                <div class="mb-2 d-none" id="grupoCliente">
+                    <label class="form-label">Cliente</label>
+                    <select id="modalIdCliente" class="form-select">
+                        <option selected disabled>Seleccione un cliente</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+
+                <!-- Financista -->
+                <div class="mb-2 d-none" id="grupoFinancista">
+                    <label class="form-label">Financista</label>
+                    <select id="modalIdFinancista" class="form-select">
+                        <option selected disabled>Seleccione un financista</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+
+                <!-- Actividad -->
+                <div class="mb-2 d-none" id="grupoActividad">
+                    <label class="form-label">Actividad</label>
+                    <select id="modalIdActividad" class="form-select">
+                        <option selected disabled>Seleccione una actividad</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+
+                <hr />
+
                 <div class="mb-2">
                     <label class="form-label">N° Comprobante</label>
                     <input type="text" id="modalNumComprobante" class="form-control" />
@@ -179,7 +190,6 @@
                 <button type="button" id="addDetailIngresoBtn" class="btn btn-success">Agregar</button>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -187,6 +197,24 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        const rutasFactura = {
+            obtenerAsociados: '@Url.Action("ObtenerAsociadosPorAsociacion", "TbMovimientoIngresos")',
+            obtenerConceptos: '@Url.Action("ObtenerConceptosPorAsociacion", "TbMovimientoIngresos")',
+            obtenerFinancistas: '@Url.Action("ObtenerFinancistasPorAsociacion", "TbMovimientoIngresos")',
+            obtenerClientes: '@Url.Action("ObtenerClientesPorAsociacion", "TbMovimientoIngresos")',
+            obtenerActividades: '@Url.Action("ObtenerActividadesPorAsociacion", "TbMovimientoIngresos")',
+            obtenerMontoActividad: '@Url.Action("ObtenerMontoActividad", "TbMovimientoIngresos")',
+
+
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/MovimientoIngresosScripts/MovimientoIngresoFormHandler.js"></script>
+    <!-- Summernote CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+
+    <!-- Summernote JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+    <script src="~/js/MovimientoIngresosScripts/MovimientoIngresoH.js"></script>
 }

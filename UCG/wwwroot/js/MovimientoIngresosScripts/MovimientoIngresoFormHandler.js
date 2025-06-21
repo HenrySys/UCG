@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectActividad = document.getElementById("IdActividad");
     const selectFinancista = document.getElementById("IdFinancista");
 
-    // Selección de elementos del modal
 
     const documentosIngreso = [];
 

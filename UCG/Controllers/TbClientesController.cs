@@ -39,6 +39,8 @@ namespace UCG.Controllers
 
             var tbCliente = await _context.TbClientes
                 .Include(t => t.IdAsociacionNavigation)
+                .Include(t => t.TbDocumentoIngresos)
+
                 .FirstOrDefaultAsync(m => m.IdCliente == id);
             if (tbCliente == null)
             {

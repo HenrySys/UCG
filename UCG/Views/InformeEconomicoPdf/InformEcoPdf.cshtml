@@ -1,10 +1,10 @@
-﻿@{
-    ViewData["Title"] = "InformEcoPdf";
-}
+﻿@model UCG.Models.ViewModels.InformeEconomicoViewModel
 @{
     Layout = null;
     string formato(decimal valor) => valor.ToString("C", new System.Globalization.CultureInfo("es-CR"));
+    int maxFilas = Math.Max(Math.Max(Model.Ingresos.Count, Model.Egresos.Count), 1);
 }
+
 
 <!DOCTYPE html>
 <html>
@@ -26,13 +26,18 @@
         <p>
             Señor(a) _____________________________, portador(a) del documento de identidad número _______________________ (cédula identidad o residencia),
             en el cargo de la presidencia y señor(a) _____________________________, portador(a) del documento de identidad número _______________________,
-            en el cargo de la tesorería, de la organización comunal denominada _____________________________,
-            cédula jurídica N° _____________________________,
-            advertidos del delito de perjurio contemplado en el artículo 309 del Código Penal, declaramos que la información brindada en este formulario corresponde al detalle de todos los movimientos económicos realizados durante el año ________________, mismos que son legítimos y verdaderos.
+            en el cargo de la tesorería, de la organización comunal denominada <strong>@Model.Asociacion?.Nombre</strong>,
+            cédula jurídica N° <strong>@Model.Asociacion?.CedulaJuridica</strong>,
+            advertidos del delito...
         </p>
         <p>
-            Nº código de registro ___________, provincia ___________, cantón ___________, distrito ___________<br />
-            Para notificaciones: Número de teléfono ___________ Número de Fax ___________ Correo electrónico ___________
+            Nº código de registro <strong>@Model.Asociacion?.CodigoRegistro</strong>,
+            provincia <strong>@Model.Asociacion?.Provincia</strong>,
+            cantón <strong>@Model.Asociacion?.Canton</strong>,
+            distrito <strong>@Model.Asociacion?.Distrito</strong><br />
+            Para notificaciones: Número de teléfono <strong>@Model.Asociacion?.Telefono</strong>,
+            Número de Fax <strong>@Model.Asociacion?.Fax</strong>,
+            Correo electrónico <strong>@Model.Asociacion?.Correo</strong>
         </p>
     </div>
 
@@ -50,33 +55,34 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 1; i <= 15; i++)
+            @for (int i = 0; i < maxFilas; i++)
             {
                 <tr>
-                    <td>@i.</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>@(i + 1). @(Model.Ingresos.ElementAtOrDefault(i)?.Descripcion ?? "")</td>
+                    <td>@formato(Model.Ingresos.ElementAtOrDefault(i)?.MontoTotalIngresado ?? 0)</td>
+                    <td>@(i + 1). @(Model.Egresos.ElementAtOrDefault(i)?.Descripcion ?? "")</td>
+                    <td>@formato(Model.Egresos.ElementAtOrDefault(i)?.Monto ?? 0)</td>
                 </tr>
             }
             <tr class="highlight">
                 <td>Total de entradas en el período</td>
-                <td>₡</td>
+                <td>@formato(Model.TotalIngresos)</td>
                 <td>Total de salidas en el período</td>
-                <td>₡</td>
+                <td>@formato(Model.TotalEgresos)</td>
             </tr>
             <tr class="highlight">
                 <td>Saldo inicial del período</td>
-                <td>₡</td>
+                <td>@formato(Model.SaldoInicial)</td>
                 <td>Saldo final en caja al 31 de diciembre</td>
-                <td>₡</td>
+                <td>@formato(Model.SaldoFinal)</td>
             </tr>
             <tr class="highlight">
                 <td>Total de entradas más el saldo inicial del período</td>
-                <td>₡</td>
+                <td>@formato(Model.TotalIngresosConSaldo)</td>
                 <td>Total de salidas más el saldo final del período</td>
-                <td>₡</td>
+                <td>@formato(Model.TotalEgresosConSaldo)</td>
             </tr>
+
         </tbody>
     </table>
         

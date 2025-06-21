@@ -6,14 +6,23 @@
 
 <h1 class="text-center mb-4">Detalle del Financista</h1>
 <hr />
-<div class="row justify-content-center">
-    <div class="col-lg-7">
-        <div class="card shadow">
+<div class="row g-4 justify-content-center">
+
+    <!-- Card izquierda: Información del Financista -->
+    <div class="col-lg-6">
+        <div class="card shadow h-100">
             <div class="card-header">
                 Información del Financista
             </div>
             <div class="card-body">
                 <dl class="row">
+                    <dt class="col-sm-4 mb-3">Asociación</dt>
+                    <dd class="col-sm-8 mb-3">
+                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacion">
+                            @Model.IdAsociacionNavigation?.Nombre
+                        </a>
+                    </dd>
+
                     <dt class="col-sm-4 mb-3">Nombre</dt>
                     <dd class="col-sm-8 mb-3">@Model.Nombre</dd>
 
@@ -40,13 +49,6 @@
                             <span class="text-muted">No especificado</span>
                         }
                     </dd>
-
-                    <dt class="col-sm-4 mb-3">Asociación</dt>
-                    <dd class="col-sm-8 mb-3">
-                        <a asp-controller="TbAsociacions" asp-action="Details" asp-route-id="@Model.IdAsociacionNavigation.IdAsociacion">
-                            @Model.IdAsociacionNavigation.Nombre
-                        </a>
-                    </dd>
                 </dl>
 
                 <div class="d-flex justify-content-between mt-4">
@@ -56,4 +58,49 @@
             </div>
         </div>
     </div>
+
+    <!-- Card derecha: Documentos de ingreso relacionados -->
+    <div class="col-lg-4">
+        <div class="card shadow h-100">
+            <div class="card-header bg-secondary-emphasis d-flex justify-content-between align-items-center">
+                <span>Documentos Relacionados</span>
+            </div>
+            <div class="card-body">
+                <table id="tablaDocumentos" class="table table-striped table-hover display">
+                    <thead>
+                        <tr>
+                            <th>Comprobante</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doc in Model.TbDocumentoIngresos)
+                        {
+                            <tr>
+                                <td>@doc.NumComprobante</td>
+                                <td>@doc.FechaComprobante?.ToString("dd/MM/yyyy")</td>
+                                <td>@doc.Monto?.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<!-- DataTables CSS con Bootstrap -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="~/js/FinancistaScripts/FinancistaDetail.js"></script>
+
+
+   
+}

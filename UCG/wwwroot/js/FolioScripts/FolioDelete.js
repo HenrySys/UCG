@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
     const successMessage = $('#tempDataSwal').data('success');
     const errorMessage = $('#tempDataSwal').data('error');
+
     // 🔹 Confirmación antes de eliminar
     const deleteBtn = document.getElementById('btnConfirmDelete');
     if (deleteBtn) {
@@ -18,7 +19,20 @@
                 }
             });
         });
-    }}else if (errorMessage) {
+    }
+
+    // 🔹 Mensaje de éxito
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: successMessage,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    // 🔹 Mensaje de error
+    if (errorMessage) {
         Swal.fire({
             icon: 'error',
             title: 'Error',

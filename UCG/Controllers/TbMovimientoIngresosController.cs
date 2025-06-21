@@ -123,6 +123,28 @@ namespace UCG.Controllers
         }
 
 
+        [HttpGet]
+        public JsonResult ObtenerAsociadosPorAsociacion(int idAsociacion)
+        {
+            try
+            {
+                var asociados = _context.TbAsociados
+                    .Where(c => c.IdAsociacion == idAsociacion)
+                    .ToList();
+
+                if (!asociados.Any())
+                {
+                    return Json(new { success = false, message = "No hay asociados disponibles." });
+                }
+
+                return Json(new { success = true, data = asociados });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al obtener los asociados: " + ex.Message });
+            }
+        }
+
 
         // GET: TbMovimientoIngresos/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -335,7 +357,8 @@ namespace UCG.Controllers
                     {
                         idConceptoAsociacion = ca.IdConceptoAsociacion,
                         descripcionPersonalizada = ca.DescripcionPersonalizada ?? "(Sin descripción)",
-                        tipoOrigen = (int?)ca.IdConceptoNavigation.TipoOrigenIngreso
+                        tipoOrigen = ca.IdConceptoNavigation!.TipoOrigenIngreso!.ToString()
+
                     })
                     .ToList();
 
@@ -425,9 +448,17 @@ namespace UCG.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult ObtenerMontoActividad(int idActividad)
+        {
+            var monto = _context.TbActividads
+                .Where(a => a.IdActividad == idActividad)
+                .Select(a => a.MontoTotalRecuadado) // o el campo correspondiente
+                .FirstOrDefault();
 
-
-
+            return Json(new { success = true, monto = monto });
+        }
 
     }
+
 }

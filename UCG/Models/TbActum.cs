@@ -15,8 +15,7 @@ public partial class TbActum
         Inactivo = 2,
 
         [Display(Name = "En Proceso")]
-        EnProceso = 3
-        
+        EnProceso = 3 
     }
 
     public enum TipoDeActa
@@ -51,8 +50,6 @@ public partial class TbActum
     public virtual TbAsociado? IdAsociadoNavigation { get; set; }
     [Display(Name = "Folio")]
     public virtual TbFolio? IdFolioNavigation { get; set; }
-
-
 
     public virtual ICollection<TbActaAsistencium> TbActaAsistencias { get; } = new List<TbActaAsistencium>();
 

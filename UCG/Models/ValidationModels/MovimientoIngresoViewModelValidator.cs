@@ -56,7 +56,7 @@ namespace UCG.Models.ValidationModels
             return !string.IsNullOrWhiteSpace(fecha) &&
                 DateTime.TryParseExact(
                     fecha,
-                    "yyyy-MM-dd",
+                    "yyyy-MM-aa",
                     System.Globalization.CultureInfo.InvariantCulture,
                     System.Globalization.DateTimeStyles.None,
                     out _);

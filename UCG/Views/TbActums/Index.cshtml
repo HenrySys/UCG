@@ -80,10 +80,10 @@
                 </td>
 
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation.IdAsociacion)
+                    @Html.DisplayFor(modelItem => item.IdAsociacionNavigation!.Nombre)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdAsociadoNavigation.IdAsociado)
+                    @Html.DisplayFor(modelItem => item.IdAsociadoNavigation!.Nombre)
                 </td>
                     <td class="action-links text-end">
                         <a asp-action="Edit" asp-route-id="@item.IdActa" class="btn btn-secondary" title="Editar">
@@ -108,6 +108,8 @@
     @{
         <!-- Tu script separado -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>

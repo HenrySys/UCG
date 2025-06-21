@@ -5,8 +5,14 @@ using UCG.Services;
 using Rotativa.AspNetCore; // Importar Rotativa
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+var culturaCR = new CultureInfo("es-CR");
+CultureInfo.DefaultThreadCurrentCulture = culturaCR;
+CultureInfo.DefaultThreadCurrentUICulture = culturaCR;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

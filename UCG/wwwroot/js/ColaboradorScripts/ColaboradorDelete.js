@@ -1,6 +1,27 @@
 ﻿$(document).ready(function () {
     const successMessage = $('#tempDataSwal').data('success');
     const errorMessage = $('#tempDataSwal').data('error');
+
+    // 🔹 Mostrar mensaje de éxito si existe
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: successMessage,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    // 🔹 Mostrar mensaje de error si existe
+    else if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
     // 🔹 Confirmación antes de eliminar
     const deleteBtn = document.getElementById('btnConfirmDelete');
     if (deleteBtn) {
@@ -17,13 +38,6 @@
                     this.closest('form').submit();
                 }
             });
-        });
-    }}else if (errorMessage) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: errorMessage,
-            confirmButtonText: 'Aceptar'
         });
     }
 });

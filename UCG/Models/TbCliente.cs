@@ -12,7 +12,7 @@ public partial class TbCliente
         Activo = 1,
 
         [Display(Name = "Inactivo")]
-        Inactivo = 2,
+        Inactivo = 2
 
     }
 
